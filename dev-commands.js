@@ -10,6 +10,20 @@ const commands = [
     .setName("ping")
     .setDescription("Replies with pong!"),
   new SlashCommandBuilder()
+    .setName("suggestion")
+    .setDescription("dev suggestion commands")
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("delete")
+        .setDescription("deletes a suggestion")
+        .addIntegerOption((option) =>
+          option
+            .setName("id")
+            .setDescription("selects the ID of the suggestion")
+            .setRequired(true)
+        )
+    ),
+  new SlashCommandBuilder()
     .setName("additem")
     .setDescription("Add items to database")
     .addStringOption((option) =>

@@ -7,9 +7,10 @@
     "start": "npm run deploy && npm run bot",
     "bot": "node bot.js",
     "deploy": "node deploy-commands.js",
-    "startdev": "npm run dev-commands && npm run dev",
+    "startdev": "npm run database && npm run dev-commands && npm run dev",
     "dev": "node dev.js",
-    "dev-commands": "node dev-commands.js"
+    "dev-commands": "node dev-commands.js",
+    "database": "node database.js"
   },
   "author": "",
   "license": "ISC",

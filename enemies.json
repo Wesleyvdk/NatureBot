@@ -1,0 +1,20 @@
+{
+  "enemies": {
+    "goblin": {
+      "minLevel": 1,
+      "maxLevel": 5,
+      "enemyStats": {
+        "damage": "5-10",
+        "specialAttackDamage": "10-20"
+      }
+    },
+    "orcs": {
+      "minLevel": 5,
+      "maxLevel": 10,
+      "enemyStats": {
+        "damage": "10-20",
+        "specialAttackDamage": "30-40"
+      }
+    }
+  }
+}

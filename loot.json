@@ -1,0 +1,32 @@
+{
+  "lootChest": {
+    "tier1": {
+      "loot": {
+        "amount": 2,
+        "type": "rare"
+      }
+    },
+    "tier2": {
+      "loot": {
+        "amount": 2,
+        "type": "rare"
+      }
+    },
+    "tier3": {
+      "loot": {
+        "amount": 2,
+        "type": "rare"
+      }
+    },
+    "tier4": {
+      "loot": {
+        "amount": 2,
+        "type": "rare"
+      }
+    }
+  },
+  "lootDrop": {
+    "type": "monster item, loot box, currency",
+    "chance": 1
+  }
+}

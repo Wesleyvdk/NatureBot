@@ -1,0 +1,31 @@
+{
+  "name": "wevi_schedule",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "start": "npm run deploy && npm run bot",
+    "bot": "node bot.js",
+    "deploy": "node deploy-commands.js",
+    "startdev": "npm run dev-commands && npm run dev",
+    "dev": "node dev.js",
+    "dev-commands": "node dev-commands.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.15.0",
+    "@discordjs/rest": "^0.5.0",
+    "@napi-rs/canvas": "^0.1.41",
+    "better-sqlite3": "^7.5.3",
+    "digitalocean": "^1.2.1",
+    "discord-api-types": "^0.36.0",
+    "discord.js": "^14.8.0",
+    "fetch": "^1.1.0",
+    "moment": "^2.29.4",
+    "node-fetch": "^2.6.9"
+  },
+  "devDependencies": {
+    "eslint": "^8.19.0"
+  }
+}

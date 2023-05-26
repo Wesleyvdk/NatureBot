@@ -1,0 +1,474 @@
+{
+  "class": {
+    "Mage": {
+      "starterStats": {
+        "HP": 50,
+        "Mana": 100,
+        "Stats": " +5 Intellect, +2 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "staff",
+        "WeaponName": "Arcane Staff",
+        "WeaponId": "1",
+        "WeaponStats": "+5 Intelligence, +2 Spell Power, +1 Critical Strike Chance",
+        "DamageStats": {
+          "BaseDamage": "10-15",
+          "SpellPowerModifier": "+25%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Shaman": {
+      "starterStats": {
+        "HP": 60,
+        "Mana": 80,
+        "Stats": "+3 Intellect, +2 Spirit, +2 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "totem",
+        "WeaponName": "Earthfury Totem",
+        "WeaponId": "2",
+        "WeaponStats": "+5 Spirit, +2 Spell Power, +1 Critical Strike Chance",
+        "DamageStats": {
+          "BaseDamage": "8-12",
+          "SpellPowerModifier": "+30%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Warrior": {
+      "starterStats": {
+        "HP": 80,
+        "Mana": 20,
+        "Stats": "+5 Strength, +2 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "totem",
+        "WeaponName": "Bronze Longsword",
+        "WeaponId": "3",
+        "WeaponStats": "+5 Strength, +2 Stamina, +1 Critical Strike Chance",
+        "DamageStats": {
+          "BaseDamage": "15-20",
+          "StrengthModifier": "+10%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Druid": {
+      "starterStats": {
+        "HP": 70,
+        "Mana": 60,
+        "Stats": "+4 Intellect, +1 Spirit, +1 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "magic tome",
+        "WeaponName": "Emerald Tome",
+        "WeaponId": "4",
+        "WeaponStats": "+5 Intellect, +2 Spell Power, +1 Critical Strike Chance",
+        "DamageStats": {
+          "BaseDamage": "10-15",
+          "SpellPowerModifier": "+25%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Archer": {
+      "starterStats": {
+        "HP": 60,
+        "Mana": 40,
+        "Stats": "+4 Agility, +1 Stamina, +1 Intellect"
+      },
+      "Weapon": {
+        "WeaponType": "bow",
+        "WeaponName": "Oak Longbow",
+        "WeaponId": "5",
+        "WeaponStats": "+5 Agility, +2 Critical Strike Chance, +1 Haste",
+        "DamageStats": {
+          "BaseDamage": "12-18",
+          "AgilityModifier": "+15%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Rogue": {
+      "starterStats": {
+        "HP": 50,
+        "Mana": 20,
+        "Stats": "+5 Agility, +2 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "dagger",
+        "WeaponName": "Shadowblade",
+        "WeaponId": "6",
+        "WeaponStats": "+5 Agility +2 Critical Strike Chance +1 Haste",
+        "DamageStats": {
+          "BaseDamage": "8-12",
+          "AgilityModifier": "+25%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Paladin": {
+      "starterStats": {
+        " HP": 90,
+        "Mana": 20,
+        "Stats": "+4 Strength, +1 Spirit, +1 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "mace",
+        "WeaponName": "Light's Justice",
+        "WeaponId": "7",
+        "WeaponStats": "+5 Strength, +2 Intellect, +1 Haste",
+        "DamageStats": {
+          "BaseDamage": "12-18",
+          "StrengthModifier": "+10%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Necromancer": {
+      "starterStats": {
+        "HP": 50,
+        "Mana": 100,
+        "Stats": "+4 Intellect, +2 Spirit"
+      },
+      "Weapon": {
+        "WeaponType": "scepter",
+        "WeaponName": "Necrotic Scepter",
+        "WeaponId": "8",
+        "WeaponStats": "+5 Intellect +2 Spell Power +1 Critical Strike Chance",
+        "DamageStats": {
+          "BaseDamage": "10-15",
+          "SpellPowerModifier": "+25%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Bard": {
+      "starterStats": {
+        "HP": 60,
+        "Mana": 60,
+        "Stats": " +3 Intellect, +1 Spirit, +1 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "lute",
+        "WeaponName": "Melodic Lute",
+        "WeaponId": "9",
+        "WeaponStats": "+5 Spirit +2 Haste +1 Critical Strike Chance",
+        "DamageStats": {
+          "BaseDamage": "8-12",
+          "SpellPowerModifier": "+20%"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    },
+    "Gunslinger": {
+      "starterStats": {
+        "HP": 100,
+        "Mana": 50,
+        "Stats": "+5 Intellect, +2 Stamina"
+      },
+      "Weapon": {
+        "WeaponType": "gun",
+        "WeaponName": "Revolver",
+        "WeaponId": "10",
+        "WeaponStats": "TBD",
+        "DamageStats": {
+          "BaseDamage": "15-20",
+          "TBDModifier": "TBD"
+        }
+      },
+      "Abilities": {
+        "ability_1": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_2": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_3": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        },
+        "ability_4": {
+          "name": "",
+          "description": "",
+          "stats": {
+            "damage": ""
+          }
+        }
+      }
+    }
+  }
+}

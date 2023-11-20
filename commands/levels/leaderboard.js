@@ -24,11 +24,9 @@ module.exports = {
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "leaderboard"`
       );
 
-    const top10 = ldb
-      .prepare(
-        "SELECT * FROM levels WHERE guild = ? ORDER BY experience DESC LIMIT 10;"
-      )
-      .all(interaction.guild.id);
+    const top10 = conn
+      .promise()
+      .query("SELECT * FROM VampLevels ORDER BY experience DESC LIMIT 10;");
     // let user = client.getLevels.get(userid, interaction.guild.id);
     // Now shake it and show it! (as a nice embed, too!)
     const embed = new EmbedBuilder()
@@ -41,8 +39,8 @@ module.exports = {
       //const user = client.users.cache.get(data.user);
       //console.log(data.user, user)
       embed.addFields({
-        name: data.userName,
-        value: `level: ${data.level}  exp:   ${data.experience}`,
+        name: data.name,
+        value: `level: ${data.level}  exp:   ${data.exp}`,
       });
     }
     return interaction.editReply({ embeds: [embed] });

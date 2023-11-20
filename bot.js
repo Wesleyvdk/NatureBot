@@ -261,68 +261,28 @@ client.on("messageCreate", async (message) => {
             (role) => role.name === "HiRe Pro"
           );
           message.member.roles.add(role);
-          try {
-            const prevRole = guild.roles.cache.find(
-              (prevRole) => prevRole.name === "Ai Novice"
-            );
-            message.member.roles.remove(prevRole);
-          } catch (e) {
-            console.log(e);
-          }
         }
         if (rows[0].level === 15) {
           const role = message.guild.roles.cache.find(
             (role) => role.name === "Promptologist"
           );
           message.member.roles.add(role);
-          try {
-            const prevRole = guild.roles.cache.find(
-              (prevRole) => prevRole.name === "HiRe Pro"
-            );
-            message.member.roles.remove(prevRole);
-          } catch (e) {
-            console.log(e);
-          }
         }
         if (rows[0].level === 20) {
           const role = guild.roles.cache.find((role) => role.name === "Ai Pro");
           message.member.roles.add(role);
-          try {
-            const prevRole = guild.roles.cache.find(
-              (prevRole) => prevRole.name === "Promptologist"
-            );
-            message.member.roles.remove(prevRole);
-          } catch (e) {
-            console.log(e);
-          }
         }
         if (rows[0].level === 25) {
           const role = guild.roles.cache.find(
             (role) => role.name === "LoRe Expert"
           );
           message.member.roles.add(role);
-          try {
-            const prevRole = guild.roles.cache.find(
-              (prevRole) => prevRole.name === "Ai Pro"
-            );
-            message.member.roles.remove(prevRole);
-          } catch (e) {
-            console.log(e);
-          }
         }
         if (rows[0].level === 30) {
           const role = guild.roles.cache.find(
             (role) => role.name === "Ultimate Upscale Pro"
           );
           message.member.roles.add(role);
-          try {
-            const prevRole = guild.roles.cache.find(
-              (prevRole) => prevRole.name === "LoRe Expert"
-            );
-            message.member.roles.remove(prevRole);
-          } catch (e) {
-            console.log(e);
-          }
         }
       }
     }

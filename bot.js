@@ -1,18 +1,39 @@
-import {
+const fs = require("node:fs");
+const path = require("node:path");
+const {
     Client,
+    Collection,
+    Events,
     GatewayIntentBits,
     Partials,
     EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    Embed,
-    ButtonInteraction,
-    StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder,
-    ComponentType,
-    AttachmentBuilder,
-} from 'discord.js';
+} = require("discord.js");
+import { Database } from "bun:sqlite"
+const mysql = require("mysql2");
+const conn = mysql.createConnection(process.env.DATABASE_URL);
+conn.connect(function (err) {
+    if (err) throw err;
+    console.log("Succesfully connected to PlanetScale!");
+});
+// arrays
+const number = [
+    50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68,
+    69,
+];
+// databases
+const ldb = new Database("./databases/levels.sqlite");
+const cdb = new Database("./databases/currency.sqlite");
+const fdb = new Database("./databases/family.sqlite");
+const rdb = new Database("./databases/roleplay.sqlite");
+const battleDB = new Database("./databases/battlegame.sqlite");
+const suggestionDB = new Database("./databases/suggestion.sqlite");
+// variables
+let counter = 0;
+let dropMessage = false;
+let randomMoney = 0;
+let randNumber = number[Math.floor(Math.random() * number.length)];
+
+
 const client = new Client({
     intents: [
         GatewayIntentBits.DirectMessages,
@@ -32,394 +53,616 @@ const client = new Client({
         Partials.GuildScheduledEvent,
     ],
 });
+const PREFIX = "."
 
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+client.commands = new Collection();
+const foldersPath = path.join(__dirname, "commands");
+const commandFolders = fs.readdirSync(foldersPath);
+
+for (const folder of commandFolders) {
+    const commandsPath = path.join(foldersPath, folder);
+    const commandFiles = fs
+        .readdirSync(commandsPath)
+        .filter((file) => file.endsWith(".js"));
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = require(filePath);
+        if ("data" in command && "execute" in command) {
+            client.commands.set(command.data.name, command);
+        } else {
+            console.log(
+                `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+            );
+        }
+    }
+}
+client.once(Events.ClientReady, async () => {
+    const levelTable = ldb
+        .prepare(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name = 'levels';"
+        )
+        .get();
+    const currencyTable = cdb
+        .prepare(
+            "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'currency';"
+        )
+        .get();
+
+    const familyTable = fdb
+        .prepare(
+            "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'family';"
+        )
+        .get();
+    const rpTable = rdb
+        .prepare(
+            "SELECT count() FROM sqlite_master where type='table' AND name = 'roleplay';"
+        )
+        .get();
+    const bgPlayerTable = battleDB
+        .prepare(
+            "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'player';"
+        )
+        .get();
+    const bgLootTable = battleDB
+        .prepare(
+            "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'loot';"
+        )
+        .get();
+    const suggestionTable = suggestionDB
+        .prepare(
+            "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'suggestion';"
+        )
+        .get();
+    await createDatabases(
+        levelTable,
+        currencyTable,
+        familyTable,
+        rpTable,
+        bgPlayerTable,
+        bgLootTable,
+        suggestionTable
+    );
+    await getDatabases();
+
+    console.log(`logged in as: ${client.user.username}. ready to be used!`);
+    console.log();
+    const channelId = "929363312527953950";
+    const channel = await client.channels.fetch(channelId);
+    // const embed = new EmbedBuilder()
+    //   .setTitle("BOT UPDATES")
+    //   .addFields(
+    //     { name: "ADDED", value: "Boop", inline: true },
+    //     { name: "ADDED", value: "Hug", inline: true },
+    //     { name: "ADDED", value: "Kiss", inline: true },
+    //     { name: "ADDED", value: "Slap", inline: true },
+    //     { name: "ADDED", value: "Cry", inline: true },
+    //     { name: "ADDED", value: "Handholding", inline: true },
+    //     { name: "ADDED", value: "Pat", inline: true },
+    //     { name: "ADDED", value: "Spank", inline: true },
+    //     { name: "\u200B", value: "\u200B", inline: true },
+    //     { name: "ADDED", value: "Adopt", inline: true },
+    //     { name: "ADDED", value: "Disown", inline: true },
+    //     { name: "ADDED", value: "Children", inline: true }
+    //   )
+    //   .setTimestamp();
+
+    // channel.send({ embeds: [embed] });
 });
 
-client.on('interactionCreate', async interaction => {
+client.on("messageCreate", async (message) => {
+    try {
+        if (message.author.bot) return;
+        const guild = client.guilds.cache.get("937728755223367741");
+        if (message.guild.id == guild) {
+            if (message.author.bot) return;
+            userid = message.author.id;
+            username = message.author.username;
+            user = message.author;
+            conn
+                .promise()
+                .query(
+                    "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
+                    [userid, username]
+                );
+
+            conn
+                .promise()
+                .execute("SELECT * FROM `VampLevels` WHERE id=?", [userid])
+                .then(async ([rows, fields]) => {
+                    add_experience(rows);
+                    level_up(rows, user);
+
+                });
+
+            await add_experience(rUser);
+            await level_up(rUser, user, message);
+            await client.setLevels.run(rUser);
+        }
+
+        async function check_level_reward(rUser, message) {
+            const roles = [
+                "Member",
+                "Ai Novice",
+                "HiRe Pro",
+                "Promptologist",
+                "Ai Pro",
+                "LoRe Expert",
+                "Ultimate Upscale Pro",
+            ];
+            const member = message.member;
+            const roleLevel = 1;
+            const roleName = `level ${roleLevel}`;
+            for (i = 0; i < roles.length; i++) {
+                const role = message.guild.roles.cache.find(
+                    (role) => role.name === roles[i]
+                );
+                if (!role) {
+                    guild.roles
+                        .create({
+                            name: roles[i],
+                        })
+                        .then((createdRole) => {
+                            console.log(`Role created: ${createdRole.name}`);
+                            // if (roleLevel == 1) roleLevel + 4
+                            // else if (roleLevel == 5) roleLevel + 5
+                            // else if (roleLevel >= 10) roleLevel + 10
+                        })
+                        .catch(console.error);
+                }
+
+                if (rUser.level === 1) {
+                    const role = guild.roles.cache.find(
+                        (role) => role.name === "Member"
+                    );
+                    message.member.roles.add(role);
+                }
+                if (rUser.level === 5) {
+                    const role = guild.roles.cache.find(
+                        (role) => role.name === "Ai Novice"
+                    );
+                    message.member.roles.add(role);
+                }
+                if (rUser.level === 10) {
+                    const role = guild.roles.cache.find(
+                        (role) => role.name === "HiRe Pro"
+                    );
+                    message.member.roles.add(role);
+                    try {
+                        const prevRole = guild.roles.cache.find(
+                            (prevRole) => prevRole.name === "Ai Novice"
+                        );
+                        message.member.roles.remove(prevRole);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                if (rUser.level === 15) {
+                    const role = message.guild.roles.cache.find(
+                        (role) => role.name === "Promptologist"
+                    );
+                    message.member.roles.add(role);
+                    try {
+                        const prevRole = guild.roles.cache.find(
+                            (prevRole) => prevRole.name === "HiRe Pro"
+                        );
+                        message.member.roles.remove(prevRole);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                if (rUser.level === 20) {
+                    const role = guild.roles.cache.find(
+                        (role) => role.name === "Ai Pro"
+                    );
+                    message.member.roles.add(role);
+                    try {
+                        const prevRole = guild.roles.cache.find(
+                            (prevRole) => prevRole.name === "Promptologist"
+                        );
+                        message.member.roles.remove(prevRole);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                if (rUser.level === 25) {
+                    const role = guild.roles.cache.find(
+                        (role) => role.name === "LoRe Expert"
+                    );
+                    message.member.roles.add(role);
+                    try {
+                        const prevRole = guild.roles.cache.find(
+                            (prevRole) => prevRole.name === "Ai Pro"
+                        );
+                        message.member.roles.remove(prevRole);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+                if (rUser.level === 30) {
+                    const role = guild.roles.cache.find(
+                        (role) => role.name === "Ultimate Upscale Pro"
+                    );
+                    message.member.roles.add(role);
+                    try {
+                        const prevRole = guild.roles.cache.find(
+                            (prevRole) => prevRole.name === "LoRe Expert"
+                        );
+                        message.member.roles.remove(prevRole);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                }
+            }
+        }
+        async function add_experience() {
+            exp = rows[0].exp;
+            newExp = exp += 5;
+
+            conn.query(`UPDATE VampLevels SET exp = ${newExp} WHERE id = ?`, [userid]);
+        }
+
+        async function level_up(rows, user) {
+            xp = rows[0].exp;
+            lvl_start = rows[0].level;
+            lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+
+            let round = Math.floor(lvl_end);
+            let lvl_up = Number(round);
+
+            if (lvl_up < 0) {
+                conn
+                    .promise()
+                    .query(
+                        `UPDATE VampLevels SET level = ${rows[0].level} + 1 WHERE id = ?`,
+                        [userid]
+                    )
+                    .then(
+                        message.channel.send(
+                            `${user} has leveled up to level ${rows[0].level + 1}`
+                        )
+                    );
+            }
+            await check_level_reward(rUser, message);
+        }
+
+        if (message.content.startsWith(".addBump")) {
+            const roleName = "bumper";
+            const guild = message.guild;
+            const role = guild.roles.cache.find((role) => role.name === roleName);
+            if (!role) {
+                await guild.roles
+                    .create({
+                        name: roleName,
+                    })
+                    .then((createdRole) => {
+                        console.log(`Role created: ${createdRole.name}`);
+                        message.channel.send(`I created the role ${createdRole.name}`);
+                        message.member.roles.add(createdRole);
+                        message.reply(
+                            `I gave you the role. remove the role using \`.delBump\``
+                        );
+                    })
+                    .catch(console.error);
+            } else {
+                message.member.roles.add(role).then(() => {
+                    message.reply(
+                        `I gave you the role. remove the role using \`.delBump\``
+                    );
+                });
+            }
+        }
+        if (message.content.startsWith(".delBump")) {
+            const roleName = "bumper";
+            const role = message.guild.roles.cache.find(
+                (role) => role.name === roleName
+            );
+
+            message.member.roles.remove(role).then(() => {
+                message.reply(
+                    `I removed the role. If you want to be reminded of bumps, use \`.addBump\``
+                );
+            });
+        }
+
+        const keyword = "Bump done";
+        const roleName = "bumper";
+        const role = message.guild.roles.cache.find(
+            (role) => role.name === roleName
+        );
+        const embed = message.embeds[0];
+        try {
+            if (embed) {
+                try {
+                    if (embed.description.includes(keyword)) {
+                        message.channel.send(
+                            `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
+                if this role does not exist, the role will be created on first use of the .addBump command`
+                        );
+
+                        const delay = 2 * 60 * 60 * 1000;
+                        // in milliseconds
+                        if (role) {
+                            const roleMention = role.toString();
+                            setTimeout(() => {
+                                // Send a message to the channel where the command was used
+                                message.channel.send(`bump is ready ${roleMention}`);
+                            }, delay);
+                        } else {
+                            setTimeout(() => {
+                                // Send a message to the channel where the command was used
+                                message.channel.send("bump is ready");
+                            }, delay);
+                        }
+
+                        // Log the title and description of the embed
+                        // console.log(`Title: ${embed.title}`);
+                        // console.log(`Description: ${embed.description}`);
+                    } else {
+                        return;
+                    }
+                } catch (e) {
+                    console.log(`Error: ${e.message}`);
+                }
+            }
+        } catch (e) {
+            console.log(`Error: ${e.message}`);
+        }
+
+
+        if (message.channel.id === "929352993701253154") return;
+        if (message.channel.id === "929352993701253154") return;
+        if (message.channel.id === "929352994158419971") return;
+        if (message.channel.id === "1085133582596591657") return;
+        if (message.channel.id === "1085129112961691729") return;
+        if (message.channel.id === "1007281491568492634") return;
+        if (message.channel.id === "938036238101921844") return;
+        currDrop(message);
+    } catch (e) {
+        console.log(e);
+    }
+
+});
+
+client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === 'bored') {
-        const response = await fetch("http://www.boredapi.com/api/activity/")
-        const data = await response.json();
-        interaction.reply(data.activity);
-    }
-    //start command
-    if (interaction.commandName === 'uno') {
-        await interaction.deferReply();
-        const players = [];
-        //wait for max 4 people to join
-        const embed = new EmbedBuilder();
-        embed.setDescription("Join this uno game!")
-        const button = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId("join")
-                .setLabel("Join")
-                .setStyle(ButtonStyle.Success)
-        );
-        interaction.editReply({ embeds: [embed], components: [button] })
-        try {
-            const intCollector =
-                interaction.channel.createMessageComponentCollector({
-                    componentType: ComponentType.Button,
-                });
-            intCollector.on("collect", async (i) => {
-                if (i.customId === "join") {
-                    if (!players.includes(i.user.id)) {
-                        players.push(i.user.id);
-                        if (players.length == 2) {
-                            const joinButton = new ButtonBuilder()
-                                .setCustomId("join")
-                                .setLabel("Join")
-                                .setStyle(ButtonStyle.Success)
-                            const startButton = new ButtonBuilder()
-                                .setCustomId('start')
-                                .setLabel('Start')
-                                .setStyle(ButtonStyle.Primary);
-                            const newRow = new ActionRowBuilder()
-                                .addComponents(
-                                    joinButton,
-                                    startButton // New Button
-                                );
-                            await interaction.editReply({
-                                components: [newRow]
-                            });
-                        }
-                        if (players.length == 4) {
-                            const newEmbed = new EmbedBuilder();
-                            i.reply({ content: "This uno game is full!" })
-                            newEmbed.setDescription("This uno game is full!").setFooter({ text: 'start a new game using /uno' })
-                            interaction.editReply({ embeds: [newEmbed], components: [] })
-                            let { queue, unoDeck, topCard } = StartGame(players)
-                            const channelId = interaction.channelId;
-                            Play(queue, unoDeck, topCard, channelId)
-                        }
-                        i.reply({
-                            content: `${i.user} has joined the game.`,
-                            components: [],
-                        });
-                    } else {
-                        i.reply({
-                            content: `${i.user} you're already in the game`,
-                            ephemeral: true,
-                        });
-                    }
-                }
-                if (i.customId === "start") {
-                    const newEmbed = new EmbedBuilder();
-                    newEmbed.setDescription("This uno game Started!").setFooter({ text: 'start a new game using /uno' })
-                    await interaction.editReply({ embeds: [newEmbed], components: [] })
-                    const channelId = interaction.channelId;
-                    let { queue, unoDeck, topCard } = StartGame(players)
-                    Play(queue, unoDeck, topCard, channelId)
-                }
-                if (i.customId === "leave") {
-                    if (!usersIngame.includes(i.user.id)) {
-                        i.reply({
-                            content: `${i.user} you're not in the game`,
-                        });
-                    } else {
-                        usersIngame.pop(i.user.id);
-                        i.reply({
-                            content: `${i.user} has left the game`,
-                            components: [],
-                        });
-                    }
-                }
+    const command = client.commands.get(interaction.commandName);
+
+    if (!command) return;
+
+    try {
+        await command.execute(client, interaction);
+    } catch (error) {
+        console.error(error);
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({
+                content: "There was an error while executing this command!",
+                ephemeral: true,
             });
-            intCollector.on("end", (collected) => {
-                console.log(`Collected ${collected.size} interactions.`);
+        } else {
+            await interaction.reply({
+                content: "There was an error while executing this command!",
+                ephemeral: true,
             });
-        } catch (err) {
-            console.log(err);
         }
     }
-
-    function StartGame(players) {
-        let unoDeck = []
-        for (let k = 0; k <= 1; k++) {
-            for (let j = 0; j <= 9; j++) {
-                unoDeck.push(`Red ${j}`)
-                unoDeck.push(`Green ${j}`)
-                unoDeck.push(`Blue ${j}`)
-                unoDeck.push(`Yellow ${j}`)
-            }
-            unoDeck.push(`Red +2`)
-            unoDeck.push(`Green +2`)
-            unoDeck.push(`Blue +2`)
-            unoDeck.push(`Yellow +2`)
-
-            unoDeck.push(`Red Switch`)
-            unoDeck.push(`Green Switch`)
-            unoDeck.push(`Blue Switch`)
-            unoDeck.push(`Yellow Switch`)
-
-            unoDeck.push(`Red Skip`)
-            unoDeck.push(`Green Skip`)
-            unoDeck.push(`Blue Skip`)
-            unoDeck.push(`Yellow Skip`)
-
-            for (let l = 0; l < 2; l++) {
-                unoDeck.push(`+4`)
-                unoDeck.push(`WildCard`)
-            }
-        }
-
-        // give cards to players, implement way to check amount of players, link user with player number
-        if (players.length === 2) {
-
-            let player1 = {
-                playerId: players[0],
-                cards: []
-
-            }
-            let player2 = {
-                playerId: players[1],
-                cards: []
-
-            }
-
-            for (let a = 0; a < 7; a++) {
-
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player1.cards.push(card)
-            }
-            for (let a = 0; a < 7; a++) {
-
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player2.cards.push(card)
-            }
-
-
-            // dm users their cards
-            client.users.send(player1.playerId, `Your cards: ${player1.cards} `)
-            client.users.send(player2.playerId, `Your cards: ${player2.cards} `)
-
-
-            let index = Math.floor(Math.random() * unoDeck.length)
-            let topCard = unoDeck[index];
-            unoDeck.splice(index, 1)
-
-            let queue = [player1, player2]
-            return { queue, unoDeck, topCard }
-
-        }
-        if (players.length === 3) {
-            let player1 = {
-                playerId: players[0],
-                cards: []
-            }
-            let player2 = {
-                playerId: players[1],
-                cards: []
-            }
-            let player3 = {
-                playerId: players[2],
-                cards: []
-            }
-
-            for (let a = 0; a < 7; a++) {
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player1.cards.push(card)
-            }
-            for (let a = 0; a < 7; a++) {
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player2.cards.push(card)
-            }
-            for (let a = 0; a < 7; a++) {
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player3.cards.push(card)
-            }
-
-
-            // dm users their cards
-            client.users.send(player1.playerId, `Your cards: ${player1.cards} `)
-            client.users.send(player2.playerId, `Your cards: ${player2.cards} `)
-            client.users.send(player3.playerId, `Your cards: ${player3.cards} `)
-
-            let index = Math.floor(Math.random() * unoDeck.length)
-            let topCard = unoDeck[index];
-            unoDeck.splice(index, 1)
-
-            let queue = [player1, player2, player3]
-            return { queue, unoDeck, topCard }
-
-        }
-
-        if (players.length === 4) {
-            let player1 = {
-                playerId: players[0],
-                cards: []
-            }
-            let player2 = {
-                playerId: players[1],
-                cards: []
-            }
-            let player3 = {
-                playerId: players[2],
-                cards: []
-            }
-            let player4 = {
-                playerId: players[3],
-                cards: []
-            }
-
-            for (let a = 0; a < 7; a++) {
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player1.cards.push(card)
-            }
-            for (let a = 0; a < 7; a++) {
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player2.cards.push(card)
-            }
-            for (let a = 0; a < 7; a++) {
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player3.cards.push(card)
-            }
-            for (let a = 0; a < 7; a++) {
-                let index = Math.floor(Math.random() * unoDeck.length)
-                let card = unoDeck[index];
-                unoDeck.splice(index, 1)
-                player4.cards.push(card)
-            }
-
-            // dm users their cards
-            client.users.send(player1.playerId, `Your cards: ${player1.cards} `)
-            client.users.send(player2.playerId, `Your cards: ${player2.cards} `)
-            client.users.send(player3.playerId, `Your cards: ${player3.cards} `)
-            client.users.send(player4.playerId, `Your cards: ${player4.cards} `)
-
-            let index = Math.floor(Math.random() * unoDeck.length)
-            let topCard = unoDeck[index];
-            unoDeck.splice(index, 1)
-
-            let queue = [player1, player2, player3, player4]
-            return { queue, unoDeck, topCard }
-        }
-    }
-
-    async function Play(queue, unoDeck, topCard, channelId) {
-        let selection = null
-        // let first player play turn
-        const channel = client.channels.cache.get(channelId);
-        channel.send(`The current top card is: ${topCard}`);
-        let player = queue[0]
-        queue.shift()
-
-        client.users.send(player.playerId, `it's your turn `)
-        const options = player.cards.map((card, i) => {
-            if (card.split(" ")[0] == topCard.split(" ")[0] || card.split(" ")[1] == topCard.split(" ")[1] || card == "+4" || card == "WildCard") // only get playable cards
-                return {
-                    label: card,
-                    value: i.toString()  // assuming you want the card name in lowercase as the value
-                };
-        });
-        const select = new StringSelectMenuBuilder()
-            .setCustomId('cards')
-            .setPlaceholder('Which card do you want xto play?')
-            .addOptions(options);
-        const row = new ActionRowBuilder()
-            .addComponents(select);
-        const user = await client.users.fetch(player.playerId);
-        let response = await user.send({ components: [row] })
-
-        const collector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, max: 1, time: 60_000 });
-
-
-        collector.on('collect', async i => {
-            const selectedValue = i.values[0];
-            const selectedOption = options.find(option => option.value === selectedValue);
-            const selection = selectedOption.label;
-            await i.reply(`${i.user} you played: ${selection}!`);
-            channel.send(`${i.user} has played: ${selection}!`)
-            const index = player.cards.indexOf(selection)
-            player.cards.splice(index, 1)
-            if (player.cards.length == 1) {
-                channel.send(`${i.user}: UNO`)
-            }
-            if (player.cards.length == 0) {
-                channel.send(`${i.user} has won this game!`)
-                return;
-            }
-        });
-
-        collector.on('end', async collected => {
-            const interaction = collected.first();  // Get the first item collected
-            const selectedValue = interaction.values[0];
-            const selectedOption = options.find(option => option.value === selectedValue);
-            const selection = selectedOption.label;
-
-            queue.push(player)
-
-            // check card being placed. +2 or +4: let next player grab; switch: reverse order; skip: skip next player.
-            if (selection.includes('+2')) {
-                if (queue[0].cards.includes("+2"))
-                    client.users.send(queue[0].playerId, `You have to draw 2 cards`)
-                for (let i = 0; i <= 1; i++) {
-                    let index = Math.floor(Math.random() * unoDeck.length)
-                    let card = unoDeck[index];
-                    unoDeck.splice(index, 1)
-                    queue[0].cards.push(card)
-                    client.users.send(queue[0].playerId, `You picked up ${card}`)
-                }
-                let player = queue[0].shift
-                queue.push(player)
-            }
-            if (selection.includes('+4')) {
-                client.users.send(queue[0].playerId, `You have to draw 4 cards`)
-                for (let i = 0; i <= 3; i++) {
-                    let index = Math.floor(Math.random() * unoDeck.length)
-                    let card = unoDeck[index];
-                    unoDeck.splice(index, 1)
-                    queue[0].cards.push(card)
-                    client.users.send(queue[0].playerId, `You picked up ${card}`)
-                }
-                let player = queue[0].shift
-                queue.push(player)
-            }
-            if (selection.includes('Skip')) {
-                let player = queue.shift()
-                queue.push(player)
-            }
-            if (selection.includes('Switch')) {
-                let player = queue.pop()
-                queue.reverse()
-                queue.push(player)
-            }
-
-            // next player. if player can't, pick up till can and let decide whether to keep card, or play it.
-            unoDeck.push(topCard)
-            topCard = selection
-            Play(queue, unoDeck, topCard, channelId)
-
-            // if player has 1 card left, announce uno in chat.
-
-            // if player has no cards left, player wins
-
-        });
-        collector.on('error', (error) => {
-            console.error('Error collecting:', error);
-        });
-
-    }
-
 });
 
-client.login("ODk0OTA2MDQ2MzgzMDE3OTk0.GT9kFq.1yiIzR6Id1ZdkT7iW3IRHL4LO6rRgQkkdYYxWU");
+function createDatabases(
+    levelTable,
+    currencyTable,
+    familyTable,
+    rpTable,
+    bgPlayerTable,
+    bgLootTable,
+    suggestionTable
+) {
+    // ------------------ Level Table ----------------
+    if (!levelTable["count(*)"]) {
+        // If the table isn't there, create it and setup the database correctly.
+        ldb
+            .prepare(
+                "CREATE TABLE levels (id TEXT PRIMARY KEY, user TEXT, guild TEXT, userName TEXT, level INTEGER, experience INTEGER);"
+            )
+            .run();
+        // Ensure that the "id" row is always unique and indexed.
+        ldb.prepare("CREATE UNIQUE INDEX idx_levels_id ON levels (id);").run();
+        ldb.exec("PRAGMA journal_mode = WAL;");
+        console.log(`level table created successfully`);
+    }
+
+    // ------------------ Currency Table ----------------
+    if (!currencyTable["count()"]) {
+        // If the table isn't there, create it and setup the database correctly.
+        cdb
+            .prepare(
+                "CREATE TABLE currency (id TEXT PRIMARY KEY, user TEXT, guild TEXT, userName TEXT, bank Integer, cash Integer, bitcoin Integer);"
+            )
+            .run();
+
+        // Ensure that the "id" row is always unique and indexed.
+        cdb.prepare("CREATE UNIQUE INDEX idx_currency_id ON currency (id);").run();
+        cdb.exec("PRAGMA journal_mode = WAL;");
+        console.log(`currency table created successfully`);
+    }
+
+    // ------------------ Family Table ----------------
+    if (!familyTable["count()"]) {
+        // If the table isn't there, create it and setup the database correctly.
+        fdb
+            .prepare(
+                "CREATE TABLE family (id TEXT PRIMARY KEY, user TEXT, partnerID TEXT, partnerName TEXT, date TEXT, parent1 TEXT, parent1Name TEXT, parent2 TEXT, parent2Name TEXT, child1 TEXT, child1Name TEXT, child2 TEXT, child2Name TEXT, child3 TEXT, child3Name TEXT, child4 TEXT, child4Name TEXT, child5 TEXT, child5Name TEXT);"
+            )
+            .run();
+
+        fdb.prepare("CREATE UNIQUE INDEX idx_family_id ON family (id);").run();
+        fdb.exec("PRAGMA journal_mode = WAL;");
+    }
+    // ------------------ RolePlay Table ----------------
+    if (!rpTable["count()"]) {
+        // If the table isn't there, create it and setup the database correctly.
+        rdb
+            .prepare(
+                "CREATE TABLE roleplay (id TEXT PRIMARY KEY, user TEXT, guild TEXT, kissed INTEGER, gkissed INTEGER, hugged INTEGER, ghugged INTEGER, cried INTEGER, gcried INTEGER, holdhands INTEGER, gholdhands INTEGER, boop INTEGER, gboop INTEGER, slapped INTEGER, gslapped INTEGER, spanked INTEGER, gspanked INTEGER, pet INTEGER, gpet INTEGER);"
+            )
+            .run();
+        // Ensure that the "id" row is always unique and indexed.
+        rdb.prepare("CREATE UNIQUE INDEX idx_roleplay_id ON roleplay (id);").run();
+        rdb.exec("PRAGMA journal_mode = WAL;");
+    }
+    // ------------------ BG Player Table ----------------
+    if (!bgPlayerTable["count()"]) {
+        battleDB
+            .prepare(
+                "CREATE TABLE player (id TEXT PRIMARY KEY, user TEXT, guild TEXT, level INTEGER, class TEXT, equipedWeapon TEXT, equipedHelmet TEXT, equipedChestplate TEXT, equipedPants TEXT, equipedBoots TEXT);"
+            )
+            .run();
+        battleDB.prepare("CREATE UNIQUE INDEX idx_player_id ON player (id);").run();
+        battleDB.exec("PRAGMA journal_mode = WAL;");
+    }
+    // ------------------ BG Loot Table ----------------
+    if (!bgLootTable["count()"]) {
+        battleDB
+            .prepare(
+                "CREATE TABLE loot (id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, item TEXT, rarity TEXT);"
+            )
+            .run();
+        battleDB.prepare("CREATE UNIQUE INDEX idx_loot_id ON loot (id);").run();
+        battleDB.exec("PRAGMA journal_mode = WAL;");
+    }
+    // ------------------ Suggestion Table ----------------
+    if (!suggestionTable["count()"]) {
+        suggestionDB
+            .prepare(
+                "CREATE TABLE suggestion (id INTEGER PRIMARY KEY AUTOINCREMENT, userid TEXT, suggestion TEXT, category TEXT, upvotes INTEGER, downvotes INTEGER, dateAdded TEXT);"
+            )
+            .run();
+        suggestionDB
+            .prepare("CREATE UNIQUE INDEX idx_suggestion_id ON suggestion (id);")
+            .run();
+        suggestionDB.exec("PRAGMA journal_mode = WAL;");
+    }
+}
+
+function getDatabases() {
+    client.getLevels = ldb.prepare(
+        "SELECT * FROM levels WHERE user = ? and guild = ?"
+    );
+    client.setLevels = ldb.prepare(
+        "INSERT OR REPLACE INTO levels (id, user, guild, userName, level, experience) VALUES (@id, @user, @guild, @userName, @level, @experience);"
+    );
+    console.log(`Levels table loaded successfully`);
+
+    client.getCurrency = cdb.prepare(
+        "SELECT * FROM currency WHERE user = ? AND guild = ?"
+    );
+    client.setCurrency = cdb.prepare(
+        "INSERT OR REPLACE INTO currency (id, user, guild, userName, bank, cash, bitcoin) VALUES (@id, @user, @guild, @userName, @bank, @cash, @bitcoin);"
+    );
+    console.log(`Currency table loaded successfully`);
+
+    client.getFamily = fdb.prepare("SELECT * FROM family WHERE user = ?");
+    client.setFamily = fdb.prepare(
+        "INSERT OR REPLACE INTO family (id, user, partnerID, partnerName, date, parent1 , parent1Name , parent2, parent2Name, child1, child1Name, child2, child2Name, child3, child3Name, child4, child4Name, child5, child5Name) VALUES (@id, @user, @partnerID, @partnerName, @date, @parent1, @parent1Name, @parent2, @parent2Name,@child1, @child1Name, @child2, @child2Name, @child3, @child3Name, @child4, @child4Name, @child5, @child5Name);"
+    );
+    console.log(`Family table loaded successfully`);
+
+    client.getRoleplay = rdb.prepare(
+        "SELECT * FROM roleplay WHERE user = ? AND guild = ?"
+    );
+    client.setRoleplay = rdb.prepare(
+        "INSERT OR REPLACE INTO roleplay (id, user, guild, kissed, gkissed, hugged, ghugged, cried, gcried, holdhands, gholdhands, boop, gboop, slapped, gslapped, spanked, gspanked, pet, gpet) VALUES (@id, @user, @guild, @kissed, @gkissed, @hugged, @ghugged, @cried, @gcried, @holdhands, @gholdhands, @boop, @gboop, @slapped, @gslapped, @spanked, @gspanked, @pet, @gpet);"
+    );
+    console.log(`Roleplay table loaded successfully`);
+    client.getBattlePlayer = battleDB.prepare(
+        "SELECT * FROM player WHERE id = ?"
+    );
+    client.setBattlePlayer = battleDB.prepare(
+        "INSERT OR REPLACE INTO player (id, user, guild, level, class, equipedWeapon, equipedHelmet, equipedChestplate, equipedPants, equipedBoots) VALUES (@id, @user, @guild, @level, @class, @equipedWeapon, @equipedHelmet, @equipedChestplate, @equipedPants, @equipedBoots);"
+    );
+    console.log(`battle game player table loaded successfully`);
+    client.getBattleLoot = battleDB.prepare("SELECT * FROM loot WHERE id = ?");
+    client.setBattleLoot = battleDB.prepare(
+        "INSERT OR REPLACE INTO loot (id, userID, item, rarity) VALUES (@id, @userID, @item, @rarity);"
+    );
+    console.log(`battle game loot table loaded successfully`);
+    client.getSuggestion = suggestionDB.prepare(
+        "SELECT * FROM suggestion WHERE suggestion = ? AND category = ?"
+    );
+    client.setSuggestion = suggestionDB.prepare(
+        "INSERT OR REPLACE INTO suggestion (id, userID, suggestion, category, upvotes, downvotes, dateAdded) VALUES (@id, @userid, @suggestion, @category, @upvotes, @downvotes, @dateAdded);"
+    );
+    console.log(`suggestion table loaded successfully`);
+}
+
+function loading() {
+    setTimeout(function () {
+        dropMessage = false;
+    }, 20000);
+    //console.log(dropMessage + "after timeout")
+}
+function currDrop(message) {
+    let randMoney = Math.floor(Math.random() * (500 - 50 + 1)) + 50;
+    //console.log(randNumber)
+    //console.log(randNumber, counter)
+    if (++counter === randNumber) {
+        let counter = 0;
+        let dropembed = new EmbedBuilder();
+        dropembed.setDescription(
+            `Quick! Someone dropped ${randMoney}$, pick it using \`.pick\``
+        );
+        dropMessage = true;
+        //console.log(dropMessage)
+        loading();
+        randomMoney = randMoney;
+
+        randNumber = number[Math.floor(Math.random() * number.length)];
+        //message.channel.send(`${randNumber} messages were sent!`)//.then(message=>message.delete({timeout:"20000"/*Time until delete in milliseconds*/}))
+        message.channel
+            .send({ embeds: [dropembed] })
+            .then((message) =>
+                setTimeout(() => message.delete(), 10000)
+            ); /*Time until delete in milliseconds*/
+    }
+    if (
+        message.content.startsWith(`${PREFIX}pick`) ||
+        message.content.startsWith(`${PREFIX}pick`)
+    ) {
+        let userid = message.author.id;
+        let user = message.author;
+        let username = user.username;
+        let rUser = client.getCurrency.get(userid, message.guild.id);
+        if (!rUser) {
+            rUser = {
+                id: `${message.guild.id}-${userid}`,
+                user: userid,
+                guild: message.guild.id,
+                userName: username,
+                bank: 0,
+                cash: 0,
+                bitcoin: 0,
+            };
+        }
+        if (dropMessage == true) {
+            message.delete();
+            message.channel
+                .send(`${user} picked up ${randomMoney}`)
+                .then((message) =>
+                    setTimeout(() => message.delete(), 10000)
+                ); /*Time until delete in milliseconds*/
+            dropMessage = false;
+            oldCash = rUser.cash;
+            newCash = oldCash + randomMoney;
+            //console.log(oldCash + " + " +  randomMoney + " = " + newCash)
+            rUser.cash = newCash;
+            client.setCurrency.run(rUser);
+            counter = 0;
+        } else {
+            //console.log(`nothing to pick: ${dropMessage}`)
+            message.delete();
+        }
+    }
+}
+
+
+client.login(process.env.BOT_TOKEN);

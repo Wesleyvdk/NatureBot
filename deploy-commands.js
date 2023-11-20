@@ -1,36 +1,51 @@
-import { REST, Routes } from 'discord.js';
+const { REST, Routes } = require("discord.js");
+const fs = require("node:fs");
+const path = require("node:path");
+require("dotenv").config();
 
-const commands = [
-    {
-        name: 'bored',
-        description: 'Replies with an activity!',
-    },
-    {
-        name: "uno",
-        description: 'uno'
-    },
-    {
-        name: "codechallenge",
-        description: "Shares a random coding challenge for programmers.",
-    },
-    {
-        name: "technews",
-        description: "Provides the latest news in technology.Provides the latest news in technology."
-    },
-    {
-        name: "weather",
-        description: "Gives current weather for a specified location."
-    },
-];
+const commands = [];
+// Grab all the command folders from the commands directory you created earlier
+const foldersPath = path.join(__dirname, "commands");
+const commandFolders = fs.readdirSync(foldersPath);
 
-const rest = new REST({ version: '10' }).setToken("ODk0OTA2MDQ2MzgzMDE3OTk0.GT9kFq.1yiIzR6Id1ZdkT7iW3IRHL4LO6rRgQkkdYYxWU");
+const token = process.env.BOT_TOKEN;
 
-try {
-    console.log('Started refreshing application (/) commands.');
-
-    await rest.put(Routes.applicationCommands("894906046383017994"), { body: commands });
-
-    console.log('Successfully reloaded application (/) commands.');
-} catch (error) {
-    console.error(error);
+for (const folder of commandFolders) {
+    // Grab all the command files from the commands directory you created earlier
+    const commandsPath = path.join(foldersPath, folder);
+    const commandFiles = fs
+        .readdirSync(commandsPath)
+        .filter((file) => file.endsWith(".js"));
+    // Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
+    for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+        const command = require(filePath);
+        commands.push(command.data.toJSON());
+    }
 }
+
+const rest = new REST({ version: "10" }).setToken(token);
+
+(async () => {
+    try {
+        console.log(
+            `Started refreshing ${commands.length} application (/) commands.`
+        );
+        // for (let i = 0; i < commands.length; i++) {
+        //   console.log(commands[i].name);
+        //   console.log(commands[i].description);
+        // }
+
+        // The put method is used to fully refresh all commands in the guild with the current set
+        const data = await rest.put(Routes.applicationCommands(process.env.CLIENTID), {
+            body: commands,
+        });
+
+        console.log(
+            `Successfully reloaded ${data.length} application (/) commands.`
+        );
+    } catch (error) {
+        // And of course, make sure you catch and log any errors!
+        console.error(error);
+    }
+})();

@@ -1,0 +1,7 @@
+{
+    "scripts": {
+        "start": "bun run deploy && bun run bot",
+        "bot": "bun bot.js",
+        "deploy": "bun deploy-commands.js"
+    }
+}

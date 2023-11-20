@@ -1,4 +1,5 @@
 const fs = require("node:fs");
+require('dotenv').config()
 const path = require("node:path");
 const {
     Client,
@@ -8,8 +9,8 @@ const {
     Partials,
     EmbedBuilder,
 } = require("discord.js");
-import { Database } from "bun:sqlite"
 const mysql = require("mysql2");
+const Database = require("better-sqlite3");
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 conn.connect(function (err) {
     if (err) throw err;
@@ -173,13 +174,9 @@ client.on("messageCreate", async (message) => {
                     level_up(rows, user);
 
                 });
-
-            await add_experience(rUser);
-            await level_up(rUser, user, message);
-            await client.setLevels.run(rUser);
         }
 
-        async function check_level_reward(rUser, message) {
+        async function check_level_reward(rows, message) {
             const roles = [
                 "Member",
                 "Ai Novice",
@@ -210,19 +207,19 @@ client.on("messageCreate", async (message) => {
                         .catch(console.error);
                 }
 
-                if (rUser.level === 1) {
+                if (rows[0].level === 1) {
                     const role = guild.roles.cache.find(
                         (role) => role.name === "Member"
                     );
                     message.member.roles.add(role);
                 }
-                if (rUser.level === 5) {
+                if (rows[0].level === 5) {
                     const role = guild.roles.cache.find(
                         (role) => role.name === "Ai Novice"
                     );
                     message.member.roles.add(role);
                 }
-                if (rUser.level === 10) {
+                if (rows[0].level === 10) {
                     const role = guild.roles.cache.find(
                         (role) => role.name === "HiRe Pro"
                     );
@@ -236,7 +233,7 @@ client.on("messageCreate", async (message) => {
                         console.log(e);
                     }
                 }
-                if (rUser.level === 15) {
+                if (rows[0].level === 15) {
                     const role = message.guild.roles.cache.find(
                         (role) => role.name === "Promptologist"
                     );
@@ -250,7 +247,7 @@ client.on("messageCreate", async (message) => {
                         console.log(e);
                     }
                 }
-                if (rUser.level === 20) {
+                if (rows[0].level === 20) {
                     const role = guild.roles.cache.find(
                         (role) => role.name === "Ai Pro"
                     );
@@ -264,7 +261,7 @@ client.on("messageCreate", async (message) => {
                         console.log(e);
                     }
                 }
-                if (rUser.level === 25) {
+                if (rows[0].level === 25) {
                     const role = guild.roles.cache.find(
                         (role) => role.name === "LoRe Expert"
                     );
@@ -278,7 +275,7 @@ client.on("messageCreate", async (message) => {
                         console.log(e);
                     }
                 }
-                if (rUser.level === 30) {
+                if (rows[0].level === 30) {
                     const role = guild.roles.cache.find(
                         (role) => role.name === "Ultimate Upscale Pro"
                     );
@@ -294,7 +291,7 @@ client.on("messageCreate", async (message) => {
                 }
             }
         }
-        async function add_experience() {
+        async function add_experience(rows) {
             exp = rows[0].exp;
             newExp = exp += 5;
 
@@ -310,6 +307,8 @@ client.on("messageCreate", async (message) => {
             let lvl_up = Number(round);
 
             if (lvl_up < 0) {
+              const channelId = "1173064790340534412";
+              const channel = await client.channels.fetch(channelId);
                 conn
                     .promise()
                     .query(
@@ -317,12 +316,13 @@ client.on("messageCreate", async (message) => {
                         [userid]
                     )
                     .then(
-                        message.channel.send(
+
+                        channel.send(
                             `${user} has leveled up to level ${rows[0].level + 1}`
                         )
                     );
             }
-            await check_level_reward(rUser, message);
+            await check_level_reward(rows, message);
         }
 
         if (message.content.startsWith(".addBump")) {
@@ -431,7 +431,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (!command) return;
 
     try {
-        await command.execute(client, interaction);
+        await command.execute(client, interaction, conn);
     } catch (error) {
         console.error(error);
         if (interaction.replied || interaction.deferred) {

@@ -16,7 +16,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("shop")
         .setDescription("shows the shop"),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const shopembed = new EmbedBuilder()
             .setDescription("The shop is empty right now")

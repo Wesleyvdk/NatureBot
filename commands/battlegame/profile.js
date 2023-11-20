@@ -20,7 +20,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("profile")
         .setDescription("show's the user's battle profile"),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         user = interaction.user;
         let rUser = client.getBattlePlayer.get(user.id);

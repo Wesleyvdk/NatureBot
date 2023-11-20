@@ -16,7 +16,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("bored")
         .setDescription("Find an activity to do"),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const response = await fetch("http://www.boredapi.com/api/activity/")
         const data = await response.json();

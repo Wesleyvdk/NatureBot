@@ -16,7 +16,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("playlists")
         .setDescription("show your created playlists on the bot"),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         playerid = interaction.user.id;
         playername = interaction.user.username;
 

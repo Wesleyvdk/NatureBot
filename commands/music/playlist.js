@@ -16,7 +16,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("playlist")
         .setDescription("play a playlist from spotify, youtube, or soundcloud, or your own playlist on the bot"),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         playerid = interaction.user.id;
         playername = interaction.user.username;
 

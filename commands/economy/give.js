@@ -28,7 +28,7 @@ module.exports = {
                 .setDescription("Select a user to give to")
                 .setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const target = interaction.options.getUser("user");
         const amount = interaction.options.getInteger("amount");

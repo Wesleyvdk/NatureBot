@@ -19,7 +19,7 @@ module.exports = {
         .addUserOption((option) =>
             option.setName("user").setDescription("select a user")
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const mentioned = interaction.options.getUser("user");
         userid = interaction.user.id;

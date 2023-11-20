@@ -16,7 +16,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("uno")
         .setDescription("start a uno match"),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const players = [];
         //wait for max 4 people to join

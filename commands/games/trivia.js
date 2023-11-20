@@ -16,7 +16,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("trivia")
         .setDescription("answer a trivial question"),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         let answers = []
         const response = await fetch("https://opentdb.com/api.php?amount=1&type=multiple")

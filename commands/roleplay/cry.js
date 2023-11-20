@@ -19,7 +19,7 @@ module.exports = {
         .addUserOption((option) =>
             option.setName("target").setDescription("user you want to cry at")
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         //all url's of the gifs
         let gifs = ["https://media.giphy.com/media/ROF8OQvDmxytW/source.gif"];

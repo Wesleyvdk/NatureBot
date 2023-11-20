@@ -23,7 +23,7 @@ module.exports = {
                 .setDescription("select user you want to marry")
                 .setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         let marrymsg = ["Do you wanna marry me?"];
         let marriedmsg = [

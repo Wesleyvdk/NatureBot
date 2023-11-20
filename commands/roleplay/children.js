@@ -21,7 +21,7 @@ module.exports = {
                 .setName("target")
                 .setDescription("select user you want to know the children of")
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const mentioned = interaction.options.getUser("target");
         if (mentioned) {

@@ -25,7 +25,7 @@ module.exports = {
         .addUserOption((option) =>
             option.setName("user").setDescription("Select a user").setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         // interaction options
         const question = interaction.options.getString("question");

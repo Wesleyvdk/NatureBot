@@ -22,7 +22,7 @@ module.exports = {
                 .setDescription("user you want to pat")
                 .setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         //all url's of the gifs
         let gifs = ["https://media.giphy.com/media/109ltuoSQT212w/source.gif"];

@@ -18,7 +18,7 @@ module.exports = {
         .setDescription(
             "give details about what you want. once we accept this, we'll notify you about it."
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const usersIngame = [];
 

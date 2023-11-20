@@ -22,7 +22,7 @@ module.exports = {
                 .setDescription("user you want to hold hands with")
                 .setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         //all url's of the gifs
         let gifs = ["https://media.giphy.com/media/TnUJHKyjwHXOM/source.gif"];

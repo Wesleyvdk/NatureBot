@@ -22,7 +22,7 @@ module.exports = {
                 .setDescription("user you want to slap")
                 .setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         let gifs = ["https://media.giphy.com/media/Gf3AUz3eBNbTW/source.gif"];
         //will calculate which one to send

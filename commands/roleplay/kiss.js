@@ -22,7 +22,7 @@ module.exports = {
                 .setDescription("user you want to kiss")
                 .setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
 
         await interaction.deferReply();
         let gifs = [

@@ -22,7 +22,7 @@ module.exports = {
                 .setDescription("user you want to adopt")
                 .setRequired(true)
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const mentioned = interaction.options.getUser("target");
         mentionedid = mentioned.id;

@@ -19,7 +19,7 @@ module.exports = {
         .addIntegerOption((option) =>
             option.setName("amount").setDescription("specifies the amount to deposit")
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const amount = interaction.options.getInteger("amount");
         userid = interaction.user.id;

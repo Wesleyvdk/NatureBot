@@ -19,7 +19,7 @@ module.exports = {
         .addUserOption((option) =>
             option.setName("target").setDescription("user you want to boop")
         ),
-    async execute(client, interaction) {
+    async execute(client, interaction, conn) {
         await interaction.deferReply();
         const mentioned = interaction.options.getUser("target");
         //all url's of the gifs

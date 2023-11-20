@@ -1,25 +1,31 @@
 const {
-    SlashCommandBuilder,
-    EmbedBuilder,
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    Embed,
-    ButtonInteraction,
-    StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder,
-    ComponentType,
-    AttachmentBuilder,
-} = require('discord.js');
+  SlashCommandBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  Embed,
+  ButtonInteraction,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  ComponentType,
+  AttachmentBuilder,
+} = require("discord.js");
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("lyrics")
-        .setDescription("get and show the lyrics of current playing song"),
-    async execute(client, interaction, conn) {
-        playerid = interaction.user.id;
-        playername = interaction.user.username;
+  data: new SlashCommandBuilder()
+    .setName("lyrics")
+    .setDescription("get and show the lyrics of current playing song"),
+  async execute(client, interaction, conn) {
+    await interaction.deferReply();
+    conn
+      .promise()
+      .query(
+        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "lyrics"`
+      );
+    playerid = interaction.user.id;
+    playername = interaction.user.username;
 
-        interaction.reply("work in progress");
-    },
+    interaction.editReply("work in progress");
+  },
 };

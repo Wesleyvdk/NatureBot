@@ -160,32 +160,34 @@ client.on("messageCreate", async (message) => {
     try {
       if (embed) {
         try {
-          if (embed.description.includes(keyword)) {
-            message.channel.send(
-              `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
-                if this role does not exist, the role will be created on first use of the .addBump command`
-            );
+          if (message.author.bot) {
+            if (embed.description.includes(keyword)) {
+              message.channel.send(
+                `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
+                  if this role does not exist, the role will be created on first use of the .addBump command`
+              );
 
-            const delay = 2 * 60 * 60 * 1000;
-            // in milliseconds
-            if (role) {
-              const roleMention = role.toString();
-              setTimeout(() => {
-                // Send a message to the channel where the command was used
-                message.channel.send(`bump is ready ${roleMention}`);
-              }, delay);
+              const delay = 2 * 60 * 60 * 1000;
+              // in milliseconds
+              if (role) {
+                const roleMention = role.toString();
+                setTimeout(() => {
+                  // Send a message to the channel where the command was used
+                  message.channel.send(`bump is ready ${roleMention}`);
+                }, delay);
+              } else {
+                setTimeout(() => {
+                  // Send a message to the channel where the command was used
+                  message.channel.send("bump is ready");
+                }, delay);
+              }
+
+              // Log the title and description of the embed
+              // console.log(`Title: ${embed.title}`);
+              // console.log(`Description: ${embed.description}`);
             } else {
-              setTimeout(() => {
-                // Send a message to the channel where the command was used
-                message.channel.send("bump is ready");
-              }, delay);
+              return;
             }
-
-            // Log the title and description of the embed
-            // console.log(`Title: ${embed.title}`);
-            // console.log(`Description: ${embed.description}`);
-          } else {
-            return;
           }
         } catch (e) {
           console.log(`Error: ${e.message}`);

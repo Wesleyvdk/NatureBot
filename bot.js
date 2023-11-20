@@ -203,13 +203,13 @@ client.on("messageCreate", async (message) => {
       conn
         .promise()
         .query(
-          "INSERT INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
+          "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
           [userid, username]
         );
 
       conn
         .promise()
-        .execute("SELECT * FROM `VampLevels` WHERE id=?", [user.id])
+        .execute("SELECT * FROM `VampLevels` WHERE id=?", [userid])
         .then(async ([rows, fields]) => {
           add_experience(rows, user);
         });
@@ -294,7 +294,7 @@ client.on("messageCreate", async (message) => {
         conn
           .promise()
           .query(
-            "INSERT INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
+            "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
             [user.id, user.username]
           );
 

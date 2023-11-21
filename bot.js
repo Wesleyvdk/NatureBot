@@ -151,51 +151,6 @@ client.once(Events.ClientReady, async () => {
 
 client.on("messageCreate", async (message) => {
   try {
-    const keyword = "Bump done";
-    const roleName = "bumper";
-    const role = message.guild.roles.cache.find(
-      (role) => role.name === roleName
-    );
-    const embed = message.embeds[0];
-    try {
-      if (embed) {
-        try {
-          if (message.author.bot) {
-            if (embed.description.includes(keyword)) {
-              message.channel.send(
-                `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
-                  if this role does not exist, the role will be created on first use of the .addBump command`
-              );
-
-              const delay = 2 * 60 * 60 * 1000;
-              // in milliseconds
-              if (role) {
-                const roleMention = role.toString();
-                setTimeout(() => {
-                  // Send a message to the channel where the command was used
-                  message.channel.send(`bump is ready ${roleMention}`);
-                }, delay);
-              } else {
-                setTimeout(() => {
-                  // Send a message to the channel where the command was used
-                  message.channel.send("bump is ready");
-                }, delay);
-              }
-
-              // Log the title and description of the embed
-              // console.log(`Title: ${embed.title}`);
-              // console.log(`Description: ${embed.description}`);
-            } else {
-              return;
-            }
-          }
-        } catch (e) {
-          console.log(`Error: ${e.message}`);
-        }
-      }
-    } catch (e) {
-      console.log(`Error: ${e.message}`);
-    }
     if (message.author.bot) return;
     const guild = client.guilds.cache.get("937728755223367741");
     if (message.guild.id == guild) {

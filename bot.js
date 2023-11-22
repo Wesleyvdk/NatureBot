@@ -152,148 +152,147 @@ client.once(Events.ClientReady, async () => {
 client.on("messageCreate", async (message) => {
   try {
     if (message.author.bot) return;
-    const guild = client.guilds.cache.get("937728755223367741");
-    if (message.guild.id == guild) {
-      userid = message.author.id;
-      username = message.author.username;
-      user = message.author;
-      conn
-        .promise()
-        .query(
-          "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
-          [userid, username]
-        );
+    // const guild = client.guilds.cache.get("937728755223367741");
+    // if (message.guild.id == guild) {
+    //   userid = message.author.id;
+    //   username = message.author.username;
+    //   user = message.author;
+    //   conn
+    //     .promise()
+    //     .query(
+    //       "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
+    //       [userid, username]
+    //     );
 
-      conn
-        .promise()
-        .execute("SELECT * FROM `VampLevels` WHERE id=?", [userid])
-        .then(async ([rows, fields]) => {
-          add_experience(rows, user);
-        });
-    }
+    //   conn
+    //     .promise()
+    //     .execute("SELECT * FROM `VampLevels` WHERE id=?", [userid])
+    //     .then(async ([rows, fields]) => {
+    //       add_experience(rows, user);
+    //     });
+    // }
 
-    async function check_level_reward(rows, message) {
-      const roles = [
-        "Member",
-        "Ai Novice",
-        "HiRe Pro",
-        "Promptologist",
-        "Ai Pro",
-        "LoRe Expert",
-        "Ultimate Upscale Pro",
-      ];
-      const member = message.member;
-      const roleLevel = 1;
-      const roleName = `level ${roleLevel}`;
-      for (i = 0; i < roles.length; i++) {
-        const role = message.guild.roles.cache.find(
-          (role) => role.name === roles[i]
-        );
-        if (!role) {
-          guild.roles
-            .create({
-              name: roles[i],
-            })
-            .then((createdRole) => {
-              console.log(`Role created: ${createdRole.name}`);
-              // if (roleLevel == 1) roleLevel + 4
-              // else if (roleLevel == 5) roleLevel + 5
-              // else if (roleLevel >= 10) roleLevel + 10
-            })
-            .catch(console.error);
-        }
+    // async function check_level_reward(rows, message) {
+    //   const roles = [
+    //     "Member",
+    //     "Ai Novice",
+    //     "HiRe Pro",
+    //     "Promptologist",
+    //     "Ai Pro",
+    //     "LoRe Expert",
+    //     "Ultimate Upscale Pro",
+    //   ];
+    //   const member = message.member;
+    //   const roleLevel = 1;
+    //   const roleName = `level ${roleLevel}`;
+    //   for (i = 0; i < roles.length; i++) {
+    //     const role = message.guild.roles.cache.find(
+    //       (role) => role.name === roles[i]
+    //     );
+    //     if (!role) {
+    //       guild.roles
+    //         .create({
+    //           name: roles[i],
+    //         })
+    //         .then((createdRole) => {
+    //           console.log(`Role created: ${createdRole.name}`);
+    //           // if (roleLevel == 1) roleLevel + 4
+    //           // else if (roleLevel == 5) roleLevel + 5
+    //           // else if (roleLevel >= 10) roleLevel + 10
+    //         })
+    //         .catch(console.error);
+    //     }
+    //     if (rows[0].level === 1) {
+    //       const role = guild.roles.cache.find((role) => role.name === "Member");
+    //       message.member.roles.add(role);
+    //     }
+    //     if (rows[0].level === 5) {
+    //       const role = guild.roles.cache.find(
+    //         (role) => role.name === "Ai Novice"
+    //       );
+    //       message.member.roles.add(role);
+    //     }
+    //     if (rows[0].level === 10) {
+    //       const role = guild.roles.cache.find(
+    //         (role) => role.name === "HiRe Pro"
+    //       );
+    //       message.member.roles.add(role);
+    //     }
+    //     if (rows[0].level === 15) {
+    //       const role = message.guild.roles.cache.find(
+    //         (role) => role.name === "Promptologist"
+    //       );
+    //       message.member.roles.add(role);
+    //     }
+    //     if (rows[0].level === 20) {
+    //       const role = guild.roles.cache.find((role) => role.name === "Ai Pro");
+    //       message.member.roles.add(role);
+    //     }
+    //     if (rows[0].level === 25) {
+    //       const role = guild.roles.cache.find(
+    //         (role) => role.name === "LoRe Expert"
+    //       );
+    //       message.member.roles.add(role);
+    //     }
+    //     if (rows[0].level === 30) {
+    //       const role = guild.roles.cache.find(
+    //         (role) => role.name === "Ultimate Upscale Pro"
+    //       );
+    //       message.member.roles.add(role);
+    //     }
+    //   }
+    // }
+    // async function add_experience(rows, user) {
+    //   try {
+    //     exp = rows[0].exp;
+    //     newExp = exp += 5;
+    //   } catch (e) {
+    //     conn
+    //       .promise()
+    //       .query(
+    //         "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
+    //         [user.id, user.username]
+    //       );
 
-        if (rows[0].level === 1) {
-          const role = guild.roles.cache.find((role) => role.name === "Member");
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 5) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "Ai Novice"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 10) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "HiRe Pro"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 15) {
-          const role = message.guild.roles.cache.find(
-            (role) => role.name === "Promptologist"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 20) {
-          const role = guild.roles.cache.find((role) => role.name === "Ai Pro");
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 25) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "LoRe Expert"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 30) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "Ultimate Upscale Pro"
-          );
-          message.member.roles.add(role);
-        }
-      }
-    }
-    async function add_experience(rows, user) {
-      try {
-        exp = rows[0].exp;
-        newExp = exp += 5;
-      } catch (e) {
-        conn
-          .promise()
-          .query(
-            "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
-            [user.id, user.username]
-          );
+    //     conn
+    //       .promise()
+    //       .execute("SELECT * FROM `VampLevels` WHERE id=?", [user.id])
+    //       .then(async ([rows, fields]) => {
+    //         add_experience(rows, user);
+    //       });
+    //   }
+    //   exp = rows[0].exp;
+    //   newExp = exp += 5;
 
-        conn
-          .promise()
-          .execute("SELECT * FROM `VampLevels` WHERE id=?", [user.id])
-          .then(async ([rows, fields]) => {
-            add_experience(rows, user);
-          });
-      }
-      exp = rows[0].exp;
-      newExp = exp += 5;
+    //   conn
+    //     .promise()
+    //     .query(`UPDATE VampLevels SET exp = ${newExp} WHERE id = ?`, [user.id])
+    //     .then(level_up(rows, user));
+    // }
 
-      conn
-        .promise()
-        .query(`UPDATE VampLevels SET exp = ${newExp} WHERE id = ?`, [user.id])
-        .then(level_up(rows, user));
-    }
+    // async function level_up(rows, user) {
+    //   xp = rows[0].exp;
+    //   lvl_start = rows[0].level;
+    //   lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
 
-    async function level_up(rows, user) {
-      xp = rows[0].exp;
-      lvl_start = rows[0].level;
-      lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+    //   let round = Math.floor(lvl_end);
+    //   let lvl_up = Number(round);
 
-      let round = Math.floor(lvl_end);
-      let lvl_up = Number(round);
-
-      if (lvl_up < 0) {
-        const channelId = "1173064790340534412";
-        const channel = await client.channels.cache.get(channelId);
-        conn
-          .promise()
-          .query(
-            `UPDATE VampLevels SET level = ${rows[0].level} + 1 WHERE id = ?`,
-            [user.id]
-          )
-          .then(
-            channel.send(`${user} has leveled up to level ${rows[0].level + 1}`)
-          );
-      }
-      await check_level_reward(rows, message);
-    }
+    //   if (lvl_up < 0) {
+    //     const channelId = "1173064790340534412";
+    //     const channel = await client.channels.cache.get(channelId);
+    //     conn
+    //       .promise()
+    //       .query(
+    //         `UPDATE VampLevels SET level = ${rows[0].level} + 1 WHERE id = ?`,
+    //         [user.id]
+    //       )
+    //       .then(
+    //         channel.send(`${user} has leveled up to level ${rows[0].level + 1}`)
+    //       );
+    //   }
+    //   await check_level_reward(rows, message);
+    // }
 
     if (message.content.startsWith(".addBump")) {
       const roleName = "bumper";

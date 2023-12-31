@@ -146,6 +146,7 @@ module.exports = {
                       client.setBattlePlayer.run(rUser);
                     }
                   }
+                  // change to switch case
                   if (selection == "mage") {
                     if (!rUser) {
                       let rUser = {

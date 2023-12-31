@@ -15,7 +15,7 @@ module.exports = {
     userid = interaction.user.id;
     conn
       .promise()
-      .query("SELECT * FROM VampLevels WHERE id=?", [userid])
+      .query(`SELECT * FROM ${interaction.guild.id}Levels WHERE id=?`, [userid])
       .then(function ([rows, fields]) {
         interaction.editReply(
           `${interaction.user}, your current level is ${rows[0].level} and your current exp is ${rows[0].exp}`

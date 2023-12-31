@@ -22,8 +22,6 @@ const number = [
   69,
 ];
 // databases
-const ldb = new Database("./databases/levels.sqlite");
-const cdb = new Database("./databases/currency.sqlite");
 const fdb = new Database("./databases/family.sqlite");
 const rdb = new Database("./databases/roleplay.sqlite");
 const battleDB = new Database("./databases/battlegame.sqlite");
@@ -67,8 +65,12 @@ for (const folder of commandFolders) {
   for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     const command = require(filePath);
+    const commandObject = {
+      command: command, // This is your command structure
+      category: folder, // Category of the command
+    };
     if ("data" in command && "execute" in command) {
-      client.commands.set(command.data.name, command);
+      client.commands.set(command.data.name, commandObject);
     } else {
       console.log(
         `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
@@ -77,17 +79,6 @@ for (const folder of commandFolders) {
   }
 }
 client.once(Events.ClientReady, async () => {
-  const levelTable = ldb
-    .prepare(
-      "SELECT count(*) FROM sqlite_master WHERE type='table' AND name = 'levels';"
-    )
-    .get();
-  const currencyTable = cdb
-    .prepare(
-      "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'currency';"
-    )
-    .get();
-
   const familyTable = fdb
     .prepare(
       "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'family';"
@@ -98,201 +89,315 @@ client.once(Events.ClientReady, async () => {
       "SELECT count() FROM sqlite_master where type='table' AND name = 'roleplay';"
     )
     .get();
-  const bgPlayerTable = battleDB
-    .prepare(
-      "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'player';"
-    )
-    .get();
-  const bgLootTable = battleDB
-    .prepare(
-      "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'loot';"
-    )
-    .get();
   const suggestionTable = suggestionDB
     .prepare(
       "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'suggestion';"
     )
     .get();
-  await createDatabases(
-    levelTable,
-    currencyTable,
-    familyTable,
-    rpTable,
-    bgPlayerTable,
-    bgLootTable,
-    suggestionTable
-  );
+  await createDatabases(familyTable, rpTable, suggestionTable);
   await getDatabases();
+  conn.promise().query(
+    `CREATE TABLE IF NOT EXISTS players (
+        id char(30) PRIMARY KEY,
+        user varchar(255),
+        guild varchar(255),
+        level INTEGER,
+        class varchar(255),
+        equipedWeapon varchar(255),
+        equipedHelmet varchar(255),
+        equipedChestplate varchar(255),
+        equipedPants varchar(255),
+        equipedBoots varchar(255)
+        );`
+  );
+  conn.promise().query(
+    `CREATE TABLE IF NOT EXISTS loot (
+        id INTEGER PRIMARY KEY AUTO_INCREMENT,
+        userID varchar(255),
+        item varchar(255),
+        rarity varchar(255)
+        );`
+  );
+  client.guilds.cache.forEach((guild) => {
+    conn.promise().query(
+      `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
+        id char(30) NOT NULL PRIMARY KEY UNIQUE, 
+        user varchar(255), 
+        guild varchar(255), 
+        userName varchar(255), 
+        bank Integer, 
+        cash Integer, 
+        bitcoin Integer
+        );`
+    );
+    conn.promise().query(
+      `CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
+      id char(30) NOT NULL PRIMARY KEY UNIQUE,
+      name varchar(255) NOT NULL,
+      level int NOT NULL,
+      exp int NOT NULL
+      );`
+    );
+
+    const settingsTable = `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
+      id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE, 
+      command varchar(255) NOT NULL UNIQUE, 
+      category varchar(255) NOT NULL,
+      turnedOn bool NOT NULL
+      );`;
+    conn.promise().query(settingsTable);
+
+    client.commands.forEach((commandObject) => {
+      const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
+        command, category, turnedOn) VALUES (?, ?, True);
+      `;
+      conn
+        .promise()
+        .query(commandSettings, [
+          commandObject.command.data.name,
+          commandObject.category,
+        ]);
+    });
+  });
 
   console.log(`logged in as: ${client.user.username}. ready to be used!`);
-  console.log();
-  const channelId = "929363312527953950";
-  const channel = await client.channels.fetch(channelId);
-  // const embed = new EmbedBuilder()
-  //   .setTitle("BOT UPDATES")
-  //   .addFields(
-  //     { name: "ADDED", value: "Boop", inline: true },
-  //     { name: "ADDED", value: "Hug", inline: true },
-  //     { name: "ADDED", value: "Kiss", inline: true },
-  //     { name: "ADDED", value: "Slap", inline: true },
-  //     { name: "ADDED", value: "Cry", inline: true },
-  //     { name: "ADDED", value: "Handholding", inline: true },
-  //     { name: "ADDED", value: "Pat", inline: true },
-  //     { name: "ADDED", value: "Spank", inline: true },
-  //     { name: "\u200B", value: "\u200B", inline: true },
-  //     { name: "ADDED", value: "Adopt", inline: true },
-  //     { name: "ADDED", value: "Disown", inline: true },
-  //     { name: "ADDED", value: "Children", inline: true }
-  //   )
-  //   .setTimestamp();
+});
 
-  // channel.send({ embeds: [embed] });
+client.on("guildCreate", async (guild) => {
+  conn.promise().query(
+    `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
+      id char(30) NOT NULL PRIMARY KEY UNIQUE, 
+      user varchar(255), 
+      guild varchar(255), 
+      userName varchar(255), 
+      bank Integer, 
+      cash Integer, 
+      bitcoin Integer)`
+  );
+  conn.promise().query(`CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
+    id char(30) NOT NULL PRIMARY KEY UNIQUE,
+    name varchar(255) NOT NULL,
+    level int NOT NULL,
+    exp int NOT NULL
+    );`);
+
+  conn.promise().query(
+    `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
+        id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE, 
+        command varchar(255) NOT NULL, 
+        category varchar(255) NOT NULL, 
+        turnedOn bool NOT NULL
+        );`
+  );
+
+  client.commands.forEach((commandObject) => {
+    const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
+        command, category, turnedOn) VALUES (?, ?, True);
+      `;
+    conn
+      .promise()
+      .query(commandSettings, [
+        commandObject.command.data.name,
+        commandObject.category,
+      ]);
+  });
+  // send "hello" message
+});
+
+client.on("guildDelete", async (guild) => {
+  conn.promise().query(`DROP TABLE ${guild.id}Currency`);
+  conn.promise().query(`DROP TABLE ${guild.id}Levels`);
+  conn.promise().query(`DROP TABLE ${guild.id}Settings`);
 });
 
 client.on("messageCreate", async (message) => {
+  const keyword = "Bump done";
+  const roleName = "bumper";
+  const role = message.guild.roles.cache.find((role) => role.name === roleName);
+  const embed = message.embeds[0];
+  try {
+    if (embed) {
+      if (message.channel.id === "1176067648006672394") {
+        try {
+          if (embed.description.includes(keyword)) {
+            message.channel.send(
+              `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
+              if this role does not exist, the role will be created on first use of the .addBump command`
+            );
+
+            const delay = 2 * 60 * 60 * 1000;
+            // in milliseconds
+            if (role) {
+              const roleMention = role.toString();
+              setTimeout(() => {
+                // Send a message to the channel where the command was used
+                message.channel.send(`bump is ready ${roleMention}`);
+              }, delay);
+            } else {
+              setTimeout(() => {
+                // Send a message to the channel where the command was used
+                message.channel.send("bump is ready");
+              }, delay);
+            }
+          } else {
+            return;
+          }
+        } catch (e) {
+          console.log(`Error: ${e.message}`);
+        }
+      }
+    }
+  } catch (e) {
+    console.log(`Error: ${e.message}`);
+  }
   try {
     if (message.author.bot) return;
-    // const guild = client.guilds.cache.get("937728755223367741");
-    // if (message.guild.id == guild) {
-    //   userid = message.author.id;
-    //   username = message.author.username;
-    //   user = message.author;
-    //   conn
-    //     .promise()
-    //     .query(
-    //       "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
-    //       [userid, username]
-    //     );
 
-    //   conn
-    //     .promise()
-    //     .execute("SELECT * FROM `VampLevels` WHERE id=?", [userid])
-    //     .then(async ([rows, fields]) => {
-    //       add_experience(rows, user);
-    //     });
-    // }
+    let guild = message.guild.id;
+    userid = message.author.id;
+    username = message.author.username;
+    user = message.author;
+    conn
+      .promise()
+      .query(
+        `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+        [userid, username]
+      );
 
-    // async function check_level_reward(rows, message) {
-    //   const roles = [
-    //     "Member",
-    //     "Ai Novice",
-    //     "HiRe Pro",
-    //     "Promptologist",
-    //     "Ai Pro",
-    //     "LoRe Expert",
-    //     "Ultimate Upscale Pro",
-    //   ];
-    //   const member = message.member;
-    //   const roleLevel = 1;
-    //   const roleName = `level ${roleLevel}`;
-    //   for (i = 0; i < roles.length; i++) {
-    //     const role = message.guild.roles.cache.find(
-    //       (role) => role.name === roles[i]
-    //     );
-    //     if (!role) {
-    //       guild.roles
-    //         .create({
-    //           name: roles[i],
-    //         })
-    //         .then((createdRole) => {
-    //           console.log(`Role created: ${createdRole.name}`);
-    //           // if (roleLevel == 1) roleLevel + 4
-    //           // else if (roleLevel == 5) roleLevel + 5
-    //           // else if (roleLevel >= 10) roleLevel + 10
-    //         })
-    //         .catch(console.error);
-    //     }
-    //     if (rows[0].level === 1) {
-    //       const role = guild.roles.cache.find((role) => role.name === "Member");
-    //       message.member.roles.add(role);
-    //     }
-    //     if (rows[0].level === 5) {
-    //       const role = guild.roles.cache.find(
-    //         (role) => role.name === "Ai Novice"
-    //       );
-    //       message.member.roles.add(role);
-    //     }
-    //     if (rows[0].level === 10) {
-    //       const role = guild.roles.cache.find(
-    //         (role) => role.name === "HiRe Pro"
-    //       );
-    //       message.member.roles.add(role);
-    //     }
-    //     if (rows[0].level === 15) {
-    //       const role = message.guild.roles.cache.find(
-    //         (role) => role.name === "Promptologist"
-    //       );
-    //       message.member.roles.add(role);
-    //     }
-    //     if (rows[0].level === 20) {
-    //       const role = guild.roles.cache.find((role) => role.name === "Ai Pro");
-    //       message.member.roles.add(role);
-    //     }
-    //     if (rows[0].level === 25) {
-    //       const role = guild.roles.cache.find(
-    //         (role) => role.name === "LoRe Expert"
-    //       );
-    //       message.member.roles.add(role);
-    //     }
-    //     if (rows[0].level === 30) {
-    //       const role = guild.roles.cache.find(
-    //         (role) => role.name === "Ultimate Upscale Pro"
-    //       );
-    //       message.member.roles.add(role);
-    //     }
-    //   }
-    // }
-    // async function add_experience(rows, user) {
-    //   try {
-    //     exp = rows[0].exp;
-    //     newExp = exp += 5;
-    //   } catch (e) {
-    //     conn
-    //       .promise()
-    //       .query(
-    //         "INSERT IGNORE INTO VampLevels(id, name, level, exp) VALUES (?,?, 1, 0)",
-    //         [user.id, user.username]
-    //       );
+    conn
+      .promise()
+      .execute(`SELECT * FROM '${guild}Levels' WHERE id=?`, [userid])
+      .then(async ([rows, fields]) => {
+        add_experience(rows, user, guild);
+      });
 
-    //     conn
-    //       .promise()
-    //       .execute("SELECT * FROM `VampLevels` WHERE id=?", [user.id])
-    //       .then(async ([rows, fields]) => {
-    //         add_experience(rows, user);
-    //       });
-    //   }
-    //   exp = rows[0].exp;
-    //   newExp = exp += 5;
+    async function check_level_reward(rows, message) {
+      // MAKE PREMIUM
 
-    //   conn
-    //     .promise()
-    //     .query(`UPDATE VampLevels SET exp = ${newExp} WHERE id = ?`, [user.id])
-    //     .then(level_up(rows, user));
-    // }
+      // const roles = [
+      //   "Member",
+      //   "Ai Novice",
+      //   "HiRe Pro",
+      //   "Promptologist",
+      //   "Ai Pro",
+      //   "LoRe Expert",
+      //   "Ultimate Upscale Pro",
+      // ];
+      const member = message.member;
+      const roleLevel = 1;
+      const roleName = `level ${roleLevel}`;
+      for (i = 0; i < roles.length; i++) {
+        const role = message.guild.roles.cache.find(
+          (role) => role.name === roles[i]
+        );
+        if (!role) {
+          guild.roles
+            .create({
+              name: roles[i],
+            })
+            .then((createdRole) => {
+              console.log(`Role created: ${createdRole.name}`);
+              // if (roleLevel == 1) roleLevel + 4
+              // else if (roleLevel == 5) roleLevel + 5
+              // else if (roleLevel >= 10) roleLevel + 10
+            })
+            .catch(console.error);
+        }
+        if (rows[0].level === 1) {
+          const role = guild.roles.cache.find((role) => role.name === "Member");
+          message.member.roles.add(role);
+        }
+        if (rows[0].level === 5) {
+          const role = guild.roles.cache.find(
+            (role) => role.name === "Ai Novice"
+          );
+          message.member.roles.add(role);
+        }
+        if (rows[0].level === 10) {
+          const role = guild.roles.cache.find(
+            (role) => role.name === "HiRe Pro"
+          );
+          message.member.roles.add(role);
+        }
+        if (rows[0].level === 15) {
+          const role = message.guild.roles.cache.find(
+            (role) => role.name === "Promptologist"
+          );
+          message.member.roles.add(role);
+        }
+        if (rows[0].level === 20) {
+          const role = guild.roles.cache.find((role) => role.name === "Ai Pro");
+          message.member.roles.add(role);
+        }
+        if (rows[0].level === 25) {
+          const role = guild.roles.cache.find(
+            (role) => role.name === "LoRe Expert"
+          );
+          message.member.roles.add(role);
+        }
+        if (rows[0].level === 30) {
+          const role = guild.roles.cache.find(
+            (role) => role.name === "Ultimate Upscale Pro"
+          );
+          message.member.roles.add(role);
+        }
+      }
+    }
+    async function add_experience(rows, user, guild) {
+      try {
+        exp = rows[0].exp;
+        newExp = exp += 5;
+      } catch (e) {
+        conn
+          .promise()
+          .query(
+            `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+            [user.id, user.username]
+          );
 
-    // async function level_up(rows, user) {
-    //   xp = rows[0].exp;
-    //   lvl_start = rows[0].level;
-    //   lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+        conn
+          .promise()
+          .execute(`SELECT * FROM "${guild}Levels" WHERE id=?`, [user.id])
+          .then(async ([rows, fields]) => {
+            add_experience(rows, user);
+          });
+      }
+      exp = rows[0].exp;
+      newExp = exp += 5;
 
-    //   let round = Math.floor(lvl_end);
-    //   let lvl_up = Number(round);
+      conn
+        .promise()
+        .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
+          user.id,
+        ])
+        .then(level_up(rows, user, guild));
+    }
 
-    //   if (lvl_up < 0) {
-    //     const channelId = "1173064790340534412";
-    //     const channel = await client.channels.cache.get(channelId);
-    //     conn
-    //       .promise()
-    //       .query(
-    //         `UPDATE VampLevels SET level = ${rows[0].level} + 1 WHERE id = ?`,
-    //         [user.id]
-    //       )
-    //       .then(
-    //         channel.send(`${user} has leveled up to level ${rows[0].level + 1}`)
-    //       );
-    //   }
-    //   await check_level_reward(rows, message);
-    // }
+    async function level_up(rows, user, guild) {
+      xp = rows[0].exp;
+      lvl_start = rows[0].level;
+      lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+
+      let round = Math.floor(lvl_end);
+      let lvl_up = Number(round);
+
+      if (lvl_up < 0) {
+        // const channelId = "1173064790340534412";
+        // const channel = await client.channels.cache.get(channelId);
+        conn
+          .promise()
+          .query(
+            `UPDATE ${guild}Levels SET level = ${rows[0].level} + 1 WHERE id = ?`,
+            [user.id]
+          )
+          .then(
+            message.channel.send(
+              `${user} has leveled up to level ${rows[0].level + 1}`
+            )
+          );
+      }
+      //await check_level_reward(rows, message);
+    }
 
     if (message.content.startsWith(".addBump")) {
       const roleName = "bumper";
@@ -349,12 +454,27 @@ client.on("messageCreate", async (message) => {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
-  const command = client.commands.get(interaction.commandName);
-
+  const command = interaction.client.commands.get(interaction.commandName);
   if (!command) return;
-
   try {
-    await command.execute(client, interaction, conn);
+    conn
+      .promise()
+      .query(
+        `SELECT * FROM ${interaction.guild.id}Settings WHERE command = ?`,
+        [command.command.data.name]
+      )
+      .then(async ([rows, fields]) => {
+        if (rows[0].turnedOn == 0) {
+          interaction.reply({
+            content:
+              "This command is not turned on in this server. Contact the server owner if you're interested in this command.",
+            ephemeral: true,
+          });
+          return;
+        } else {
+          await command.command.execute(client, interaction, conn);
+        }
+      });
   } catch (error) {
     console.error(error);
     if (interaction.replied || interaction.deferred) {
@@ -371,44 +491,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-function createDatabases(
-  levelTable,
-  currencyTable,
-  familyTable,
-  rpTable,
-  bgPlayerTable,
-  bgLootTable,
-  suggestionTable
-) {
-  // ------------------ Level Table ----------------
-  if (!levelTable["count(*)"]) {
-    // If the table isn't there, create it and setup the database correctly.
-    ldb
-      .prepare(
-        "CREATE TABLE levels (id TEXT PRIMARY KEY, user TEXT, guild TEXT, userName TEXT, level INTEGER, experience INTEGER);"
-      )
-      .run();
-    // Ensure that the "id" row is always unique and indexed.
-    ldb.prepare("CREATE UNIQUE INDEX idx_levels_id ON levels (id);").run();
-    ldb.exec("PRAGMA journal_mode = WAL;");
-    console.log(`level table created successfully`);
-  }
-
-  // ------------------ Currency Table ----------------
-  if (!currencyTable["count()"]) {
-    // If the table isn't there, create it and setup the database correctly.
-    cdb
-      .prepare(
-        "CREATE TABLE currency (id TEXT PRIMARY KEY, user TEXT, guild TEXT, userName TEXT, bank Integer, cash Integer, bitcoin Integer);"
-      )
-      .run();
-
-    // Ensure that the "id" row is always unique and indexed.
-    cdb.prepare("CREATE UNIQUE INDEX idx_currency_id ON currency (id);").run();
-    cdb.exec("PRAGMA journal_mode = WAL;");
-    console.log(`currency table created successfully`);
-  }
-
+function createDatabases(familyTable, rpTable, suggestionTable) {
   // ------------------ Family Table ----------------
   if (!familyTable["count()"]) {
     // If the table isn't there, create it and setup the database correctly.
@@ -433,26 +516,7 @@ function createDatabases(
     rdb.prepare("CREATE UNIQUE INDEX idx_roleplay_id ON roleplay (id);").run();
     rdb.exec("PRAGMA journal_mode = WAL;");
   }
-  // ------------------ BG Player Table ----------------
-  if (!bgPlayerTable["count()"]) {
-    battleDB
-      .prepare(
-        "CREATE TABLE player (id TEXT PRIMARY KEY, user TEXT, guild TEXT, level INTEGER, class TEXT, equipedWeapon TEXT, equipedHelmet TEXT, equipedChestplate TEXT, equipedPants TEXT, equipedBoots TEXT);"
-      )
-      .run();
-    battleDB.prepare("CREATE UNIQUE INDEX idx_player_id ON player (id);").run();
-    battleDB.exec("PRAGMA journal_mode = WAL;");
-  }
-  // ------------------ BG Loot Table ----------------
-  if (!bgLootTable["count()"]) {
-    battleDB
-      .prepare(
-        "CREATE TABLE loot (id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, item TEXT, rarity TEXT);"
-      )
-      .run();
-    battleDB.prepare("CREATE UNIQUE INDEX idx_loot_id ON loot (id);").run();
-    battleDB.exec("PRAGMA journal_mode = WAL;");
-  }
+
   // ------------------ Suggestion Table ----------------
   if (!suggestionTable["count()"]) {
     suggestionDB
@@ -468,22 +532,6 @@ function createDatabases(
 }
 
 function getDatabases() {
-  client.getLevels = ldb.prepare(
-    "SELECT * FROM levels WHERE user = ? and guild = ?"
-  );
-  client.setLevels = ldb.prepare(
-    "INSERT OR REPLACE INTO levels (id, user, guild, userName, level, experience) VALUES (@id, @user, @guild, @userName, @level, @experience);"
-  );
-  console.log(`Levels table loaded successfully`);
-
-  client.getCurrency = cdb.prepare(
-    "SELECT * FROM currency WHERE user = ? AND guild = ?"
-  );
-  client.setCurrency = cdb.prepare(
-    "INSERT OR REPLACE INTO currency (id, user, guild, userName, bank, cash, bitcoin) VALUES (@id, @user, @guild, @userName, @bank, @cash, @bitcoin);"
-  );
-  console.log(`Currency table loaded successfully`);
-
   client.getFamily = fdb.prepare("SELECT * FROM family WHERE user = ?");
   client.setFamily = fdb.prepare(
     "INSERT OR REPLACE INTO family (id, user, partnerID, partnerName, date, parent1 , parent1Name , parent2, parent2Name, child1, child1Name, child2, child2Name, child3, child3Name, child4, child4Name, child5, child5Name) VALUES (@id, @user, @partnerID, @partnerName, @date, @parent1, @parent1Name, @parent2, @parent2Name,@child1, @child1Name, @child2, @child2Name, @child3, @child3Name, @child4, @child4Name, @child5, @child5Name);"
@@ -497,18 +545,6 @@ function getDatabases() {
     "INSERT OR REPLACE INTO roleplay (id, user, guild, kissed, gkissed, hugged, ghugged, cried, gcried, holdhands, gholdhands, boop, gboop, slapped, gslapped, spanked, gspanked, pet, gpet) VALUES (@id, @user, @guild, @kissed, @gkissed, @hugged, @ghugged, @cried, @gcried, @holdhands, @gholdhands, @boop, @gboop, @slapped, @gslapped, @spanked, @gspanked, @pet, @gpet);"
   );
   console.log(`Roleplay table loaded successfully`);
-  client.getBattlePlayer = battleDB.prepare(
-    "SELECT * FROM player WHERE id = ?"
-  );
-  client.setBattlePlayer = battleDB.prepare(
-    "INSERT OR REPLACE INTO player (id, user, guild, level, class, equipedWeapon, equipedHelmet, equipedChestplate, equipedPants, equipedBoots) VALUES (@id, @user, @guild, @level, @class, @equipedWeapon, @equipedHelmet, @equipedChestplate, @equipedPants, @equipedBoots);"
-  );
-  console.log(`battle game player table loaded successfully`);
-  client.getBattleLoot = battleDB.prepare("SELECT * FROM loot WHERE id = ?");
-  client.setBattleLoot = battleDB.prepare(
-    "INSERT OR REPLACE INTO loot (id, userID, item, rarity) VALUES (@id, @userID, @item, @rarity);"
-  );
-  console.log(`battle game loot table loaded successfully`);
   client.getSuggestion = suggestionDB.prepare(
     "SELECT * FROM suggestion WHERE suggestion = ? AND category = ?"
   );

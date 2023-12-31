@@ -18,6 +18,7 @@ module.exports = {
     .setDescription("show your created playlists on the bot"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
+
     conn
       .promise()
       .query(

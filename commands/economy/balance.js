@@ -29,51 +29,46 @@ module.exports = {
 
     const mentioned = interaction.options.getUser("user");
     userid = interaction.user.id;
-    user = interaction.user;
-    username = user.username;
-    let rUser = client.getCurrency.get(userid, interaction.guild.id);
-    if (!rUser) {
-      rUser = {
-        id: `${interaction.guild.id}-${userid}`,
-        user: userid,
-        guild: interaction.guild.id,
-        userName: username,
-        bank: 0,
-        cash: 0,
-        bitcoin: 0,
-      };
-    }
-    client.setCurrency.run(rUser);
+
     // let mentioned = interaction.mentions.users.first();
     if (mentioned) {
       mentionedid = mentioned.id;
-      let rMentioned = client.getCurrency.get(
-        mentionedid,
-        interaction.guild.id
-      );
-      if (!rMentioned) {
-        rMentioned = {
-          id: `${interaction.guild.id}-${mentionedid}`,
-          user: mentionedid,
-          guild: interaction.guild.id,
-          userName: mentioned.username,
-          bank: 0,
-          cash: 0,
-          bitcoin: 0,
-        };
-      }
-      client.setCurrency.run(rMentioned);
-      const balEmbed = new EmbedBuilder();
-      balEmbed.setDescription(
-        `${mentioned}'s current balance:\nbank: ${rMentioned.bank}\ncash: ${rMentioned.cash}\nbitcoin ${rMentioned.bitcoin}`
-      );
-      await interaction.editReply({ embeds: [balEmbed] });
+
+      conn
+        .promise()
+        .query(
+          `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (?, ?, ?, ?, 0, 0, 0)`,
+          [mentionedid, mentionedid, interaction.guild.id, mentioned.username]
+        );
+      conn
+        .promise()
+        .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
+          mentionedid,
+        ])
+        .then(async function ([rows, fields]) {
+          const balEmbed = new EmbedBuilder().setDescription(
+            `${mentioned}'s current balance:\nbank: ${rows[0].bank}\ncash: ${rows[0].cash}\nbitcoin: ${rows[0].bitcoin}`
+          );
+          await interaction.editReply({ embeds: [balEmbed] });
+        });
     } else {
-      const balEmbed = new EmbedBuilder();
-      balEmbed.setDescription(
-        `Your current balance:\nbank: ${rUser.bank}\ncash: ${rUser.cash}\nbitcoin ${rUser.bitcoin}`
-      );
-      await interaction.editReply({ embeds: [balEmbed] });
+      conn
+        .promise()
+        .query(
+          `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (?, ?, ?, ?, 0, 1000, 0)`,
+          [userid, userid, interaction.guild.id, interaction.user.username]
+        );
+      conn
+        .promise()
+        .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
+          userid,
+        ])
+        .then(async function ([rows, fields]) {
+          const balEmbed = new EmbedBuilder().setDescription(
+            `Your current balance:\nbank: ${rows[0].bank}\ncash: ${rows[0].cash}\nbitcoin ${rows[0].bitcoin}`
+          );
+          await interaction.editReply({ embeds: [balEmbed] });
+        });
     }
   },
 };

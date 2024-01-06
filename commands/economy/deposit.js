@@ -31,51 +31,51 @@ module.exports = {
     userid = interaction.user.id;
     user = interaction.user;
     username = user.username;
-    let rUser = client.getCurrency.get(userid, interaction.guild.id);
-    if (!rUser) {
-      rUser = {
-        id: `${interaction.guild.id}-${userid}`,
-        user: userid,
-        guild: interaction.guild.id,
-        userName: username,
-        bank: 0,
-        cash: 0,
-        bitcoin: 0,
-      };
-    }
-    client.setCurrency.run(rUser);
-    if (!amount) {
-      oldCash = rUser.cash;
-      oldBank = rUser.bank;
-      newBank = Number(oldCash) + Number(oldBank);
-      newCash = 0;
-      rUser.cash = newCash;
-      rUser.bank = newBank;
-      const balEmbed = new EmbedBuilder();
-      balEmbed.setDescription(
-        `Your new balance:\nbank: ${rUser.bank}\ncash: ${rUser.cash}\nbitcoin ${rUser.bitcoin}`
+    conn
+      .promise()
+      .query(
+        `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (?, ?, ?, ?, 0, 1000, 0)`,
+        [userid, userid, interaction.guild.id, interaction.user.username]
       );
-      interaction.editReply({ embeds: [balEmbed] });
-      client.setCurrency.run(rUser);
-    } else if (amount > rUser.cash) {
-      interaction.editReply(
-        `you have insufficient cash, your cash is: ${rUser.cash}`
-      );
-    } else if (amount < rUser.cash) {
-      let oldCash = rUser.cash;
-      let oldBank = rUser.bank;
-      await oldBank;
-      await oldCash;
-      deposit(oldCash, oldBank, amount);
-      rUser.bank = newBank;
-      rUser.cash = newCash;
-      const balEmbed = new EmbedBuilder();
-      balEmbed.setDescription(
-        `Your new balance:\nbank: ${rUser.bank}\ncash: ${rUser.cash}\nbitcoin ${rUser.bitcoin}`
-      );
-      interaction.editReply({ embeds: [balEmbed] });
-      client.setCurrency.run(rUser);
-    }
+    conn
+      .promise()
+      .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
+        userid,
+      ])
+      .then(async function ([rows, fields]) {
+        if (!amount) {
+          oldCash = rows[0].cash;
+          oldBank = rows[0].bank;
+          newBank = Number(oldCash) + Number(oldBank);
+          newCash = 0;
+          conn
+            .promise()
+            .query(
+              `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash}, bank = ${newBank} WHERE id=${userid}`
+            );
+          const balEmbed = new EmbedBuilder().setDescription(
+            `Your new balance:\nbank: ${rows[0].bank}\ncash: ${rows[0].cash}\nbitcoin ${rows[0].bitcoin}`
+          );
+          await interaction.editReply({ embeds: [balEmbed] });
+        } else if (amount > rows[0].cash) {
+          interaction.editReply(
+            `you have insufficient cash, your cash is: ${rows[0].cash}`
+          );
+        } else if (amount < rows[0].cash) {
+          let oldCash = rows[0].cash;
+          let oldBank = rows[0].bank;
+          await oldBank;
+          await oldCash;
+          deposit(oldCash, oldBank, amount);
+          rows[0].bank = newBank;
+          rows[0].cash = newCash;
+          const balEmbed = new EmbedBuilder().setDescription(
+            `Your new balance:\nbank: ${rows[0].bank}\ncash: ${rows[0].cash}\nbitcoin ${rows[0].bitcoin}`
+          );
+          interaction.editReply({ embeds: [balEmbed] });
+        }
+      });
+
     function deposit(oldCash, oldBank, amount) {
       newCash = oldCash - amount;
       newBank = Number(`${oldBank}`) + Number(`${amount}`);

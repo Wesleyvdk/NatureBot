@@ -217,34 +217,32 @@ client.on("messageCreate", async (message) => {
   const embed = message.embeds[0];
   try {
     if (embed) {
-      if (message.channel.id === "1176067648006672394") {
-        try {
-          if (embed.description.includes(keyword)) {
-            message.channel.send(
-              `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
+      try {
+        if (embed.description.includes(keyword)) {
+          message.channel.send(
+            `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
               if this role does not exist, the role will be created on first use of the .addBump command`
-            );
+          );
 
-            const delay = 2 * 60 * 60 * 1000;
-            // in milliseconds
-            if (role) {
-              const roleMention = role.toString();
-              setTimeout(() => {
-                // Send a message to the channel where the command was used
-                message.channel.send(`bump is ready ${roleMention}`);
-              }, delay);
-            } else {
-              setTimeout(() => {
-                // Send a message to the channel where the command was used
-                message.channel.send("bump is ready");
-              }, delay);
-            }
+          const delay = 2 * 60 * 60 * 1000;
+          // in milliseconds
+          if (role) {
+            const roleMention = role.toString();
+            setTimeout(() => {
+              // Send a message to the channel where the command was used
+              message.channel.send(`bump is ready ${roleMention}`);
+            }, delay);
           } else {
-            return;
+            setTimeout(() => {
+              // Send a message to the channel where the command was used
+              message.channel.send("bump is ready");
+            }, delay);
           }
-        } catch (e) {
-          console.log(`Error: ${e.message}`);
+        } else {
+          return;
         }
+      } catch (e) {
+        console.log(`Error: ${e.message}`);
       }
     }
   } catch (e) {
@@ -266,7 +264,7 @@ client.on("messageCreate", async (message) => {
 
     conn
       .promise()
-      .execute(`SELECT * FROM '${guild}Levels' WHERE id=?`, [userid])
+      .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
       .then(async ([rows, fields]) => {
         add_experience(rows, user, guild);
       });

@@ -11,6 +11,8 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+require("dotenv").config();
+const axios = require("axios");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -29,90 +31,100 @@ module.exports = {
       .query(
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "kiss"`
       );
-    let gifs = [
-      "https://media1.tenor.com/images/d307db89f181813e0d05937b5feb4254/tenor.gif?itemid=16371489",
-      "https://media1.tenor.com/images/78095c007974aceb72b91aeb7ee54a71/tenor.gif?itemid=5095865",
-      "https://media.giphy.com/media/hnNyVPIXgLdle/giphy.gif",
-      "https://media1.tenor.com/images/bc5e143ab33084961904240f431ca0b1/tenor.gif?itemid=9838409",
-      "https://media1.tenor.com/images/b8d0152fbe9ecc061f9ad7ff74533396/tenor.gif?itemid=5372258",
-      "https://media1.tenor.com/images/7fd98defeb5fd901afe6ace0dffce96e/tenor.gif?itemid=9670722",
-      "https://media.tenor.com/images/9fb52dbfd3b7695ae50dfd00f5d241f7/tenor.gif",
-      "https://media1.tenor.com/images/9fac3eab2f619789b88fdf9aa5ca7b8f/tenor.gif?itemid=12925177",
-      "https://media1.tenor.com/images/632a3db90c6ecd87f1242605f92120c7/tenor.gif?itemid=5608449",
-      "https://media1.tenor.com/images/61dba0b61a2647a0663b7bde896c966c/tenor.gif?itemid=5262571",
-      "https://media1.tenor.com/images/37633f0b8d39daf70a50f69293e303fc/tenor.gif?itemid=13344412",
-    ];
-    //will calculate which one to send
-    const random = gifs[Math.floor(Math.random() * gifs.length)];
-    //sends the random message
+
     let mentioned = interaction.options.getUser("target");
-    mentionedid = mentioned.id;
-    userid = interaction.user.id;
-    user = interaction.user;
-    let rUser = client.getRoleplay.get(userid, interaction.guild.id);
-    let rMentioned = client.getRoleplay.get(mentionedid, interaction.guild.id);
-    if (!rUser) {
-      rUser = {
-        id: `${interaction.guild.id}-${mentionedid}`,
-        user: mentionedid,
-        guild: interaction.guild.id,
-        kissed: 0,
-        gkissed: 0,
-        boop: 0,
-        gboop: 0,
-        hugged: 0,
-        ghugged: 0,
-        cried: 0,
-        gcried: 0,
-        holdhands: 0,
-        gholdhands: 0,
-        pet: 0,
-        gpet: 0,
-        slapped: 0,
-        gslapped: 0,
-        spanked: 0,
-        gspanked: 0,
-        partner: null,
-        date: null,
-      };
+    const api_key = process.env.TENOR_KEY;
+    const search_term = "anime_kiss";
+    const limit = 1;
+    const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
+
+    try {
+      const response = await axios({
+        method: "GET",
+        url: url,
+        headers: {
+          "User-Agent": "PostmanRuntime/7.28.4",
+        },
+      });
+      const data = response.data;
+      if (!data.results || data.results.length === 0) {
+        await interaction.editReply("Sorry but no gifs were found");
+      }
+      const gif = data.results[0].media_formats.gif.url;
+      mentionedid = mentioned.id;
+      userid = interaction.user.id;
+      user = interaction.user;
+      let rUser = client.getRoleplay.get(userid, interaction.guild.id);
+      let rMentioned = client.getRoleplay.get(
+        mentionedid,
+        interaction.guild.id
+      );
+      if (!rUser) {
+        rUser = {
+          id: `${interaction.guild.id}-${mentionedid}`,
+          user: mentionedid,
+          guild: interaction.guild.id,
+          kissed: 0,
+          gkissed: 0,
+          boop: 0,
+          gboop: 0,
+          hugged: 0,
+          ghugged: 0,
+          cried: 0,
+          gcried: 0,
+          holdhands: 0,
+          gholdhands: 0,
+          pet: 0,
+          gpet: 0,
+          slapped: 0,
+          gslapped: 0,
+          spanked: 0,
+          gspanked: 0,
+          partner: null,
+          date: null,
+        };
+      }
+      if (!rMentioned) {
+        rMentioned = {
+          id: `${interaction.guild.id}-${mentionedid}`,
+          user: mentionedid,
+          guild: interaction.guild.id,
+          kissed: 0,
+          gkissed: 0,
+          boop: 0,
+          gboop: 0,
+          hugged: 0,
+          ghugged: 0,
+          cried: 0,
+          gcried: 0,
+          holdhands: 0,
+          gholdhands: 0,
+          pet: 0,
+          gpet: 0,
+          slapped: 0,
+          gslapped: 0,
+          spanked: 0,
+          gspanked: 0,
+          partner: null,
+          date: null,
+        };
+      }
+      rUser.kissed++;
+      rMentioned.gkissed++;
+      client.setRoleplay.run(rUser);
+      client.setRoleplay.run(rMentioned);
+      let embed = new EmbedBuilder();
+      embed.setColor("#fc05cb");
+      embed.setFooter({
+        text: `${user.username} kissed others ${rUser.kissed} times and ${mentioned.username} got kissed ${rMentioned.gkissed} times `,
+      });
+      //embed.setTimestamp();
+      embed.setTitle(`${user.username} kisses ${mentioned.username}`);
+      embed.setImage(gif);
+      interaction.editReply({ embeds: [embed] });
+    } catch (e) {
+      console.log(e);
+      await interaction.editReply("an error occurred. try again later");
     }
-    if (!rMentioned) {
-      rMentioned = {
-        id: `${interaction.guild.id}-${mentionedid}`,
-        user: mentionedid,
-        guild: interaction.guild.id,
-        kissed: 0,
-        gkissed: 0,
-        boop: 0,
-        gboop: 0,
-        hugged: 0,
-        ghugged: 0,
-        cried: 0,
-        gcried: 0,
-        holdhands: 0,
-        gholdhands: 0,
-        pet: 0,
-        gpet: 0,
-        slapped: 0,
-        gslapped: 0,
-        spanked: 0,
-        gspanked: 0,
-        partner: null,
-        date: null,
-      };
-    }
-    rUser.kissed++;
-    rMentioned.gkissed++;
-    client.setRoleplay.run(rUser);
-    client.setRoleplay.run(rMentioned);
-    let embed = new EmbedBuilder();
-    embed.setColor("#fc05cb");
-    embed.setFooter({
-      text: `${user.username} kissed others ${rUser.kissed} times and ${mentioned.username} got kissed ${rMentioned.gkissed} times `,
-    });
-    //embed.setTimestamp();
-    embed.setTitle(`${user.username} kisses ${mentioned.username}`);
-    embed.setImage(random);
-    interaction.editReply({ embeds: [embed] });
   },
 };

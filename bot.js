@@ -213,6 +213,19 @@ client.on("guildMemberAdd", async (member) => {
   }
 });
 
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+  if (newMember.guild.id == "929352993655124000") {
+    const oldStatus = oldMember.premiumSince;
+    const newStatus = newMember.premiumSince;
+
+    if (!oldStatus && newStatus) {
+      client.channels.cache
+        .get("1104478351114129570")
+        .send(`Thank you ${newMember.user} for boosting!!`);
+    }
+  }
+});
+
 client.on("guildCreate", async (guild) => {
   conn.promise().query(
     `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(

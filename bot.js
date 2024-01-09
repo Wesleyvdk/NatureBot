@@ -623,8 +623,7 @@ function loading() {
 }
 function currDrop(message) {
   let randMoney = Math.floor(Math.random() * (500 - 50 + 1)) + 50;
-  //console.log(randNumber)
-  //console.log(randNumber, counter)
+
   if (++counter === randNumber) {
     let counter = 0;
     let dropembed = new EmbedBuilder();
@@ -650,19 +649,6 @@ function currDrop(message) {
   ) {
     let userid = message.author.id;
     let user = message.author;
-    let username = user.username;
-    let rUser = client.getCurrency.get(userid, message.guild.id);
-    if (!rUser) {
-      rUser = {
-        id: `${message.guild.id}-${userid}`,
-        user: userid,
-        guild: message.guild.id,
-        userName: username,
-        bank: 0,
-        cash: 0,
-        bitcoin: 0,
-      };
-    }
     if (dropMessage == true) {
       message.delete();
       message.channel
@@ -671,12 +657,20 @@ function currDrop(message) {
           setTimeout(() => message.delete(), 10000)
         ); /*Time until delete in milliseconds*/
       dropMessage = false;
-      oldCash = rUser.cash;
-      newCash = oldCash + randomMoney;
-      //console.log(oldCash + " + " +  randomMoney + " = " + newCash)
-      rUser.cash = newCash;
-      client.setCurrency.run(rUser);
-      counter = 0;
+      conn
+        .promise()
+        .query(`SELECT * FROM ${message.guild.id}Currency WHERE id=?`, [userid])
+        .then(async function ([rows, fields]) {
+          oldCash = rows[0].cash;
+          newCash = oldCash + randomMoney;
+          conn
+            .promise()
+            .query(
+              `UPDATE ${message.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+            );
+          counter = 0;
+          randNumber = number[Math.floor(Math.random() * number.length)];
+        });
     } else {
       //console.log(`nothing to pick: ${dropMessage}`)
       message.delete();

@@ -663,6 +663,7 @@ function currDrop(message) {
         .promise()
         .query(`SELECT * FROM ${message.guild.id}Currency WHERE id=?`, [userid])
         .then(async function ([rows, fields]) {
+          console.log(rows);
           oldCash = rows[0].cash;
           newCash = oldCash + randomMoney;
           conn

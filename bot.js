@@ -167,49 +167,51 @@ client.once(Events.ClientReady, async () => {
 client.on("guildMemberAdd", async (member) => {
   let joiner = member.user;
   let joinerid = member.user.id;
-  const channel = member.guild.channels.cache.get("1104478351114129570");
-  const api_key = process.env.TENOR_KEY;
-  const search_term = "anime_wave";
-  const limit = 1;
-  const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
+  if (member.guild.id === "929352993655124000") {
+    const channel = member.guild.channels.cache.get("1104478351114129570");
+    const api_key = process.env.TENOR_KEY;
+    const search_term = "anime_wave";
+    const limit = 1;
+    const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
 
-  try {
-    const response = await axios({
-      method: "GET",
-      url: url,
-      headers: {
-        "User-Agent": "PostmanRuntime/7.28.4",
-      },
-    });
-    const data = response.data;
-    if (!data.results || data.results.length === 0) {
-      console.log("no gifs were found");
+    try {
+      const response = await axios({
+        method: "GET",
+        url: url,
+        headers: {
+          "User-Agent": "PostmanRuntime/7.28.4",
+        },
+      });
+      const data = response.data;
+      if (!data.results || data.results.length === 0) {
+        console.log("no gifs were found");
+      }
+      const gif = data.results[0].media_formats.gif.url;
+      let welcomeMessage = `give ${joiner} a warm welcome`;
+      const welcomeEmbed = new EmbedBuilder()
+        .setColor("#5cf000")
+        .setDescription(
+          `Welcome to ${member.guild.name}\n\nMake sure to check out:\n-> <#929352994158419968>\n-> <#982734226808012801>\n\nEnjoy your stay!`
+        )
+        .setImage(gif)
+        .setFooter({ text: `We now have ${member.guild.memberCount} Members` })
+        .setTimestamp();
+      channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
+    } catch (e) {
+      console.log(e);
+      let welcomeMessage = `give ${joiner} a warm welcome`; //<@&771100361326985229>
+      const welcomeEmbed = new EmbedBuilder()
+        .setColor("#5cf000")
+        .setDescription(
+          `Welcome to ${member.guild.name}\nMake sure to check out:\n-> <#929352994158419968>\n-> <#982734226808012801>\nEnjoy your stay!`
+        )
+        .setImage(
+          "https://media2.giphy.com/media/3ov9jIYPU7NMT6TS7K/giphy.gif?cid=ecf05e47dp3ynov4tbepk3akc4wb7kpiv7l0jq5p6526jzi9&rid=giphy.gif&ct=g"
+        )
+        .setFooter({ text: `We now have ${member.guild.memberCount} Members` })
+        .setTimestamp();
+      channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
     }
-    const gif = data.results[0].media_formats.gif.url;
-    let welcomeMessage = `give ${joiner} a warm welcome`;
-    const welcomeEmbed = new EmbedBuilder()
-      .setColor("#5cf000")
-      .setDescription(
-        `Welcome to ${member.guild.name}\n\nMake sure to check out:\n-> <#929352994158419968>\n-> <#982734226808012801>\n\nEnjoy your stay!`
-      )
-      .setImage(gif)
-      .setFooter({ text: `We now have ${member.guild.memberCount} Members` })
-      .setTimestamp();
-    channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
-  } catch (e) {
-    console.log(e);
-    let welcomeMessage = `give ${joiner} a warm welcome`; //<@&771100361326985229>
-    const welcomeEmbed = new EmbedBuilder()
-      .setColor("#5cf000")
-      .setDescription(
-        `Welcome to ${member.guild.name}\nMake sure to check out:\n-> <#929352994158419968>\n-> <#982734226808012801>\nEnjoy your stay!`
-      )
-      .setImage(
-        "https://media2.giphy.com/media/3ov9jIYPU7NMT6TS7K/giphy.gif?cid=ecf05e47dp3ynov4tbepk3akc4wb7kpiv7l0jq5p6526jzi9&rid=giphy.gif&ct=g"
-      )
-      .setFooter({ text: `We now have ${member.guild.memberCount} Members` })
-      .setTimestamp();
-    channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
   }
 });
 

@@ -11,6 +11,8 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const moment = require("moment/moment");
+let CurrentDate = moment().format();
 
 module.exports = {
   data: new SlashCommandBuilder()

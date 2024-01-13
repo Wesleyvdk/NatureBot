@@ -13,6 +13,8 @@ const {
 } = require("discord.js");
 const moment = require("moment");
 
+let CurrentDate = moment().format();
+
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("partner")
@@ -139,7 +141,8 @@ module.exports = {
             return diff(marriedDate);
         }
       } catch (e) {
-        console.error(e);
+        console.log(`Error: ${e}`);
+        console.log(`Date/Time: ${CurrentDate}`);
       }
     }
     function diff(marriedDate) {

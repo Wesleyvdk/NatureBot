@@ -2,6 +2,9 @@ const { REST, Routes } = require("discord.js");
 const fs = require("node:fs");
 const path = require("node:path");
 require("dotenv").config();
+const moment = require("moment/moment");
+
+let CurrentDate = moment().format();
 
 const commands = [];
 // Grab all the command folders from the commands directory you created earlier
@@ -49,8 +52,9 @@ const rest = new REST().setToken(token);
     console.log(
       `Successfully reloaded ${data.length} application (/) commands.`
     );
-  } catch (error) {
+  } catch (e) {
     // And of course, make sure you catch and log any errors!
-    console.error(error);
+    console.log(`Error: ${e}`);
+    console.log(`Date/Time: ${CurrentDate}`);
   }
 })();

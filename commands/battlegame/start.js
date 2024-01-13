@@ -12,6 +12,9 @@ const {
   AttachmentBuilder,
 } = require("discord.js");
 const classes = require("./classes.json");
+const moment = require("moment/moment");
+
+let CurrentDate = moment().format();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -319,11 +322,13 @@ module.exports = {
           Collector.on("end", (collected) => {
             console.log(`Collected ${collected.size} interactions.`);
           });
-        } catch (err) {
-          console.log(err);
+        } catch (e) {
+          console.log(`Error: ${e}`);
+          console.log(`Date/Time: ${CurrentDate}`);
         }
-      } catch (err) {
-        console.log(err);
+      } catch (e) {
+        console.log(`Error: ${e}`);
+        console.log(`Date/Time: ${CurrentDate}`);
       }
     }
   },

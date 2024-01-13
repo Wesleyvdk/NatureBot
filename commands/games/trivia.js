@@ -11,6 +11,9 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const moment = require("moment/moment");
+
+let CurrentDate = moment().format();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -122,8 +125,9 @@ module.exports = {
       triviaCollector.on("end", (collected) => {
         console.log(`Collected ${collected.size} interactions.`);
       });
-    } catch (err) {
-      console.log(err);
+    } catch (e) {
+      console.log(`Error: ${e}`);
+      console.log(`Date/Time: ${CurrentDate}`);
     }
   },
 };

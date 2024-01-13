@@ -13,7 +13,8 @@ const {
 } = require("discord.js");
 require("dotenv").config();
 const axios = require("axios");
-
+const moment = require("moment/moment");
+let CurrentDate = moment().format();
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("spank")
@@ -124,7 +125,8 @@ module.exports = {
       embed.setImage(gif);
       interaction.editReply({ embeds: [embed] });
     } catch (e) {
-      console.log(e);
+      console.log(`Error: ${e}`);
+      console.log(`Date/Time: ${CurrentDate}`);
       await interaction.editReply("an error occurred. try again later");
     }
   },

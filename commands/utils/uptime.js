@@ -18,7 +18,7 @@ module.exports = {
     .setDescription("list all the active matches"),
   async execute(client, interaction) {
     await interaction.deferReply();
-    let seconds = Math.floor(message.client.uptime / 1000);
+    let seconds = Math.floor(interaction.client.uptime / 1000);
     let minutes = Math.floor(seconds / 60);
     let hours = Math.floor(minutes / 60);
     let days = Math.floor(hours / 24);

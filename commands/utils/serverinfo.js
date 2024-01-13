@@ -42,7 +42,7 @@ module.exports = {
       return onlineCount;
     }
 
-    let sicon = interaction.guild.iconURL;
+    let sicon = interaction.guild.iconURL();
     let serverembed = new EmbedBuilder()
       .setAuthor({
         name: `${interaction.guild.name} - Informations`,

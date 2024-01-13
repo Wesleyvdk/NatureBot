@@ -42,49 +42,52 @@ module.exports = {
       return onlineCount;
     }
 
-    let sicon = message.guild.iconURL;
+    let sicon = interaction.guild.iconURL;
     let serverembed = new EmbedBuilder()
-      .setAuthor(`${message.guild.name} - Informations`, message.guild.iconURL)
+      .setAuthor(
+        `${interaction.guild.name} - Informations`,
+        interaction.guild.iconURL
+      )
       .setColor("#15f153")
       .addFields({
         name: "Server owner",
-        value: message.guild.fetchOwner,
+        value: interaction.guild.fetchOwner,
         inline: true,
       })
       .addFields({
         name: "Server region",
-        value: message.guild.region,
+        value: interaction.guild.region,
         inline: true,
       })
       .setThumbnail(sicon)
-      .addFields({ name: "Server Name", value: message.guild.name })
+      .addFields({ name: "Server Name", value: interaction.guild.name })
       .addFields({
         name: "Verification level",
-        value: message.guild.verificationLevel,
+        value: interaction.guild.verificationLevel,
         inline: true,
       })
       .addFields({
         name: "Channel count",
-        value: message.guild.channels.cache.size,
+        value: interaction.guild.channels.cache.size,
         inline: true,
       })
       .addFields({
         name: "Total member count",
-        value: message.guild.memberCount,
+        value: interaction.guild.memberCount,
       })
       .addFields({
         name: "Humans",
-        value: checkMembers(message.guild),
+        value: checkMembers(interaction.guild),
         inline: true,
       })
       .addFields({
         name: "Bots",
-        value: checkBots(message.guild),
+        value: checkBots(interaction.guild),
         inline: true,
       })
-      .addFields({ name: "Online", value: checkOnlineUsers(message.guild) })
+      .addFields({ name: "Online", value: checkOnlineUsers(interaction.guild) })
       .setFooter({ text: "Guild created at:" })
-      .setTimestamp(message.guild.createdAt);
+      .setTimestamp(interaction.guild.createdAt);
 
     interaction.editReply({ embeds: [serverembed] });
   },

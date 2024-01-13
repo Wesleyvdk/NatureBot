@@ -163,7 +163,12 @@ client.once(Events.ClientReady, async () => {
         ]);
     });
   });
-
+  const Guilds = client.guilds.cache.map((guild) => [
+    guild.id,
+    guild.name,
+    guild.features,
+  ]);
+  console.log(Guilds);
   console.log(
     `logged in as: ${client.user.username}. ready to be used! (${CurrentDate})`
   );

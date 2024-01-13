@@ -51,7 +51,7 @@ module.exports = {
       .setColor("#15f153")
       .addFields({
         name: "Server owner",
-        value: interaction.guild.fetchOwner,
+        value: interaction.guild.fetchOwner(),
         inline: true,
       })
       .addFields({

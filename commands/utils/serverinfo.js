@@ -46,7 +46,7 @@ module.exports = {
     let serverembed = new EmbedBuilder()
       .setAuthor({
         name: `${interaction.guild.name} - Informations`,
-        iconURL: `${interaction.guild.iconURL}`,
+        iconURL: `${interaction.guild.iconURL()}`,
       })
       .setColor("#15f153")
       .addFields({

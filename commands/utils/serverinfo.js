@@ -52,7 +52,7 @@ module.exports = {
       .addFields(
         {
           name: "Server owner",
-          value: `${interaction.guild.fetchOwner()}`,
+          value: `${interaction.guild.fetchOwner().name}`,
           inline: true,
         },
         {

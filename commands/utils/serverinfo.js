@@ -49,43 +49,49 @@ module.exports = {
         iconURL: `${interaction.guild.iconURL()}`,
       })
       .setColor("#15f153")
-      .addFields({
-        name: "Server owner",
-        value: interaction.guild.fetchOwner(),
-        inline: true,
-      })
-      .addFields({
-        name: "Server region",
-        value: interaction.guild.region,
-        inline: true,
-      })
-      .setThumbnail(sicon)
+      .addFields(
+        {
+          name: "Server owner",
+          value: `${interaction.guild.fetchOwner()}`,
+          inline: true,
+        },
+        {
+          name: "Server region",
+          value: `${interaction.guild.region}`,
+          inline: true,
+        }
+      )
+
       .addFields({ name: "Server Name", value: interaction.guild.name })
       .addFields({
         name: "Verification level",
-        value: interaction.guild.verificationLevel,
+        value: `${interaction.guild.verificationLevel}`,
         inline: true,
       })
       .addFields({
         name: "Channel count",
-        value: interaction.guild.channels.cache.size,
+        value: `${interaction.guild.channels.cache.size}`,
         inline: true,
       })
       .addFields({
         name: "Total member count",
-        value: interaction.guild.memberCount,
+        value: `${interaction.guild.memberCount}`,
       })
       .addFields({
         name: "Humans",
-        value: checkMembers(interaction.guild),
+        value: `${checkMembers(interaction.guild)}`,
         inline: true,
       })
       .addFields({
         name: "Bots",
-        value: checkBots(interaction.guild),
+        value: `${checkBots(interaction.guild)}`,
         inline: true,
       })
-      .addFields({ name: "Online", value: checkOnlineUsers(interaction.guild) })
+      .addFields({
+        name: "Online",
+        value: `${checkOnlineUsers(interaction.guild)}`,
+      })
+      .setThumbnail(sicon)
       .setFooter({ text: "Guild created at:" })
       .setTimestamp(interaction.guild.createdAt);
 

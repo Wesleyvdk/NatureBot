@@ -12,6 +12,7 @@ const {
 } = require("discord.js");
 const mysql = require("mysql2");
 const Database = require("better-sqlite3");
+const moment = require("moment/moment");
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 conn.connect(function (err) {
   if (err) throw err;
@@ -53,6 +54,8 @@ const client = new Client({
   ],
 });
 const PREFIX = ".";
+
+let CurrentDate = moment().format();
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, "commands");
@@ -161,7 +164,9 @@ client.once(Events.ClientReady, async () => {
     });
   });
 
-  console.log(`logged in as: ${client.user.username}. ready to be used!`);
+  console.log(
+    `logged in as: ${client.user.username}. ready to be used! (${CurrentDate})`
+  );
 });
 
 client.on("guildMemberAdd", async (member) => {
@@ -198,7 +203,8 @@ client.on("guildMemberAdd", async (member) => {
         .setTimestamp();
       channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
     } catch (e) {
-      console.log(e);
+      console.log(`Error: ${e}`);
+      console.log(`Date/Time: ${CurrentDate}`);
       let welcomeMessage = `give ${joiner} a warm welcome`; //<@&771100361326985229>
       const welcomeEmbed = new EmbedBuilder()
         .setColor("#5cf000")
@@ -307,11 +313,13 @@ client.on("messageCreate", async (message) => {
           return;
         }
       } catch (e) {
-        console.log(`Error: ${e.message}`);
+        console.log(`Error: ${e}`);
+        console.log(`Date/Time: ${CurrentDate}`);
       }
     }
   } catch (e) {
-    console.log(`Error: ${e.message}`);
+    console.log(`Error: ${e}`);
+    console.log(`Date/Time: ${CurrentDate}`);
   }
   try {
     if (message.author.bot) return;
@@ -364,7 +372,10 @@ client.on("messageCreate", async (message) => {
               // else if (roleLevel == 5) roleLevel + 5
               // else if (roleLevel >= 10) roleLevel + 10
             })
-            .catch(console.error);
+            .catch((e) => {
+              console.log(`Error: ${e}`);
+              console.log(`Date/Time: ${CurrentDate}`);
+            });
         }
         if (rows[0].level === 1) {
           const role = guild.roles.cache.find((role) => role.name === "Member");
@@ -411,6 +422,8 @@ client.on("messageCreate", async (message) => {
         exp = rows[0].exp;
         newExp = exp += 5;
       } catch (e) {
+        console.log(`Error: ${e}`);
+        console.log(`Date/Time: ${CurrentDate}`);
         conn
           .promise()
           .query(
@@ -479,7 +492,10 @@ client.on("messageCreate", async (message) => {
               `I gave you the role. remove the role using \`.delBump\``
             );
           })
-          .catch(console.error);
+          .catch((e) => {
+            console.log(`Error: ${e}`);
+            console.log(`Date/Time: ${CurrentDate}`);
+          });
       } else {
         message.member.roles.add(role).then(() => {
           message.reply(
@@ -510,7 +526,8 @@ client.on("messageCreate", async (message) => {
     if (message.channel.id === "938036238101921844") return;
     currDrop(message);
   } catch (e) {
-    console.log(e);
+    console.log(`Error: ${e}`);
+    console.log(`Date/Time: ${CurrentDate}`);
   }
 });
 
@@ -539,7 +556,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
         }
       });
   } catch (error) {
-    console.error(error);
+    console.log(`Error: ${e}`);
+    console.log(`Date/Time: ${CurrentDate}`);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: "There was an error while executing this command!",

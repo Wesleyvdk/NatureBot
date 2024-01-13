@@ -44,10 +44,10 @@ module.exports = {
 
     let sicon = interaction.guild.iconURL;
     let serverembed = new EmbedBuilder()
-      .setAuthor(
-        `${interaction.guild.name} - Informations`,
-        interaction.guild.iconURL
-      )
+      .setAuthor({
+        name: `${interaction.guild.name} - Informations`,
+        iconURL: interaction.guild.iconURL,
+      })
       .setColor("#15f153")
       .addFields({
         name: "Server owner",

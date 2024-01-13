@@ -43,6 +43,7 @@ module.exports = {
     }
 
     let sicon = interaction.guild.iconURL();
+
     let serverembed = new EmbedBuilder()
       .setAuthor({
         name: `${interaction.guild.name} - Informations`,
@@ -52,12 +53,12 @@ module.exports = {
       .addFields(
         {
           name: "Server owner",
-          value: `${interaction.guild.fetchOwner().name}`,
+          value: `${await interaction.guild.fetchOwner()}`,
           inline: true,
         },
         {
-          name: "Server region",
-          value: `${interaction.guild.region}`,
+          name: "Server language",
+          value: `${interaction.guild.preferredLocale}`,
           inline: true,
         }
       )
@@ -76,20 +77,6 @@ module.exports = {
       .addFields({
         name: "Total member count",
         value: `${interaction.guild.memberCount}`,
-      })
-      .addFields({
-        name: "Humans",
-        value: `${checkMembers(interaction.guild)}`,
-        inline: true,
-      })
-      .addFields({
-        name: "Bots",
-        value: `${checkBots(interaction.guild)}`,
-        inline: true,
-      })
-      .addFields({
-        name: "Online",
-        value: `${checkOnlineUsers(interaction.guild)}`,
       })
       .setThumbnail(sicon)
       .setFooter({ text: "Guild created at:" })

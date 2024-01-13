@@ -294,7 +294,7 @@ client.on("messageCreate", async (message) => {
   try {
     if (embed) {
       try {
-        if (message.author.id === "938036238101921844")
+        
           if (embed.description.includes(keyword)) {
             message.channel.send(
               `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n

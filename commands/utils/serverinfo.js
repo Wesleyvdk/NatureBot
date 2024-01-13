@@ -37,7 +37,7 @@ module.exports = {
     function checkOnlineUsers(guild) {
       let onlineCount = 0;
       guild.members.cache.forEach((member) => {
-        if (member.user.presence.status === "online") onlineCount++;
+        if (member.presence.status === "online") onlineCount++;
       });
       return onlineCount;
     }

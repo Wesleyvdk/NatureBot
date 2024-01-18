@@ -21,10 +21,7 @@ module.exports = {
     let permissions = [];
     let acknowledgements = "None";
 
-    const member =
-      interaction.mentions.members.first() ||
-      interaction.guild.members.cache.get(args[0]) ||
-      interaction.member;
+    const member = interaction.member;
     const randomColor = "#000000".replace(/0/g, function () {
       return (~~(Math.random() * 16)).toString(16);
     });
@@ -77,7 +74,7 @@ module.exports = {
       acknowledgements = "Server Owner";
     }
 
-    const embed = new Discord.MessageEmbed()
+    const embed = new EmbedBuilder()
       .setDescription(`<@${member.user.id}>`)
       .setAuthor(`${member.user.tag}`, member.user.displayAvatarURL)
       .setColor(randomColor)

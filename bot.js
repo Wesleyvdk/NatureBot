@@ -318,7 +318,7 @@ client.on("messageCreate", async (message) => {
           return;
         }
       } catch (e) {
-        console.log(`Error: ${e}`);
+        console.log(`Error: ${e}\n in server: ${interaction.guild.name}`);
         console.log(`Date/Time: ${CurrentDate}`);
       }
     }

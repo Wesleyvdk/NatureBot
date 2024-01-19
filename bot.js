@@ -223,6 +223,10 @@ client.on("guildMemberAdd", async (member) => {
         .setTimestamp();
       channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
     }
+    const role = guild.roles.cache.find(
+      (role) => role.name === "Trusted Member"
+    );
+    member.roles.add(role);
   }
 });
 

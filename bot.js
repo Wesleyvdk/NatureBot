@@ -296,7 +296,7 @@ client.on("messageCreate", async (message) => {
   const role = message.guild.roles.cache.find((role) => role.name === roleName);
   const embed = message.embeds[0];
   try {
-    if (embed.description) {
+    if (embed && embed.description) {
       try {
         if (embed.description.includes(keyword)) {
           message.channel.send(

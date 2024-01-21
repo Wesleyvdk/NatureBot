@@ -224,7 +224,7 @@ client.on("guildMemberAdd", async (member) => {
       channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
     }
     const role = member.guild.roles.cache.find(
-      (role) => role.name === "Trusted Member"
+      (role) => role.id === "929352993655124002"
     );
     member.roles.add(role);
   }
@@ -322,7 +322,7 @@ client.on("messageCreate", async (message) => {
           return;
         }
       } catch (e) {
-        console.log(`Error: ${e}\n in server: ${interaction.guild.name}`);
+        console.log(`Error: ${e}\n in server: ${message.guild.name}`);
         console.log(`Date/Time: ${CurrentDate}`);
       }
     }
@@ -691,15 +691,19 @@ function currDrop(message) {
         .query(`SELECT * FROM ${message.guild.id}Currency WHERE id=?`, [userid])
         .then(async function ([rows, fields]) {
           console.log(rows);
-          oldCash = rows[0].cash;
-          newCash = oldCash + randomMoney;
-          conn
-            .promise()
-            .query(
-              `UPDATE ${message.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
-            );
-          counter = 0;
-          randNumber = number[Math.floor(Math.random() * number.length)];
+          try {
+            oldCash = rows[0].cash;
+            newCash = oldCash + randomMoney;
+            conn
+              .promise()
+              .query(
+                `UPDATE ${message.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+              );
+            counter = 0;
+            randNumber = number[Math.floor(Math.random() * number.length)];
+          } catch (e) {
+            console.log(`Error: ${e}\nUser: ${user}\nrows: ${rows}`);
+          }
         });
     } else {
       //console.log(`nothing to pick: ${dropMessage}`)

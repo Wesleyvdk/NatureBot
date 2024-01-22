@@ -43,20 +43,20 @@ module.exports = {
     const option = interaction.options.getString("option");
     coinFlip = Math.floor(Math.random() * 10);
     playerid = interaction.user.id;
-    if (rows[0].cash < amount) {
-      let embed = new EmbedBuilder()
-        .setTitle("Whoops!!")
-        .setDescription(
-          "you don't have enough cash. either Withdraw from the bank, or use less cash."
-        );
-      interaction.editReply({ embeds: embed });
-    } else {
-      conn
-        .promise()
-        .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
-          playerid,
-        ])
-        .then(([rows, fields]) => {
+    conn
+      .promise()
+      .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
+        playerid,
+      ])
+      .then(([rows, fields]) => {
+        if (rows[0].cash < amount) {
+          let embed = new EmbedBuilder()
+            .setTitle("Whoops!!")
+            .setDescription(
+              "you don't have enough cash. either Withdraw from the bank, or use less cash."
+            );
+          interaction.editReply({ embeds: embed });
+        } else {
           if (coinFlip < 5 && option === "heads") {
             let embed = new EmbedBuilder()
               .setTitle("Congrats!!")
@@ -107,7 +107,7 @@ module.exports = {
               );
             interaction.editReply({ embeds: embed });
           }
-        });
-    }
+        }
+      });
   },
 };

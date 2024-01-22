@@ -43,11 +43,13 @@ module.exports = {
     const option = interaction.options.getString("option");
     coinFlip = Math.floor(Math.random() * 10);
     playerid = interaction.user.id;
+    console.log(interaction.guild.id);
+
     conn
       .promise()
-      .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
-        playerid,
-      ])
+      .query(
+        `SELECT * FROM ${interaction.guild.id}Currency WHERE id=${playerid}`
+      )
       .then(([rows, fields]) => {
         if (rows[0]) {
           if (rows[0].cash < amount) {

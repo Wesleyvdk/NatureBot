@@ -51,14 +51,14 @@ module.exports = {
     conn
       .promise()
       .query(
-        `SELECT * FROM ${interaction.guild.id}Currency WHERE id=${playerid};`
+        `SELECT * FROM ${interaction.guild.id}Currency WHERE id=${playerid}`
       )
       .then(([rows, fields]) => {
         if (!rows[0]) {
           conn
             .promise()
             .query(
-              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid};`
+              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid}`
             );
           interaction.editReply(
             "Sorry you had no cash yet! I've added 500 to your account. Try again!"
@@ -85,7 +85,7 @@ module.exports = {
             conn
               .promise()
               .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid};`
+                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
               );
             interaction.editReply({ embeds: embed });
           } else {
@@ -101,7 +101,7 @@ module.exports = {
             conn
               .promise()
               .query(
-                `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (${playerid}, ${interaction.guild.id}, ${interaction.user.name}, 0, 500, 0);`
+                `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (${playerid}, ${interaction.guild.id}, ${interaction.user.username}, 0, 500, 0)`
               );
             interaction.editReply({ embeds: embed });
           }

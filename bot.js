@@ -54,6 +54,8 @@ const client = new Client({
   ],
 });
 const PREFIX = ".";
+const REPO = "Wesleyvdk/NatureBot";
+let lastCommitSha = null;
 
 let CurrentDate = moment().format();
 
@@ -709,6 +711,27 @@ function currDrop(message) {
       //console.log(`nothing to pick: ${dropMessage}`)
       message.delete();
     }
+  }
+}
+
+async function checkCommits() {
+  try {
+    const response = await axios.get(
+      `https://api.github.com/repos/${REPO}/commits`,
+      {
+        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
+      }
+    );
+
+    const latestCommit = response.data[0];
+    if (latestCommit.sha !== lastCommitSha) {
+      lastCommitSha = latestCommit.sha;
+      const commitMessage = `New commit in ${REPO}: ${latestCommit.commit.message}`;
+      const channel = await client.channels.cache("771097960489811991");
+      channel.send(commitMessage);
+    }
+  } catch (error) {
+    console.error("Error fetching commits:", error);
   }
 }
 

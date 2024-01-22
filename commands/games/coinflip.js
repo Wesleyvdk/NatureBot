@@ -49,64 +49,68 @@ module.exports = {
         playerid,
       ])
       .then(([rows, fields]) => {
-        if (rows[0].cash < amount) {
-          let embed = new EmbedBuilder()
-            .setTitle("Whoops!!")
-            .setDescription(
-              "you don't have enough cash. either Withdraw from the bank, or use less cash."
-            );
-          interaction.editReply({ embeds: embed });
-        } else {
-          if (coinFlip < 5 && option === "heads") {
+        if (rows[0]) {
+          if (rows[0].cash < amount) {
             let embed = new EmbedBuilder()
-              .setTitle("Congrats!!")
+              .setTitle("Whoops!!")
               .setDescription(
-                `You chose ${option} and it was ${coinFlip} \nYou've won. You just doubled your bet. Your total cash is now ${
-                  amount * 2
-                }`
-              );
-            amount = amount * 2;
-            newCash = rows[0].cash + amount;
-            conn
-              .promise()
-              .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
-              );
-            interaction.editReply({ embeds: embed });
-          }
-          if (coinFlip > 5 && option === "tails") {
-            let embed = new EmbedBuilder()
-              .setTitle("Congrats!!")
-              .setDescription(
-                `You chose ${option} and it was ${coinFlip} \nYou've won. You just doubled your bet. Your total cash is now ${
-                  amount * 2
-                }`
-              );
-            amount = amount * 2;
-            newCash = rows[0].cash + amount;
-            conn
-              .promise()
-              .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                "you don't have enough cash. either Withdraw from the bank, or use less cash."
               );
             interaction.editReply({ embeds: embed });
           } else {
-            let embed = new EmbedBuilder()
-              .setTitle("Aww!!")
-              .setDescription(
-                `You chose ${option} and it was ${coinFlip} \nYou've lost. You lost everything you've bet which leaves you with ${
-                  rows[0].cash - amount
-                }`
-              );
+            if (coinFlip < 5 && option === "heads") {
+              let embed = new EmbedBuilder()
+                .setTitle("Congrats!!")
+                .setDescription(
+                  `You chose ${option} and it was ${coinFlip} \nYou've won. You just doubled your bet. Your total cash is now ${
+                    amount * 2
+                  }`
+                );
+              amount = amount * 2;
+              newCash = rows[0].cash + amount;
+              conn
+                .promise()
+                .query(
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                );
+              interaction.editReply({ embeds: embed });
+            }
+            if (coinFlip > 5 && option === "tails") {
+              let embed = new EmbedBuilder()
+                .setTitle("Congrats!!")
+                .setDescription(
+                  `You chose ${option} and it was ${coinFlip} \nYou've won. You just doubled your bet. Your total cash is now ${
+                    amount * 2
+                  }`
+                );
+              amount = amount * 2;
+              newCash = rows[0].cash + amount;
+              conn
+                .promise()
+                .query(
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                );
+              interaction.editReply({ embeds: embed });
+            } else {
+              let embed = new EmbedBuilder()
+                .setTitle("Aww!!")
+                .setDescription(
+                  `You chose ${option} and it was ${coinFlip} \nYou've lost. You lost everything you've bet which leaves you with ${
+                    rows[0].cash - amount
+                  }`
+                );
 
-            newCash = rows[0].cash - amount;
-            conn
-              .promise()
-              .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
-              );
-            interaction.editReply({ embeds: embed });
+              newCash = rows[0].cash - amount;
+              conn
+                .promise()
+                .query(
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                );
+              interaction.editReply({ embeds: embed });
+            }
           }
+        } else {
+          interaction.editReply("Something went wrong");
         }
       });
   },

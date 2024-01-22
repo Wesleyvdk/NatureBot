@@ -54,9 +54,12 @@ const client = new Client({
   ],
 });
 const PREFIX = ".";
-const REPO = "Wesleyvdk/NatureBot";
-const BRANCH = "V2";
-let lastCommitSha = null;
+const botREPO = "Wesleyvdk/NatureBot";
+const webREPO = "Wesleyvdk/DiscordBotAdminDashboard";
+const botBRANCH = "V2";
+const webBRANCH = "main";
+let lastBotCommitSha = null;
+let lastWebCommitSha = null;
 
 let CurrentDate = moment().format();
 
@@ -86,8 +89,8 @@ for (const folder of commandFolders) {
   }
 }
 
-setInterval(checkBotCommits, 1000);
-
+setInterval(checkBotCommits, 10 * 60 * 1000);
+setInterval(checkWebCommits, 10 * 60 * 1000);
 client.once(Events.ClientReady, async () => {
   const familyTable = fdb
     .prepare(
@@ -179,6 +182,7 @@ client.once(Events.ClientReady, async () => {
     `logged in as: ${client.user.username}. ready to be used! (${CurrentDate})`
   );
   checkBotCommits();
+  checkWebCommits();
 });
 
 client.on("guildMemberAdd", async (member) => {
@@ -722,18 +726,18 @@ function currDrop(message) {
 async function checkBotCommits() {
   try {
     const response = await axios.get(
-      `https://api.github.com/repos/${REPO}/commits?sha=${BRANCH}`,
+      `https://api.github.com/repos/${botREPO}/commits?sha=${botBRANCH}`,
       {
         headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
       }
     );
 
     const latestCommit = response.data[0];
-    if (lastCommitSha == null) {
+    if (lastBotCommitSha == null) {
       lastCommitSha = latestCommit.sha;
     }
-    if (latestCommit.sha !== lastCommitSha) {
-      lastCommitSha = latestCommit.sha;
+    if (latestCommit.sha !== lastBotCommitSha) {
+      lastBotCommitSha = latestCommit.sha;
       // Fetch detailed commit data
       const commitDetailsResponse = await axios.get(latestCommit.url, {
         headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
@@ -764,6 +768,36 @@ async function checkBotCommits() {
           });
         }
       }
+
+      const channel = await client.channels.cache.get("929363312527953950");
+      channel.send({ embeds: [embed] });
+    }
+  } catch (error) {
+    console.error("Error fetching commits:", error);
+  }
+}
+
+async function checkWebCommits() {
+  try {
+    const response = await axios.get(
+      `https://api.github.com/repos/${webREPO}/commits?sha=${webBRANCH}`,
+      {
+        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
+      }
+    );
+
+    const latestCommit = response.data[0];
+    if (lastWebCommitSha == null) {
+      lastWebCommitSha = latestCommit.sha;
+    }
+    if (latestCommit.sha !== lastWebCommitSha) {
+      lastWebCommitSha = latestCommit.sha;
+
+      // const commitMessage = `New commit in ${REPO} on branch ${BRANCH}: ${latestCommit.commit.message}\nAffected files: ${files}`;
+
+      let embed = new EmbedBuilder()
+        .setTitle("New Web Update")
+        .setDescription(`Update: ${latestCommit.commit.message}`);
 
       const channel = await client.channels.cache.get("929363312527953950");
       channel.send({ embeds: [embed] });

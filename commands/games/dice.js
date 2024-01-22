@@ -41,7 +41,7 @@ module.exports = {
     conn
       .promise()
       .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "dice"`
+        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "dice";`
       );
     const amount = interaction.options.getInteger("bet");
     const eyes = interaction.options.getString("eyes");
@@ -50,15 +50,15 @@ module.exports = {
     const dice = Math.floor(Math.random() * 6) + 1;
     conn
       .promise()
-      .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
-        playerid,
-      ])
+      .query(
+        `SELECT * FROM ${interaction.guild.id}Currency WHERE id=${playerid};`
+      )
       .then(([rows, fields]) => {
         if (!rows[0]) {
           conn
             .promise()
             .query(
-              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid}`
+              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid};`
             );
           interaction.editReply(
             "Sorry you had no cash yet! I've added 500 to your account. Try again!"
@@ -85,7 +85,7 @@ module.exports = {
             conn
               .promise()
               .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
+                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid};`
               );
             interaction.editReply({ embeds: embed });
           } else {
@@ -101,7 +101,7 @@ module.exports = {
             conn
               .promise()
               .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
+                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid};`
               );
             interaction.editReply({ embeds: embed });
           }

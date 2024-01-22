@@ -37,7 +37,7 @@ module.exports = {
     conn
       .promise()
       .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "coinflip"`
+        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "coinflip";`
       );
     const amount = interaction.options.getInteger("bet");
     const option = interaction.options.getString("option");
@@ -48,7 +48,7 @@ module.exports = {
     conn
       .promise()
       .query(
-        `SELECT * FROM ${interaction.guild.id}Currency WHERE id=${playerid}`
+        `SELECT * FROM ${interaction.guild.id}Currency WHERE id=${playerid};`
       )
       .then(([rows, fields]) => {
         if (rows[0]) {
@@ -73,7 +73,7 @@ module.exports = {
               conn
                 .promise()
                 .query(
-                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid};`
                 );
               interaction.editReply({ embeds: embed });
             }
@@ -90,7 +90,7 @@ module.exports = {
               conn
                 .promise()
                 .query(
-                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid};`
                 );
               interaction.editReply({ embeds: embed });
             } else {
@@ -106,7 +106,7 @@ module.exports = {
               conn
                 .promise()
                 .query(
-                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid};`
                 );
               interaction.editReply({ embeds: embed });
             }
@@ -115,7 +115,7 @@ module.exports = {
           conn
             .promise()
             .query(
-              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid}`
+              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid};`
             );
           interaction.editReply(
             "Sorry you had no cash yet! I've added 500 to your account. Try again!"

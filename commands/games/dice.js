@@ -22,17 +22,17 @@ module.exports = {
         .setDescription("set the amount you want to bet")
         .setRequired(true)
     )
-    .addIntegerOption((option) =>
+    .addStringOption((option) =>
       option
         .setName("eyes")
         .setDescription("set the amount of eyes")
         .addChoices(
-          { name: 1, value: 1 },
-          { name: 1, value: 2 },
-          { name: 1, value: 3 },
-          { name: 4, value: 4 },
-          { name: 5, value: 5 },
-          { name: 6, value: 6 }
+          { name: "1", value: "1" },
+          { name: "2", value: "2" },
+          { name: "3", value: "3" },
+          { name: "4", value: "4" },
+          { name: "5", value: "5" },
+          { name: "6", value: "6" }
         )
         .setRequired(true)
     ),
@@ -44,7 +44,7 @@ module.exports = {
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "dice"`
       );
     const amount = interaction.options.getInteger("bet");
-    const eyes = interaction.options.getInteger("eyes");
+    const eyes = interaction.options.getString("eyes");
     playerid = interaction.user.id;
     playername = interaction.user.username;
     const dice = Math.floor(Math.random() * 6) + 1;
@@ -62,7 +62,7 @@ module.exports = {
           playerid,
         ])
         .then(([rows, fields]) => {
-          if ((eyes = dice)) {
+          if (eyes == dice) {
             let embed = new EmbedBuilder()
               .setTitle("Congrats!!")
               .setDescription(

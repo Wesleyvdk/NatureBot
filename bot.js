@@ -735,8 +735,7 @@ async function checkBotCommits() {
     const latestCommit = response.data[0];
     if (lastBotCommitSha == null) {
       lastCommitSha = latestCommit.sha;
-    }
-    if (latestCommit.sha !== lastBotCommitSha) {
+    } else if (latestCommit.sha !== lastBotCommitSha) {
       lastBotCommitSha = latestCommit.sha;
       // Fetch detailed commit data
       const commitDetailsResponse = await axios.get(latestCommit.url, {
@@ -789,8 +788,7 @@ async function checkWebCommits() {
     const latestCommit = response.data[0];
     if (lastWebCommitSha == null) {
       lastWebCommitSha = latestCommit.sha;
-    }
-    if (latestCommit.sha !== lastWebCommitSha) {
+    } else if (latestCommit.sha !== lastWebCommitSha) {
       lastWebCommitSha = latestCommit.sha;
 
       // const commitMessage = `New commit in ${REPO} on branch ${BRANCH}: ${latestCommit.commit.message}\nAffected files: ${files}`;

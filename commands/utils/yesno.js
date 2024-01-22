@@ -18,9 +18,9 @@ module.exports = {
     .setDescription("list all the active matches"),
   async execute(client, interaction) {
     await interaction.deferReply();
-    playerid = interaction.user.id;
-    playername = interaction.user.username;
+    let yesno = ["yes.", "no."];
+    let randomYesNo = yesno[Math.floor(Math.random() * yesno.length)];
 
-    interaction.editReply("work in progress");
+    interaction.editReply(randomYesNo);
   },
 };

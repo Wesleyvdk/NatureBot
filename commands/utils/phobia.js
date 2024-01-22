@@ -12,8 +12,6 @@ const {
   AttachmentBuilder,
 } = require("discord.js");
 
-const phobias = require("phobias.json");
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("phobia")

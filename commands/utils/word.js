@@ -21,6 +21,6 @@ module.exports = {
     playerid = interaction.user.id;
     playername = interaction.user.username;
 
-    interaction.editReply("work in progress");
+    interaction.editReply("WIP");
   },
 };

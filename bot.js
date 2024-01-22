@@ -731,8 +731,15 @@ async function checkCommits() {
     const latestCommit = response.data[0];
     if (latestCommit.sha !== lastCommitSha) {
       lastCommitSha = latestCommit.sha;
-      const commitMessage = `New commit in ${REPO}: ${latestCommit.commit.message}`;
-      console.log(lastCommit);
+      // Fetch detailed commit data
+      const commitDetailsResponse = await axios.get(latestCommit.url, {
+        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
+      });
+      const files = commitDetailsResponse.data.files
+        .map((file) => file.filename)
+        .join(", ");
+
+      const commitMessage = `New commit in ${REPO} on branch ${BRANCH}: ${latestCommit.commit.message}\nAffected files: ${files}`;
       const channel = await client.channels.cache.get("771097960489811991");
       channel.send(commitMessage);
     }

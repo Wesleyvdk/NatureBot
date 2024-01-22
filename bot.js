@@ -55,6 +55,7 @@ const client = new Client({
 });
 const PREFIX = ".";
 const REPO = "Wesleyvdk/NatureBot";
+const BRANCH = "V2";
 let lastCommitSha = null;
 
 let CurrentDate = moment().format();
@@ -85,7 +86,7 @@ for (const folder of commandFolders) {
   }
 }
 
-setInterval(checkCommits, 10 * 60 * 1000);
+setInterval(checkCommits, 1000);
 
 client.once(Events.ClientReady, async () => {
   const familyTable = fdb
@@ -721,7 +722,7 @@ function currDrop(message) {
 async function checkCommits() {
   try {
     const response = await axios.get(
-      `https://api.github.com/repos/${REPO}/commits`,
+      `https://api.github.com/repos/${REPO}/commits?sha=${BRANCH}`,
       {
         headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
       }

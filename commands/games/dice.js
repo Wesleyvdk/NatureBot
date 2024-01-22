@@ -101,7 +101,7 @@ module.exports = {
             conn
               .promise()
               .query(
-                `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (${playerid}, ${interaction.guild.id}, ${interaction.user.name}, 0, 500, 0};`
+                `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (${playerid}, ${interaction.guild.id}, ${interaction.user.name}, 0, 500, 0);`
               );
             interaction.editReply({ embeds: embed });
           }

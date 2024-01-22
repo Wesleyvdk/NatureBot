@@ -73,7 +73,7 @@ module.exports = {
               conn
                 .promise()
                 .query(
-                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
                 );
               interaction.editReply({ embeds: embed });
             }
@@ -90,7 +90,7 @@ module.exports = {
               conn
                 .promise()
                 .query(
-                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
                 );
               interaction.editReply({ embeds: embed });
             } else {
@@ -106,13 +106,20 @@ module.exports = {
               conn
                 .promise()
                 .query(
-                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                  `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
                 );
               interaction.editReply({ embeds: embed });
             }
           }
         } else {
-          interaction.editReply(`Something went wrong\n rows: ${rows}`);
+          conn
+            .promise()
+            .query(
+              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid}`
+            );
+          interaction.editReply(
+            "Sorry you had no cash yet! I've added 500 to your account. Try again!"
+          );
         }
       });
   },

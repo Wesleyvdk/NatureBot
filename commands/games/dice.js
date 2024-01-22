@@ -54,6 +54,16 @@ module.exports = {
         playerid,
       ])
       .then(([rows, fields]) => {
+        if (!rows[0]) {
+          conn
+            .promise()
+            .query(
+              `UPDATE ${interaction.guild.id}Currency SET cash = 500 WHERE id=${playerid}`
+            );
+          interaction.editReply(
+            "Sorry you had no cash yet! I've added 500 to your account. Try again!"
+          );
+        }
         if (rows[0].cash < amount) {
           let embed = new EmbedBuilder()
             .setTitle("Whoops!!")
@@ -75,7 +85,7 @@ module.exports = {
             conn
               .promise()
               .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
               );
             interaction.editReply({ embeds: embed });
           } else {
@@ -91,7 +101,7 @@ module.exports = {
             conn
               .promise()
               .query(
-                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+                `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
               );
             interaction.editReply({ embeds: embed });
           }

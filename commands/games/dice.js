@@ -43,7 +43,7 @@ module.exports = {
       .query(
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "dice";`
       );
-    const amount = interaction.options.getInteger("bet");
+    let amount = interaction.options.getInteger("bet");
     const eyes = interaction.options.getString("eyes");
     playerid = interaction.user.id;
     playername = interaction.user.username;

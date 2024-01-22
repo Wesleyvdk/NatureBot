@@ -39,7 +39,7 @@ module.exports = {
       .query(
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "coinflip"`
       );
-    const amount = interaction.options.getInteger("bet");
+    let amount = interaction.options.getInteger("bet");
     const option = interaction.options.getString("option");
     coinFlip = Math.floor(Math.random() * 10);
     playerid = interaction.user.id;

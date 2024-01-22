@@ -48,20 +48,20 @@ module.exports = {
     playerid = interaction.user.id;
     playername = interaction.user.username;
     const dice = Math.floor(Math.random() * 6) + 1;
-    if (rows[0].cash < amount) {
-      let embed = new EmbedBuilder()
-        .setTitle("Whoops!!")
-        .setDescription(
-          "you don't have enough cash. either Withdraw from the bank, or use less cash."
-        );
-      interaction.editReply({ embeds: embed });
-    } else {
-      conn
-        .promise()
-        .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
-          playerid,
-        ])
-        .then(([rows, fields]) => {
+    conn
+      .promise()
+      .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [
+        playerid,
+      ])
+      .then(([rows, fields]) => {
+        if (rows[0].cash < amount) {
+          let embed = new EmbedBuilder()
+            .setTitle("Whoops!!")
+            .setDescription(
+              "you don't have enough cash. either Withdraw from the bank, or use less cash."
+            );
+          interaction.editReply({ embeds: embed });
+        } else {
           if (eyes == dice) {
             let embed = new EmbedBuilder()
               .setTitle("Congrats!!")
@@ -95,7 +95,7 @@ module.exports = {
               );
             interaction.editReply({ embeds: embed });
           }
-        });
-    }
+        }
+      });
   },
 };

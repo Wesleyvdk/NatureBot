@@ -732,6 +732,7 @@ async function checkCommits() {
     if (latestCommit.sha !== lastCommitSha) {
       lastCommitSha = latestCommit.sha;
       const commitMessage = `New commit in ${REPO}: ${latestCommit.commit.message}`;
+      console.log(lastCommit);
       const channel = await client.channels.cache.get("771097960489811991");
       channel.send(commitMessage);
     }

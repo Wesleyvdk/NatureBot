@@ -58,7 +58,7 @@ module.exports = {
               .setDescription(
                 "you don't have enough cash. either Withdraw from the bank, or use less cash."
               );
-            interaction.editReply({ embeds: embed });
+            interaction.editReply({ embeds: [embed] });
           } else {
             if (coinFlip < 5 && option === "heads") {
               let embed = new EmbedBuilder()
@@ -75,7 +75,7 @@ module.exports = {
                 .query(
                   `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
                 );
-              interaction.editReply({ embeds: embed });
+              interaction.editReply({ embeds: [embed] });
             }
             if (coinFlip > 5 && option === "tails") {
               let embed = new EmbedBuilder()
@@ -92,7 +92,7 @@ module.exports = {
                 .query(
                   `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
                 );
-              interaction.editReply({ embeds: embed });
+              interaction.editReply({ embeds: [embed] });
             } else {
               let embed = new EmbedBuilder()
                 .setTitle("Aww!!")
@@ -108,7 +108,7 @@ module.exports = {
                 .query(
                   `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
                 );
-              interaction.editReply({ embeds: embed });
+              interaction.editReply({ embeds: [embed] });
             }
           }
         } else {

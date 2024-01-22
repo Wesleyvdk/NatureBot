@@ -70,7 +70,7 @@ module.exports = {
             .setDescription(
               "you don't have enough cash. either Withdraw from the bank, or use less cash."
             );
-          interaction.editReply({ embeds: embed });
+          interaction.editReply({ embeds: [embed] });
         } else {
           if (eyes == dice) {
             let embed = new EmbedBuilder()
@@ -87,7 +87,7 @@ module.exports = {
               .query(
                 `UPDATE ${interaction.guild.id}Currency SET cash = ${newCash} WHERE id=${playerid}`
               );
-            interaction.editReply({ embeds: embed });
+            interaction.editReply({ embeds: [embed] });
           } else {
             let embed = new EmbedBuilder()
               .setTitle("Aww!!")
@@ -103,7 +103,7 @@ module.exports = {
               .query(
                 `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (${playerid}, ${interaction.guild.id}, ${interaction.user.username}, 0, 500, 0)`
               );
-            interaction.editReply({ embeds: embed });
+            interaction.editReply({ embeds: [embed] });
           }
         }
       });

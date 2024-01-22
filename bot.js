@@ -86,7 +86,7 @@ for (const folder of commandFolders) {
   }
 }
 
-setInterval(checkCommits, 1000);
+setInterval(checkBotCommits, 1000);
 
 client.once(Events.ClientReady, async () => {
   const familyTable = fdb
@@ -178,7 +178,7 @@ client.once(Events.ClientReady, async () => {
   console.log(
     `logged in as: ${client.user.username}. ready to be used! (${CurrentDate})`
   );
-  checkCommits();
+  checkBotCommits();
 });
 
 client.on("guildMemberAdd", async (member) => {
@@ -719,7 +719,7 @@ function currDrop(message) {
   }
 }
 
-async function checkCommits() {
+async function checkBotCommits() {
   try {
     const response = await axios.get(
       `https://api.github.com/repos/${REPO}/commits?sha=${BRANCH}`,
@@ -729,19 +729,44 @@ async function checkCommits() {
     );
 
     const latestCommit = response.data[0];
+    if (lastCommitSha == null) {
+      lastCommitSha = latestCommit.sha;
+    }
     if (latestCommit.sha !== lastCommitSha) {
       lastCommitSha = latestCommit.sha;
       // Fetch detailed commit data
       const commitDetailsResponse = await axios.get(latestCommit.url, {
         headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
       });
-      const files = commitDetailsResponse.data.files
-        .map((file) => file.filename)
-        .join(", ");
+      const files = commitDetailsResponse.data.files.map(
+        (file) => file.filename
+      );
+      // .join(", ");
 
-      const commitMessage = `New commit in ${REPO} on branch ${BRANCH}: ${latestCommit.commit.message}\nAffected files: ${files}`;
+      // const commitMessage = `New commit in ${REPO} on branch ${BRANCH}: ${latestCommit.commit.message}\nAffected files: ${files}`;
+      console.log(files);
+      let embed = new EmbedBuilder()
+        .setTitle("New Bot Update")
+        .setDescription(`Update: ${latestCommit.commit.message}`);
+      for (i = 0; i < files.length; i++) {
+        const file = files[i].replace("commands/utils/", "");
+        if (files[i].includes("commands")) {
+          embed.addFields({
+            name: `${file}`,
+            value: "Command",
+            inline: true,
+          });
+        } else {
+          embed.addFields({
+            name: `${files[i]}`,
+            value: "other",
+            inline: true,
+          });
+        }
+      }
+
       const channel = await client.channels.cache.get("771097960489811991");
-      channel.send(commitMessage);
+      channel.send({ embeds: [embed] });
     }
   } catch (error) {
     console.error("Error fetching commits:", error);

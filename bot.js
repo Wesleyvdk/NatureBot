@@ -84,6 +84,9 @@ for (const folder of commandFolders) {
     }
   }
 }
+
+setInterval(checkCommits, 10 * 60 * 1000);
+
 client.once(Events.ClientReady, async () => {
   const familyTable = fdb
     .prepare(
@@ -174,6 +177,7 @@ client.once(Events.ClientReady, async () => {
   console.log(
     `logged in as: ${client.user.username}. ready to be used! (${CurrentDate})`
   );
+  checkCommits();
 });
 
 client.on("guildMemberAdd", async (member) => {
@@ -727,7 +731,7 @@ async function checkCommits() {
     if (latestCommit.sha !== lastCommitSha) {
       lastCommitSha = latestCommit.sha;
       const commitMessage = `New commit in ${REPO}: ${latestCommit.commit.message}`;
-      const channel = await client.channels.cache("771097960489811991");
+      const channel = await client.channels.cache.get("771097960489811991");
       channel.send(commitMessage);
     }
   } catch (error) {

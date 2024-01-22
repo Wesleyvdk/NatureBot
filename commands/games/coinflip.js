@@ -110,7 +110,7 @@ module.exports = {
             }
           }
         } else {
-          interaction.editReply("Something went wrong");
+          interaction.editReply(`Something went wrong ${rows}`);
         }
       });
   },

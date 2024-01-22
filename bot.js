@@ -765,7 +765,7 @@ async function checkBotCommits() {
         }
       }
 
-      const channel = await client.channels.cache.get("771097960489811991");
+      const channel = await client.channels.cache.get("929363312527953950");
       channel.send({ embeds: [embed] });
     }
   } catch (error) {

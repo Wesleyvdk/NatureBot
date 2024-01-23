@@ -245,11 +245,18 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
   if (newMember.guild.id == "929352993655124000") {
     const oldStatus = oldMember.premiumSince;
     const newStatus = newMember.premiumSince;
-
-    if (!oldStatus && newStatus) {
-      client.channels.cache
-        .get("1104478351114129570")
-        .send(`Thank you ${newMember.user} for boosting!!`);
+    const newStatusDate = moment(newStatus);
+    const currentDate = moment();
+    const isNow = newStatusDate.isSame(currentDate, "minute");
+    if (isNow) {
+      console.log(
+        `old Status: ${oldStatus} \nnew Status: ${newStatus}\n oldMember: ${oldMember}\n newMember: ${newMember}\nis now? ${isNow}`
+      );
+      if (!oldStatus && newStatus) {
+        client.channels.cache
+          .get("1104478351114129570")
+          .send(`Thank you ${newMember.user} for boosting!!`);
+      }
     }
   }
 });

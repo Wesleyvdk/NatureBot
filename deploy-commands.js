@@ -37,6 +37,20 @@ const rest = new REST().setToken(token);
 
 (async () => {
   try {
+    // for guild-based commands
+    rest
+      .put(
+        Routes.applicationGuildCommands(
+          process.env.CLIENTID,
+          process.env.GUILDID
+        ),
+        {
+          body: [],
+        }
+      )
+      .then(() => console.log("Successfully deleted all guild commands."))
+      .catch(console.error);
+
     console.log(
       `Started refreshing ${commands.length} application (/) commands.`
     );

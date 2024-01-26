@@ -11,6 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const words = require("words.json");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -18,9 +19,20 @@ module.exports = {
     .setDescription("list all the active matches"),
   async execute(client, interaction) {
     await interaction.deferReply();
-    playerid = interaction.user.id;
-    playername = interaction.user.username;
-
-    interaction.editReply("WIP");
+    function getRandomWord() {
+      const keys = Object.keys(words);
+      const randomIndex = Math.floor(Math.random() * keys.length);
+      const randomKey = keys[randomIndex];
+      return { word: randomKey, description: word[randomKey] };
+    }
+    const randomWord = getRandomWord();
+    const embed = new EmbedBuilder()
+      .setTitle(randomWord.word)
+      .setDescription(randomWord.description)
+      .setColor("#FF0000")
+      .setFooter({
+        text: "if any of the descriptions is wrong, please let the creator know",
+      });
+    interaction.editReply({ embeds: [embed] });
   },
 };

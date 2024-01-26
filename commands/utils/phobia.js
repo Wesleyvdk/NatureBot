@@ -12,7 +12,7 @@ const {
   AttachmentBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const phobias = require("phobia.json");
+const phobias = require("./phobias.json");
 
 module.exports = {
   data: new SlashCommandBuilder()

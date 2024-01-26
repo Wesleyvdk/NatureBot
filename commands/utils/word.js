@@ -12,7 +12,7 @@ const {
   AttachmentBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const words = require("words.json");
+const words = require("./words.json");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -24,7 +24,7 @@ module.exports = {
       const keys = Object.keys(words);
       const randomIndex = Math.floor(Math.random() * keys.length);
       const randomKey = keys[randomIndex];
-      return { word: randomKey, description: word[randomKey] };
+      return { word: randomKey, description: words[randomKey] };
     }
     const randomWord = getRandomWord();
     const embed = new EmbedBuilder()

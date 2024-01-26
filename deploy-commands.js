@@ -38,7 +38,7 @@ const rest = new REST().setToken(token);
 (async () => {
   try {
     // for guild-based commands
-    rest
+    await rest
       .put(
         Routes.applicationGuildCommands(
           process.env.CLIENTID,

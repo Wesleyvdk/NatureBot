@@ -10,6 +10,7 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
+  PermissionFlagsBits,
 } = require("discord.js");
 const words = require("words.json");
 

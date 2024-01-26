@@ -27,7 +27,7 @@ module.exports = {
     conn
       .promise()
       .query(
-        `SELECT * FROM ${interaction.guild.id}Levels ORDER BY experience DESC LIMIT 10;`
+        `SELECT * FROM ${interaction.guild.id}Levels ORDER BY exp DESC LIMIT 10;`
       )
       .then(([rows, fields]) => {
         // let user = client.getLevels.get(userid, interaction.guild.id);

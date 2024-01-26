@@ -24,25 +24,29 @@ module.exports = {
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "leaderboard"`
       );
 
-    const top10 = conn
+    conn
       .promise()
-      .query("SELECT * FROM VampLevels ORDER BY experience DESC LIMIT 10;");
-    // let user = client.getLevels.get(userid, interaction.guild.id);
-    // Now shake it and show it! (as a nice embed, too!)
-    const embed = new EmbedBuilder()
-      .setTitle("Leaderboard")
-      //.setAuthor(client.user.username, client.user.displayAvatarURL())
-      .setDescription("Our top 10 level leaders!")
-      .setColor(0x00ae86);
+      .query(
+        `SELECT * FROM ${interaction.guild.id}Levels ORDER BY experience DESC LIMIT 10;`
+      )
+      .then(([rows, fields]) => {
+        // let user = client.getLevels.get(userid, interaction.guild.id);
+        // Now shake it and show it! (as a nice embed, too!)
+        const embed = new EmbedBuilder()
+          .setTitle("Leaderboard")
+          //.setAuthor(client.user.username, client.user.displayAvatarURL())
+          .setDescription("Our top 10 level leaders!")
+          .setColor(0x00ae86);
 
-    for (const data of top10) {
-      //const user = client.users.cache.get(data.user);
-      //console.log(data.user, user)
-      embed.addFields({
-        name: data.name,
-        value: `level: ${data.level}  exp:   ${data.exp}`,
+        for (const data of rows) {
+          //const user = client.users.cache.get(data.user);
+          //console.log(data.user, user)
+          embed.addFields({
+            name: data.name,
+            value: `level: ${data.level}  exp:   ${data.exp}`,
+          });
+        }
+        return interaction.editReply({ embeds: [embed] });
       });
-    }
-    return interaction.editReply({ embeds: [embed] });
   },
 };

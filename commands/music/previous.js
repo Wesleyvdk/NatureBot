@@ -11,13 +11,13 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
-const moment = require("moment/moment");
-let CurrentDate = moment().format();
+
+const { useHistory } = require("discord-player");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("active")
-    .setDescription("list all the active matches"),
+    .setName("previous")
+    .setDescription("Play the previous track"),
   async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
     conn
@@ -25,9 +25,13 @@ module.exports = {
       .query(
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "template"`
       );
-    playerid = interaction.user.id;
-    playername = interaction.user.username;
+    const history = useHistory(interaction.guild.id);
 
-    interaction.editReply("work in progress");
+    if (history.isEmpty())
+      return interaction.editReply("The queue has no history track.");
+
+    history.previous();
+
+    return interaction.editReply("Backed the history track.");
   },
 };

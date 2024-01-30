@@ -16,11 +16,18 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("skip")
     .setDescription("list all the active matches"),
-  async execute(client, interaction) {
+  async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
-    playerid = interaction.user.id;
-    playername = interaction.user.username;
+    conn
+      .promise()
+      .query(
+        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "skip"`
+      );
+    if (queue.size < 1 && queue.repeatMode !== 3)
+      return interaction.editReply("The queue has no more tracks.");
 
-    interaction.editReply("work in progress");
+    queue.node.skip();
+
+    return interaction.editReply("Skipped the current track.");
   },
 };

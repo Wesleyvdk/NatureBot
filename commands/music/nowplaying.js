@@ -11,23 +11,29 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
-const moment = require("moment/moment");
-let CurrentDate = moment().format();
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("active")
-    .setDescription("list all the active matches"),
+    .setName("nowplaying")
+    .setDescription("Show the currentp playing track."),
   async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
+    const track = queue.currentTrack;
     conn
       .promise()
       .query(
         `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "template"`
       );
-    playerid = interaction.user.id;
-    playername = interaction.user.username;
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: "Nowplaying 🎵" })
+      .setTitle(`${track.title}`)
+      .setURL(`${track.url}`)
+      .setThumbnail(`${track.thumbnail}`)
+      .setDescription(`Played by: ${track.requestedBy.toString()}\n
+${queue.node.createProgressBar()}`);
 
-    interaction.editReply("work in progress");
+    return interaction
+      .editReply({ ephemeral: true, embeds: [embed] })
+      .catch(console.error);
   },
 };

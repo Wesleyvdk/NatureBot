@@ -33,7 +33,7 @@ module.exports = {
   async execute(client, interaction) {
     const message = interaction.options.getString("message");
     const attachment = interaction.options.getAttachment("attachment");
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply();
     // implement server specifics using database
 
     // my server only

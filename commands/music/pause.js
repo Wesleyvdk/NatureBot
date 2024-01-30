@@ -14,20 +14,20 @@ const {
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("clear")
-    .setDescription("Clear the tracks in the queue."),
+    .setName("pause")
+    .setDescription("Pauses the playback"),
   async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
     conn
       .promise()
       .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "clear"`
+        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "template"`
       );
-    if (queue.size < 2)
-      return interaction.editReply("The queue has no more track.");
+    if (queue.node.isPaused())
+      return interaction.editReply("The playback is already paused.");
 
-    queue.tracks.clear();
+    queue.node.pause();
 
-    return interaction.editReply("Cleared the queue tracks.");
+    return interaction.editReply("Paused the playback.");
   },
 };

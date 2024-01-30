@@ -13,6 +13,8 @@ const {
 const mysql = require("mysql2");
 const Database = require("better-sqlite3");
 const moment = require("moment/moment");
+const { Player } = require("discord-player");
+
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 conn.connect(function (err) {
   if (err) throw err;
@@ -23,6 +25,7 @@ const number = [
   50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68,
   69,
 ];
+
 // databases
 const fdb = new Database("./databases/family.sqlite");
 const rdb = new Database("./databases/roleplay.sqlite");
@@ -42,6 +45,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildVoiceStates,
   ],
   partials: [
     Partials.Message,
@@ -62,6 +66,10 @@ let lastBotCommitSha = null;
 let lastWebCommitSha = null;
 
 let CurrentDate = moment().format();
+
+const player = new Player(client);
+
+player.extractors.loadDefault();
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, "commands");
@@ -91,6 +99,7 @@ for (const folder of commandFolders) {
 
 setInterval(checkBotCommits, 10 * 60 * 1000);
 setInterval(checkWebCommits, 10 * 60 * 1000);
+
 client.once(Events.ClientReady, async () => {
   const familyTable = fdb
     .prepare(
@@ -563,6 +572,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   const command = interaction.client.commands.get(interaction.commandName);
   if (!command) return;
+
   try {
     conn
       .promise()
@@ -579,7 +589,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
           });
           return;
         } else {
-          await command.command.execute(client, interaction, conn);
+          const { useQueue } = require("discord-player");
+          const queue = useQueue(interaction.guild.id);
+          await command.command.execute(client, interaction, conn, queue);
         }
       });
   } catch (error) {
@@ -599,6 +611,68 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
+player.events.on("playerStart", (queue, track) => {
+  if (!track.requestedBy) track.requestedBy = bot.user;
+
+  const embed = new EmbedBuilder()
+    .setAuthor({ name: "Now playing" })
+    .setTitle(`${track.title}`)
+    .setURL(`${track.url}`)
+    .setThumbnail(`${track.thumbnail}`)
+    .setFooter({
+      text: `Played by: ${track.requestedBy.username}`,
+      iconURL: `${track.requestedBy.displayAvatarURL({ dynamic: true })}`,
+    });
+  queue.metadata.channel.send({ embeds: [embed] });
+});
+player.events.on("emptyQueue", (queue) => {
+  queue.metadata.channel.send(`No more tracks to play, leaving now.`);
+});
+player.events.on("error", (queue) => {
+  const embed = new EmbedBuilder()
+    .setTitle("An error occured while playing")
+    .setDescription(`Reason: \`${error.message}\``)
+    .setColor(Colors.Red);
+
+  queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
+});
+player.events.on("playerError", (queue) => {
+  const embed = new EmbedBuilder()
+    .setTitle("An error occured while playing")
+    .setDescription(`Reason: \`${error.message}\``)
+    .setColor(Colors.Red);
+  queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
+});
+player.events.on("playerSkip", (queue, track) => {
+  queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
+});
+player.events.on("emptyChannel", (queue) => {
+  metadata.channel.send("Feeling lonely, leaving now.");
+});
+player.events.on("audioTrackAdd", (queue, track) => {
+  const embed = new EmbedBuilder()
+    .setAuthor({
+      name: `Track queued - Position ${queue.node.getTrackPosition(track) + 1}`,
+    })
+    .setTitle(`${track.title}`)
+    .setURL(`${track.url}`)
+    .setFooter({
+      text: `Requested by: ${track.requestedBy.tag}`,
+      iconURL: track.requestedBy.displayAvatarURL({ dynamic: true }),
+    });
+
+  queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
+});
+player.events.on("audioTracksAdd", (queue, tracks) => {
+  const embed = new EmbedBuilder()
+    .setTitle(`${tracks.length} tracks queued.`)
+    .setFooter({
+      text: `Requested by: ${tracks[0].requestedBy.tag}`,
+      iconURL: tracks[0].requestedBy.displayAvatarURL({ dynamic: true }),
+    });
+
+  return queue.metadata.send({ embeds: [embed] }).catch(console.error);
+});
 function createDatabases(familyTable, rpTable, suggestionTable) {
   // ------------------ Family Table ----------------
   if (!familyTable["count()"]) {

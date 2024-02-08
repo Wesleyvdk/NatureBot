@@ -829,7 +829,7 @@ async function checkBotCommits() {
         .setTitle("New Bot Update")
         .setDescription(`Update: ${latestCommit.commit.message}`);
       for (i = 0; i < files.length; i++) {
-        const file = files[i].replace("commands/", "");
+        let file = files[i].replace("commands/", "");
         file = file.replace(".js", "");
         if (files[i].includes("commands")) {
           embed.addFields({

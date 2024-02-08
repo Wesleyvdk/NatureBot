@@ -14,6 +14,7 @@ const mysql = require("mysql2");
 const Database = require("better-sqlite3");
 const moment = require("moment/moment");
 const { Player } = require("discord-player");
+const errorHandler = require("./handlers/errorHandler");
 
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 conn.connect(function (err) {
@@ -349,13 +350,11 @@ client.on("messageCreate", async (message) => {
           return;
         }
       } catch (e) {
-        console.log(`Error: ${e}\n in server: ${message.guild.name}`);
-        console.log(`Date/Time: ${CurrentDate}`);
+        errorHandler(null, e, message);
       }
     }
   } catch (e) {
-    console.log(`Error: ${e}`);
-    console.log(`Date/Time: ${CurrentDate}`);
+    errorHandler(null, e, message);
   }
   try {
     if (message.author.bot) return;
@@ -409,8 +408,7 @@ client.on("messageCreate", async (message) => {
               // else if (roleLevel >= 10) roleLevel + 10
             })
             .catch((e) => {
-              console.log(`Error: ${e}`);
-              console.log(`Date/Time: ${CurrentDate}`);
+              errorHandler(null, e, message);
             });
         }
         if (rows[0].level === 1) {
@@ -529,8 +527,7 @@ client.on("messageCreate", async (message) => {
             );
           })
           .catch((e) => {
-            console.log(`Error: ${e}`);
-            console.log(`Date/Time: ${CurrentDate}`);
+            errorHandler(null, e, message);
           });
       } else {
         message.member.roles.add(role).then(() => {
@@ -562,8 +559,7 @@ client.on("messageCreate", async (message) => {
     if (message.channel.id === "938036238101921844") return;
     currDrop(message);
   } catch (e) {
-    console.log(`Error: ${e}`);
-    console.log(`Date/Time: ${CurrentDate}`);
+    errorHandler(null, e, message);
   }
 });
 
@@ -594,9 +590,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
           await command.command.execute(client, interaction, conn, queue);
         }
       });
-  } catch (error) {
-    console.log(`Error: ${e}`);
-    console.log(`Date/Time: ${CurrentDate}`);
+  } catch (e) {
+    errorHandler(interaction, e, null);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: "There was an error while executing this command!",

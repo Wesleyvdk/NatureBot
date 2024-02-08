@@ -11,9 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
-const moment = require("moment");
-
-let CurrentDate = moment().format();
+const errorHandler = require("../../handlers/errorHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -141,8 +139,7 @@ module.exports = {
             return diff(marriedDate);
         }
       } catch (e) {
-        console.log(`Error: ${e}`);
-        console.log(`Date/Time: ${CurrentDate}`);
+        errorHandler(interaction, e, null);
       }
     }
     function diff(marriedDate) {

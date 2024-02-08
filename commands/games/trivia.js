@@ -11,9 +11,8 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
-const moment = require("moment/moment");
 
-let CurrentDate = moment().format();
+const errorHandler = require("../../handlers/errorHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -126,8 +125,7 @@ module.exports = {
         console.log(`Collected ${collected.size} interactions.`);
       });
     } catch (e) {
-      console.log(`Error: ${e}`);
-      console.log(`Date/Time: ${CurrentDate}`);
+      errorHandler(interaction, e, null);
     }
   },
 };

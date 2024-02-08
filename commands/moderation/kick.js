@@ -12,6 +12,7 @@ const {
   AttachmentBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
+const errorHandler = require("../../handlers/errorHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -45,8 +46,8 @@ module.exports = {
       try {
         await member.kick();
         interaction.editReply({ content: `${member.name} was kicked.` });
-      } catch (err) {
-        console.log(err);
+      } catch (e) {
+        errorHandler(interaction, e, null);
       }
     }
   },

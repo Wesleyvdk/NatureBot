@@ -12,6 +12,7 @@ const {
   AttachmentBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
+const errorHandler = require("../../handlers/errorHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -44,10 +45,8 @@ module.exports = {
         bannedMember;
         interaction.editReply({ content: `${option.name} was banned` });
       }
-    } catch (err) {
-      console.log(err);
+    } catch (e) {
+      errorHandler(interaction, e, null);
     }
-
-    interaction.editReply("work in progress");
   },
 };

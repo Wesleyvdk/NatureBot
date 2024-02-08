@@ -22,8 +22,8 @@ const errorHandler = require("../../handlers/errorHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("active")
-    .setDescription("list all the active matches"),
+    .setName("whosthatpokemon")
+    .setDescription("Who's That Pokemon?"),
   async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
 

@@ -18,7 +18,7 @@ import https from "node:https";
 
 const P = new Pokedex();
 
-const errorHandler = require("../../handlers/errorHandler");
+import errorHandler from ("../../handlers/errorHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()

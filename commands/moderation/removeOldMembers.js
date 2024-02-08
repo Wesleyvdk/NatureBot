@@ -11,6 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
   ButtonComponent,
+  PermissionFlagsBits,
 } = require("discord.js");
 const handleError = require("../../handlers/errorHandler");
 

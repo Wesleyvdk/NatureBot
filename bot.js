@@ -98,9 +98,6 @@ for (const folder of commandFolders) {
   }
 }
 
-setInterval(checkBotCommits, 10 * 60 * 1000);
-setInterval(checkWebCommits, 10 * 60 * 1000);
-
 client.once(Events.ClientReady, async () => {
   const familyTable = fdb
     .prepare(
@@ -191,8 +188,6 @@ client.once(Events.ClientReady, async () => {
   console.log(
     `logged in as: ${client.user.username}. ready to be used! (${CurrentDate})`
   );
-  checkBotCommits();
-  checkWebCommits();
 });
 
 client.on("guildMemberAdd", async (member) => {

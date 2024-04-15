@@ -27,11 +27,6 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "spank"`
-      );
 
     //sends the random message =
     let mentioned = interaction.options.getUser("target");

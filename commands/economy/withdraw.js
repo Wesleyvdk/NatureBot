@@ -22,7 +22,7 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    usageHandler("withdraw", mongoclient, conn);
+
     const amount = interaction.options.getInteger("amount");
     userid = interaction.user.id;
     user = interaction.user;

@@ -34,11 +34,7 @@ module.exports = {
   async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
     const system = interaction.options.getString("system");
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "removeoldmembers"`
-      );
+
     try {
       conn
         .promise()

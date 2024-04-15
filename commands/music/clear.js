@@ -18,11 +18,7 @@ module.exports = {
     .setDescription("Clear the tracks in the queue."),
   async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "clear"`
-      );
+
     if (queue.size < 2)
       return interaction.editReply("The queue has no more track.");
 

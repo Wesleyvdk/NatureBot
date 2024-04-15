@@ -18,11 +18,7 @@ module.exports = {
     .setDescription("divorce another user"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "divorce"`
-      );
+
     let breakupmsg = [
       "Let's break up.",
       "I don't think this is working out.",

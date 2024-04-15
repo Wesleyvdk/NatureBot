@@ -11,6 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const usageHandler = require("../../handlers/usageHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -34,11 +35,6 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "coinflip"`
-      );
     let amount = interaction.options.getInteger("bet");
     const option = interaction.options.getString("option");
     coinFlip = Math.floor(Math.random() * 10);

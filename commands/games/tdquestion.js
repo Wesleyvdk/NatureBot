@@ -27,11 +27,7 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "truth or dare question"`
-      );
+
     // interaction options
     const question = interaction.options.getString("question");
     const asked = interaction.options.getUser("user");

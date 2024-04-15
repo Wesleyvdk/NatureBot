@@ -35,11 +35,7 @@ module.exports = {
     await interaction.deferReply();
     const member = interaction.options.getUser("user");
     const duration = interaction.options.getNumber("duration") ?? 60_000;
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "timeout"`
-      );
+
     member.timeout(duration); // Timeout for one minute
     interaction.editReply({
       content: `${member.name} was timed out for ${duration}`,

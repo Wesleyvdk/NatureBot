@@ -19,11 +19,6 @@ module.exports = {
     .setDescription("start a uno match"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "uno"`
-      );
 
     const players = [];
     //wait for max 4 people to join

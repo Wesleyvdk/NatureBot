@@ -20,6 +20,7 @@ const uri = process.env.MONGODB; // Fill in your MongoDB connection string here
 const mongoclient = new MongoClient(uri);
 
 const errorHandler = require("./handlers/errorHandler");
+const usageHandler = require("./handlers/usageHandler");
 
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 
@@ -607,6 +608,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             mongoclient,
             queue
           );
+          usageHandler(command.command.data.name, mongoclient, conn);
         }
       });
   } catch (e) {

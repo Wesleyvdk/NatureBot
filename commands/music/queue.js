@@ -22,11 +22,7 @@ module.exports = {
 
   async execute(client, interaction, conn, queue) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "queue"`
-      );
+
     if (!queue.size)
       return interaction.editReply("There is no track in the queue.");
 

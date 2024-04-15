@@ -25,11 +25,7 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "play"`
-      );
+
     const player = useMainPlayer();
     const queue = useQueue(interaction.guild.id);
 

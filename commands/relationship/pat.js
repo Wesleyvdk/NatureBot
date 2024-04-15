@@ -27,11 +27,7 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "pat"`
-      );
+
     //all url's of the gifs
     let gifs = ["https://media.giphy.com/media/109ltuoSQT212w/source.gif"];
     //will calculate which one to send

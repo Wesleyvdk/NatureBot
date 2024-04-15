@@ -24,11 +24,7 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "partner"`
-      );
+
     const mentioned = interaction.options.getUser("target");
     //mentionedid = mentioned.id
     let userid = interaction.user.id;

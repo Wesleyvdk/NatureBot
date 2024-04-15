@@ -31,7 +31,6 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    usageHandler("give", mongoclient, conn);
 
     const target = interaction.options.getUser("user");
     const amount = interaction.options.getInteger("amount");

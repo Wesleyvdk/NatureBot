@@ -20,11 +20,7 @@ module.exports = {
     .setDescription("answer a trivial question"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "trivia"`
-      );
+
     let answers = [];
     const response = await fetch(
       "https://opentdb.com/api.php?amount=1&type=multiple"

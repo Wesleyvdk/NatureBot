@@ -19,7 +19,7 @@ module.exports = {
     .setDescription("shows the shop"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    usageHandler("shop", mongoclient, conn);
+
     const shopembed = new EmbedBuilder()
       .setDescription("The shop is empty right now")
       .setFooter({ text: "leave some shop suggestions behind" });

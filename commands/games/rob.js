@@ -11,6 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const usageHandler = require("../../handlers/usageHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()

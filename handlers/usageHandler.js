@@ -2,7 +2,7 @@ module.exports = async function handleUsage(interaction, mongoclient, conn) {
   await mongoclient
     .db("Aylani")
     .collection("botcommands")
-    .update({ command: `${interaction}` }, { $inc: { usage_count: 1 } });
+    .updateOne({ command: `${interaction}` }, { $inc: { usage_count: 1 } });
 
   conn
     .promise()

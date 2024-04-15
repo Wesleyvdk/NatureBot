@@ -109,14 +109,18 @@ client.once(Events.ClientReady, async () => {
   await mongoclient.connect().then(() => console.log("Connected to MongoDB!"));
   let i = 0;
   for (const [commandName, commandInfo] of client.commands) {
-    try {
-      mongoclient.db("Aylani").collection("botcommands").insertOne({
-        _id: i,
-        command: commandName,
-        usage_count: 0,
-        category: commandInfo.category,
-      });
-    } catch (e) {}
+    if (
+      !mongoclient.db("Aylani").collection("botcommands").findOne({ _id: i })
+    ) {
+      try {
+        mongoclient.db("Aylani").collection("botcommands").insertOne({
+          _id: i,
+          command: commandName,
+          usage_count: 0,
+          category: commandInfo.category,
+        });
+      } catch (e) {}
+    }
     i++;
   }
 

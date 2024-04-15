@@ -105,12 +105,16 @@ for (const folder of commandFolders) {
 }
 
 client.once(Events.ClientReady, async () => {
-  await mongoclient.connect();
-  for (let i = 0; i < client.commands.length; i++) {
-    mongoclient
-      .db("Aylani")
-      .collection("botcommands")
-      .insertOne({ _id: i, command: client.commands[i], usage_count: 0 });
+  await mongoclient.connect().then(() => console.log("Connected to MongoDB!"));
+  let i = 0;
+  for (const [commandName, commandInfo] of client.commands) {
+    mongoclient.db("Aylani").collection("botcommands").insertOne({
+      _id: i,
+      command: commandName,
+      usage_count: 0,
+      category: commandInfo.category,
+    });
+    i++;
   }
 
   const familyTable = fdb

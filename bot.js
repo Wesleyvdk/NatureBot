@@ -106,11 +106,11 @@ for (const folder of commandFolders) {
 
 client.once(Events.ClientReady, async () => {
   await mongoclient.connect();
-  for (let i = 0; i < commands.length; i++) {
+  for (let i = 0; i < client.commands.length; i++) {
     mongoclient
       .db("Aylani")
       .collection("botcommands")
-      .insertOne({ _id: i, command: commands[i], usage_count: 0 });
+      .insertOne({ _id: i, command: client.commands[i], usage_count: 0 });
   }
 
   const familyTable = fdb

@@ -11,6 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const usageHandler = require("../../handlers/usageHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -19,13 +20,18 @@ module.exports = {
     .addUserOption((option) =>
       option.setName("user").setDescription("select a user")
     ),
-  async execute(client, interaction, conn) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "balance"`
-      );
+    usageHandler("balance", mongoclient, conn);
+    // conn
+    //   .promise()
+    //   .query(
+    //     `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "balance"`
+    //   );
+    // await mongoclient
+    //   .db("Aylani")
+    //   .collection("botcommands")
+    //   .update({ command: "balance" }, { $inc: { usage_count: 1 } });
 
     const mentioned = interaction.options.getUser("user");
     userid = interaction.user.id;

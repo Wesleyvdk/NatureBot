@@ -11,6 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const usageHandler = require("../../handlers/usageHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -18,12 +19,7 @@ module.exports = {
     .setDescription("shows the shop"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "shop"`
-      );
-
+    usageHandler("shop", mongoclient, conn);
     const shopembed = new EmbedBuilder()
       .setDescription("The shop is empty right now")
       .setFooter({ text: "leave some shop suggestions behind" });

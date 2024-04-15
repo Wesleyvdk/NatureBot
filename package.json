@@ -29,6 +29,7 @@
     "mediaplex": "^0.0.9",
     "moment": "^2.29.4",
     "mongodb": "^6.5.0",
+    "mongoose": "^8.3.1",
     "mysql2": "^3.6.3",
     "node-fetch": "^3.3.2",
     "pokedex-promise-v2": "^4.2.0",

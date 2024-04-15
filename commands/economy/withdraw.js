@@ -11,6 +11,7 @@ const {
   ComponentType,
   AttachmentBuilder,
 } = require("discord.js");
+const usageHandler = require("../../handlers/usageHandler");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -21,12 +22,7 @@ module.exports = {
     ),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-    conn
-      .promise()
-      .query(
-        `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "withdraw"`
-      );
-
+    usageHandler("withdraw", mongoclient, conn);
     const amount = interaction.options.getInteger("amount");
     userid = interaction.user.id;
     user = interaction.user;

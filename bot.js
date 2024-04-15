@@ -14,9 +14,15 @@ const mysql = require("mysql2");
 const Database = require("better-sqlite3");
 const moment = require("moment/moment");
 const { Player } = require("discord-player");
+const { MongoClient, ObjectId } = require("mongodb");
+
+const uri = process.env.MONGODB; // Fill in your MongoDB connection string here
+const mongoclient = new MongoClient(uri);
+
 const errorHandler = require("./handlers/errorHandler");
 
 const conn = mysql.createConnection(process.env.DATABASE_URL);
+
 conn.connect(function (err) {
   if (err) throw err;
   console.log("Succesfully connected to PlanetScale!");
@@ -99,6 +105,7 @@ for (const folder of commandFolders) {
 }
 
 client.once(Events.ClientReady, async () => {
+  await mongoclient.connect();
   const familyTable = fdb
     .prepare(
       "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'family';"
@@ -582,7 +589,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
         } else {
           const { useQueue } = require("discord-player");
           const queue = useQueue(interaction.guild.id);
-          await command.command.execute(client, interaction, conn, queue);
+          await command.command.execute(
+            client,
+            interaction,
+            conn,
+            mongoclient,
+            queue
+          );
         }
       });
   } catch (e) {

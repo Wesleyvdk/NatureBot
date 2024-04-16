@@ -2,19 +2,18 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const mysql = require("mysql2");
 require("dotenv").config();
 
-const uri = process.env.MONGODB;
-const conn = mysql.createConnection(process.env.DATABASE_URL);
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
 async function main() {
+  const conn = mysql.createConnection(process.env.DATABASE_URL);
+  const uri = process.env.MONGODB;
+
+  // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+  const client = new MongoClient(uri, {
+    serverApi: {
+      version: ServerApiVersion.v1,
+      strict: true,
+      deprecationErrors: true,
+    },
+  });
   try {
     await client.connect();
     console.log("Connected successfully to MongoDB server");
@@ -132,7 +131,6 @@ async function main() {
           table.TABLE_NAME.includes("config") ||
           table.TABLE_NAME.includes("bot_commands")
         ) {
-          console.log("Skipping table: " + table.TABLE_NAME);
         }
       }
     }
@@ -166,54 +164,12 @@ async function main() {
       }
     }
   } finally {
-    await client.close();
+    await client.close().then(() => console.log("MongoDB connection closed"));
     await conn.end();
   }
 }
 
-async function findUsers(client, dbName, query) {
-  const db = client.db(dbName);
-  const collection = db.collection("currencies");
-
-  // additional options
-  // const options = {
-  // sort: { userName: 1 }, // Sort alphabetically by userName
-  // limit: 10 // Limit the results to 10 documents
-  // };
-
-  // Use with find
-  // const documents = await collection.find(query, options).toArray();
-
-  try {
-    const documents = await collection.find(query).toArray();
-    console.log("Found documents:", documents);
-  } catch (error) {
-    console.error("Error finding documents:", error);
-  }
-}
-
-async function createCollectionWithOptions(
-  client,
-  dbName,
-  collectionName,
-  options
-) {
-  const db = client.db(dbName);
-
-  try {
-    await db.createCollection(collectionName, options);
-    console.log(`Collection with options created: ${collectionName}`);
-  } catch (error) {
-    console.error(`Could not create collection with options: ${error}`);
-  }
-}
-
-async function addDocuments(client, dbName, collectionName) {
-  // Insert a document
-  const db = client.db(dbName);
-  const collection = db.collection(collectionName);
-  const insertResult = await collection.insertMany(userDocuments); // insertOne for one document
-  console.log("Number of documents inserted:", insertResult.insertedCount);
-}
-
-main().catch(console.dir);
+main().then("Backup completed").catch(console.dir);
+setInterval(() => {
+  main().then(() => console.log("Backup completed").catch(console.dir));
+}, 12 * 60 * 60 * 1000);

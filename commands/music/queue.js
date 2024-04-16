@@ -20,7 +20,7 @@ module.exports = {
       option.setName("page").setDescription("choose the queue page")
     ),
 
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     if (!queue.size)

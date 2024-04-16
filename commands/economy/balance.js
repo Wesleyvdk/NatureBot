@@ -27,9 +27,21 @@ module.exports = {
     userid = interaction.user.id;
 
     // let mentioned = interaction.mentions.users.first();
+    const table = mongoclient
+      .db("Aylani")
+      .collection(`${interaction.guild.id}Currency`);
     if (mentioned) {
       mentionedid = mentioned.id;
 
+      if (table.findOne({ _id: mentionedid })) {
+        table.insertOne({
+          _id: mentionedid,
+          username: mentioned.username,
+          bank: 500,
+          cash: 0,
+          bitcoin: 0,
+        });
+      }
       conn
         .promise()
         .query(
@@ -48,12 +60,31 @@ module.exports = {
           await interaction.editReply({ embeds: [balEmbed] });
         });
     } else {
+      if (!table.findOne({ _id: userid })) {
+        table.insertOne({
+          _id: userid,
+          username: interaction.user.username,
+          bank: 500,
+          cash: 0,
+          bitcoin: 0,
+        });
+      }
       conn
         .promise()
         .query(
           `INSERT IGNORE INTO ${interaction.guild.id}Currency(id, user, guild, userName, bank, cash, bitcoin) VALUES (?, ?, ?, ?, 0, 1000, 0)`,
           [userid, userid, interaction.guild.id, interaction.user.username]
         );
+
+      // MONGO DB
+      // table.findOne({ _id: userid }).then(async ([rows]) => {
+      //   const balEmbed = new EmbedBuilder().setDescription(
+      //     `Your current balance:\nbank: ${rows.bank}\ncash: ${rows.cash}\nbitcoin ${rows.bitcoin}`
+      //   );
+      //   await interaction.editReply({ embeds: balEmbed });
+      // });
+
+      // MYSQL DB
       conn
         .promise()
         .query(`SELECT * FROM ${interaction.guild.id}Currency WHERE id=?`, [

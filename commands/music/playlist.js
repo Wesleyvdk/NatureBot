@@ -18,7 +18,7 @@ module.exports = {
     .setDescription(
       "play a playlist from spotify, youtube, or soundcloud, or your own playlist on the bot"
     ),
-  async execute(client, interaction, conn) {
+  async execute(client, interaction, mongoclient, conn) {
     await interaction.deferReply();
 
     playerid = interaction.user.id;

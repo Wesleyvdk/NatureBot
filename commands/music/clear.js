@@ -16,7 +16,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("clear")
     .setDescription("Clear the tracks in the queue."),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     if (queue.size < 2)

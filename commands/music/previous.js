@@ -18,7 +18,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("previous")
     .setDescription("Play the previous track"),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     const history = useHistory(interaction.guild.id);

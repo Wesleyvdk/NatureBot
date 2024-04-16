@@ -16,7 +16,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("nowplaying")
     .setDescription("Show the currentp playing track."),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
     const track = queue.currentTrack;
 

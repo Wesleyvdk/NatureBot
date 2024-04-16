@@ -1,6 +1,10 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri =
-  "mongodb+srv://ehzgodd:WesleyEnMaga2012@cluster0.bp8ci8c.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const mysql = require("mysql2");
+require("dotenv").config();
+
+const uri = process.env.MONGODB;
+const conn = mysql.createConnection(process.env.DATABASE_URL);
+
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -9,81 +13,161 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
-const userDocuments = [
-  {
-    id: "user1CurrencyId", // Ensure unique IDs
-    user: "User1",
-    guild: "Guild1",
-    userName: "UserName1",
-    bank: 1500,
-    cash: 250,
-    bitcoin: 1,
-  },
-  {
-    id: "user2CurrencyId",
-    user: "User2",
-    guild: "Guild2",
-    userName: "UserName2",
-    bank: 1200,
-    cash: 500,
-    bitcoin: 2,
-  },
-  // Add as many user documents as needed
-];
-
-const validationOptions = {
-  validator: {
-    $jsonSchema: {
-      bsonType: "object",
-      required: ["user", "guild", "userName"],
-      properties: {
-        user: {
-          bsonType: "string",
-          description: "must be a string and is required",
-        },
-        guild: {
-          bsonType: "string",
-          description: "must be a string and is required",
-        },
-        userName: {
-          bsonType: "string",
-          description: "must be a string and is required",
-        },
-        bank: {
-          bsonType: "int",
-          description: "must be an integer",
-        },
-        cash: {
-          bsonType: "int",
-          description: "must be an integer",
-        },
-        bitcoin: {
-          bsonType: "int",
-          description: "must be an integer",
-        },
-      },
-    },
-  },
-};
 
 async function main() {
   try {
     await client.connect();
-    console.log("Connected successfully to server");
-    const db = client.db("test");
+    console.log("Connected successfully to MongoDB server");
+    conn.connect(function (err) {
+      if (err) throw err;
+      console.log("Succesfully connected to PlanetScale!");
+    });
+    const db = client.db("Aylani");
 
-    // find query
-    const query = { bank: { $gt: 1000 } };
-    await createCollectionWithOptions(
-      client,
-      "newDatabase",
-      "currencies",
-      validationOptions
-    );
-    await addDocuments(client, "newDatabase", "currencies");
-    await findUsers(client, "newDatabase", query);
+    const [tables] = await conn
+      .promise()
+      .query(
+        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'naturebot'"
+      );
+
+    for (table of tables) {
+      const [rows] = await conn
+        .promise()
+        .query(`SELECT * FROM \`${table.TABLE_NAME}\``);
+
+      for (row of rows) {
+        if (table.TABLE_NAME.includes("Levels")) {
+          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
+            await client
+              .db("Aylani")
+              .collection(table.TABLE_NAME)
+              .updateOne(
+                { _id: row.id },
+                { $set: { name: row.name, exp: row.exp, level: row.level } }
+              );
+          } else {
+            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
+              _id: row.id,
+              name: row.name,
+              exp: row.exp,
+              level: row.level,
+            });
+          }
+        }
+        if (table.TABLE_NAME.includes("Currency")) {
+          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
+            await client
+              .db("Aylani")
+              .collection(table.TABLE_NAME)
+              .updateOne(
+                { _id: row.id },
+                { $set: { name: row.userName, exp: row.exp, level: row.level } }
+              );
+          } else {
+            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
+              _id: row.id,
+              name: row.userName,
+              bank: row.bank,
+              cash: row.cash,
+              bitcoin: row.bitcoin,
+            });
+          }
+        }
+        if (table.TABLE_NAME.includes("Settings")) {
+          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
+            await client
+              .db("Aylani")
+              .collection(table.TABLE_NAME)
+              .updateOne(
+                { _id: row.id },
+                {
+                  $set: {
+                    command: row.command,
+                    category: row.category,
+                    turnedOn: row.turnedOn,
+                  },
+                }
+              );
+          } else {
+            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
+              _id: row.id,
+              command: row.command,
+              category: row.category,
+              turnedOn: row.turnedOn,
+            });
+          }
+        }
+        if (table.TABLE_NAME.includes("sixmans")) {
+          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
+            await client
+              .db("Aylani")
+              .collection(table.TABLE_NAME)
+              .updateOne(
+                { _id: row.id },
+                {
+                  $set: {
+                    name: row.name,
+                    amount: row.amount,
+                    wins: row.wins,
+                    loss: row.loss,
+                    perc: row.perc,
+                  },
+                }
+              );
+          } else {
+            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
+              _id: row.id,
+              name: row.name,
+              amount: row.amount,
+              wins: row.wins,
+              loss: row.loss,
+              perc: row.perc,
+            });
+          }
+        }
+
+        if (
+          table.TABLE_NAME.includes("stories") ||
+          table.TABLE_NAME.includes("users") ||
+          table.TABLE_NAME.includes("config") ||
+          table.TABLE_NAME.includes("bot_commands")
+        ) {
+          console.log("Skipping table: " + table.TABLE_NAME);
+        }
+      }
+    }
+
+    const [rows] = await conn.promise().query("SELECT * FROM levels");
+    for (row of rows) {
+      if (db.collection("ophiussaLevels").findOne({ _id: row.id })) {
+        await client
+          .db("Aylani")
+          .collection("ophiussaLevels")
+          .updateOne(
+            { _id: row.id },
+            {
+              $set: {
+                name: row.name,
+                exp: row.exp,
+                level: row.level,
+              },
+            }
+          );
+      } else {
+        let instered = await client
+          .db("Aylani")
+          .collection("ophiussaLevels")
+          .insertOne({
+            _id: row.id,
+            name: row.name,
+            exp: row.exp,
+            level: row.level,
+          });
+      }
+    }
   } finally {
     await client.close();
+    await conn.end();
   }
 }
 

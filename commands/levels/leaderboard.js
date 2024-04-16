@@ -16,9 +16,34 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("leaderboard")
     .setDescription("shows the leaderboard"),
-  async execute(client, interaction, conn) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
 
+    // MONGO DB
+    // mongoclient
+    //   .db("Aylani")
+    //   .collection(`${interaction.guild.id}Levels`)
+    //   .find()
+    //   .toArray()
+    //   .then((rows) => {
+    //     // Now shake it and show it! (as a nice embed, too!)
+    //     const embed = new EmbedBuilder()
+    //       .setTitle("Leaderboard")
+    //       //.setAuthor(client.user.username, client.user.displayAvatarURL())
+    //       .setDescription("Our top 10 level leaders!")
+    //       .setColor(0x00ae86);
+
+    //     for (const data of rows) {
+    //       //const user = client.users.cache.get(data.user);
+    //       embed.addFields({
+    //         name: data.name,
+    //         value: `level: ${data.level}  exp:   ${data.exp}`,
+    //       });
+    //     }
+    //     return interaction.editReply({ embeds: [embed] });
+    //   });
+
+    // MYSQL DB
     conn
       .promise()
       .query(

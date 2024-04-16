@@ -36,7 +36,7 @@ module.exports = {
           "Play related songs automatically based on your existing queue"
         )
     ),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     const subCmd = await interaction.options.getSubcommand(true);

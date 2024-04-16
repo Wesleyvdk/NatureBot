@@ -23,7 +23,7 @@ module.exports = {
         .setDescription("Enter the song you want to play")
         .setRequired(true)
     ),
-  async execute(client, interaction, conn) {
+  async execute(client, interaction, mongoclient, conn) {
     await interaction.deferReply();
 
     const player = useMainPlayer();

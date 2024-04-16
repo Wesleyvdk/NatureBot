@@ -23,7 +23,7 @@ module.exports = {
         .setName("query")
         .setDescription("Choose a song you want the lyrics of")
     ),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     const query =

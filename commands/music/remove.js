@@ -24,7 +24,7 @@ module.exports = {
         )
         .setRequired(true)
     ),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     if (queue.size < 1)

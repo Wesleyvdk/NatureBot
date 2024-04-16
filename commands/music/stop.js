@@ -16,7 +16,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("stop")
     .setDescription("list all the active matches"),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     queue.delete();

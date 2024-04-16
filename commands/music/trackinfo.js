@@ -24,7 +24,7 @@ module.exports = {
         .setDescription("That track's index.")
         .setRequired(true)
     ),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     const index = interaction.options.getNumber("index", true) - 1;

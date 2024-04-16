@@ -1,8 +1,11 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const mysql = require("mysql2");
 require("dotenv").config();
+const moment = require("moment/moment");
+let CurrentDate = moment().format();
 
 async function main() {
+  console.log("Started backup at: ", CurrentDate);
   const conn = mysql.createConnection(process.env.DATABASE_URL);
   const uri = process.env.MONGODB;
 
@@ -166,7 +169,7 @@ async function main() {
   } finally {
     await client.close().then(() => console.log("MongoDB connection closed"));
     await conn.end();
-    console.log("Backup completed");
+    console.log("Backup completed at: ", CurrentDate);
   }
 }
 

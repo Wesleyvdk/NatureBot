@@ -166,10 +166,11 @@ async function main() {
   } finally {
     await client.close().then(() => console.log("MongoDB connection closed"));
     await conn.end();
+    console.log("Backup completed");
   }
 }
 
-main().then(console.log("Backup completed")).catch(console.dir);
+main().catch(console.dir);
 setInterval(() => {
-  main().then(() => console.log("Backup completed").catch(console.dir));
+  main().catch(console.dir);
 }, 12 * 60 * 60 * 1000);

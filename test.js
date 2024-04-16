@@ -169,7 +169,7 @@ async function main() {
   }
 }
 
-main().then("Backup completed").catch(console.dir);
+main().then(console.log("Backup completed")).catch(console.dir);
 setInterval(() => {
   main().then(() => console.log("Backup completed").catch(console.dir));
 }, 12 * 60 * 60 * 1000);

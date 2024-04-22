@@ -36,7 +36,7 @@ module.exports = {
       username = interaction.user.username;
       db = mongoclient.db("Aylani");
       collection = db.collection("confessions");
-      const confession = collection.findOne({ _id: id });
+      const confession = collection.findOne({ id: id });
       const user = await client.users.fetch(confession.user);
       interaction.editReply(
         `confession with id: ${id} was posted by ${user.username} (id: ${confession.user})`

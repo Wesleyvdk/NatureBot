@@ -54,7 +54,7 @@ module.exports = {
             ephemeral: true,
           });
           await confessions.insertOne({
-            _id: id,
+            id: id,
             user: interaction.user.id,
           });
         } else {

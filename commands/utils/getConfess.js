@@ -36,7 +36,7 @@ module.exports = {
       username = interaction.user.username;
       db = await mongoclient.db("Aylani");
       collection = await db.collection("confessions");
-      const confession = await collection.findOne({ id: id });
+      const confession = await collection.findOne({ id: parseInt(id) });
       console.log(confession);
       const user = await client.users.fetch(confession.user);
       console.log(user);

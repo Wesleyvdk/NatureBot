@@ -780,11 +780,15 @@ function currDrop(message) {
 
     randNumber = number[Math.floor(Math.random() * number.length)];
     //message.channel.send(`${randNumber} messages were sent!`)//.then(message=>message.delete({timeout:"20000"/*Time until delete in milliseconds*/}))
-    message.channel
-      .send({ embeds: [dropembed] })
-      .then((message) =>
-        setTimeout(() => message.delete(), 10000)
-      ); /*Time until delete in milliseconds*/
+    try {
+      message.channel
+        .send({ embeds: [dropembed] })
+        .then((message) =>
+          setTimeout(() => message.delete(), 10000)
+        ); /*Time until delete in milliseconds*/
+    } catch (e) {
+      console.log(`Error: ${e}`);
+    }
   }
   if (
     message.content.startsWith(`${PREFIX}pick`) ||

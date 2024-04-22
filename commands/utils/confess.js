@@ -41,6 +41,7 @@ module.exports = {
       const data = confessions.find({}).toArray();
       let confessChannel = client.channels.cache.get("1098540438270521404");
       let id = data.length + 1;
+      console.log(data, id);
       try {
         if (attachment) {
           let embed = new EmbedBuilder()
@@ -49,10 +50,6 @@ module.exports = {
             .setTimestamp()
             .setImage(`${attachment.url}`);
           confessChannel.send({ embeds: [embed] });
-          interaction.editReply({
-            content: "confession has been sent",
-            ephemeral: true,
-          });
           await confessions.insertOne({
             id: id,
             user: interaction.user.id,

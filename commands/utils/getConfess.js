@@ -10,6 +10,7 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
+  PermissionFlagsBits,
 } = require("discord.js");
 const errorHandler = require("../../handlers/errorHandler");
 

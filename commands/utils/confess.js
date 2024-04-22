@@ -37,8 +37,10 @@ module.exports = {
 
     // my server only
     if (interaction.guild.id === "929352993655124000") {
-      const confessions = mongoclient.db("Aylani").collection("confessions");
-      const data = confessions.find({}).toArray();
+      const confessions = await mongoclient
+        .db("Aylani")
+        .collection("confessions");
+      const data = await confessions.find({}).toArray();
       let confessChannel = client.channels.cache.get("1098540438270521404");
       let id = data.length + 1;
       console.log(data, id);
@@ -60,10 +62,6 @@ module.exports = {
             .setDescription(message)
             .setTimestamp();
           confessChannel.send({ embeds: [embed] });
-          interaction.editReply({
-            content: "confession has been sent",
-            ephemeral: true,
-          });
           await confessions.insertOne({
             id: id,
             user: interaction.user.id,

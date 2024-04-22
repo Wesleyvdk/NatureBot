@@ -38,6 +38,8 @@ module.exports = {
       collection = await db.collection("confessions");
       const confession = await collection.findOne({ id: id });
       const user = await client.users.fetch(confession.user);
+      console.log(confession);
+      console.log(user);
       interaction.editReply(
         `confession with id: ${id} was posted by ${user.username} (id: ${confession.user})`
       );

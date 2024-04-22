@@ -31,7 +31,7 @@ module.exports = {
     await interaction.deferReply();
 
     try {
-      const message = interaction.options.getString("id");
+      const id = interaction.options.getString("id");
       userid = interaction.user.id;
       username = interaction.user.username;
       db = await mongoclient.db("Aylani");

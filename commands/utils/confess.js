@@ -51,6 +51,7 @@ module.exports = {
             .setDescription(message)
             .setTimestamp()
             .setImage(`${attachment.url}`);
+          interaction.deleteReply();
           confessChannel.send({ embeds: [embed] });
           await confessions.insertOne({
             id: id,
@@ -61,6 +62,7 @@ module.exports = {
             .setTitle(`Confession ${id}:`)
             .setDescription(message)
             .setTimestamp();
+          interaction.deleteReply();
           confessChannel.send({ embeds: [embed] });
           await confessions.insertOne({
             id: id,

@@ -339,247 +339,257 @@ client.on("guildDelete", async (guild) => {
 });
 
 client.on("messageCreate", async (message) => {
-  const keyword = "Bump done";
-  const roleName = "bumper";
-  const role = message.guild.roles.cache.find((role) => role.name === roleName);
-  const embed = message.embeds[0];
   try {
-    if (embed && embed.description) {
-      try {
-        if (embed.description.includes(keyword)) {
-          message.channel.send(
-            `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
-              if this role does not exist, the role will be created on first use of the .addBump command`
-          );
+    const keyword = "Bump done";
+    const roleName = "bumper";
+    const role = message.guild.roles.cache.find(
+      (role) => role.name === roleName
+    );
+    const embed = message.embeds[0];
+    try {
+      if (embed && embed.description) {
+        try {
+          if (embed.description.includes(keyword)) {
+            message.channel.send(
+              `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
+                  if this role does not exist, the role will be created on first use of the .addBump command`
+            );
 
-          const delay = 2 * 60 * 60 * 1000;
-          // in milliseconds
-          if (role) {
-            const roleMention = role.toString();
-            setTimeout(() => {
-              // Send a message to the channel where the command was used
-              message.channel.send(`bump is ready ${roleMention}`);
-            }, delay);
+            const delay = 2 * 60 * 60 * 1000;
+            // in milliseconds
+            if (role) {
+              const roleMention = role.toString();
+              setTimeout(() => {
+                // Send a message to the channel where the command was used
+                message.channel.send(`bump is ready ${roleMention}`);
+              }, delay);
+            } else {
+              setTimeout(() => {
+                // Send a message to the channel where the command was used
+                message.channel.send("bump is ready");
+              }, delay);
+            }
           } else {
-            setTimeout(() => {
-              // Send a message to the channel where the command was used
-              message.channel.send("bump is ready");
-            }, delay);
+            return;
           }
-        } else {
-          return;
+        } catch (e) {
+          errorHandler(null, e, message);
         }
-      } catch (e) {
-        errorHandler(null, e, message);
       }
+    } catch (e) {
+      errorHandler(null, e, message);
     }
-  } catch (e) {
-    errorHandler(null, e, message);
-  }
-  try {
-    if (message.author.bot) return;
+    try {
+      if (message.author.bot) return;
 
-    let guild = message.guild.id;
-    userid = message.author.id;
-    username = message.author.username;
-    user = message.author;
-    conn
-      .promise()
-      .query(
-        `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
-        [userid, username]
-      );
-
-    conn
-      .promise()
-      .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
-      .then(async ([rows, fields]) => {
-        add_experience(rows, user, guild);
-      });
-
-    async function check_level_reward(rows, message) {
-      // MAKE PREMIUM
-
-      // const roles = [
-      //   "Member",
-      //   "Ai Novice",
-      //   "HiRe Pro",
-      //   "Promptologist",
-      //   "Ai Pro",
-      //   "LoRe Expert",
-      //   "Ultimate Upscale Pro",
-      // ];
-      const member = message.member;
-      const roleLevel = 1;
-      const roleName = `level ${roleLevel}`;
-      for (i = 0; i < roles.length; i++) {
-        const role = message.guild.roles.cache.find(
-          (role) => role.name === roles[i]
+      let guild = message.guild.id;
+      userid = message.author.id;
+      username = message.author.username;
+      user = message.author;
+      conn
+        .promise()
+        .query(
+          `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+          [userid, username]
         );
+
+      conn
+        .promise()
+        .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
+        .then(async ([rows, fields]) => {
+          add_experience(rows, user, guild);
+        });
+
+      async function check_level_reward(rows, message) {
+        // MAKE PREMIUM
+
+        // const roles = [
+        //   "Member",
+        //   "Ai Novice",
+        //   "HiRe Pro",
+        //   "Promptologist",
+        //   "Ai Pro",
+        //   "LoRe Expert",
+        //   "Ultimate Upscale Pro",
+        // ];
+        const member = message.member;
+        const roleLevel = 1;
+        const roleName = `level ${roleLevel}`;
+        for (i = 0; i < roles.length; i++) {
+          const role = message.guild.roles.cache.find(
+            (role) => role.name === roles[i]
+          );
+          if (!role) {
+            guild.roles
+              .create({
+                name: roles[i],
+              })
+              .then((createdRole) => {
+                console.log(`Role created: ${createdRole.name}`);
+                // if (roleLevel == 1) roleLevel + 4
+                // else if (roleLevel == 5) roleLevel + 5
+                // else if (roleLevel >= 10) roleLevel + 10
+              })
+              .catch((e) => {
+                errorHandler(null, e, message);
+              });
+          }
+          if (rows[0].level === 1) {
+            const role = guild.roles.cache.find(
+              (role) => role.name === "Member"
+            );
+            message.member.roles.add(role);
+          }
+          if (rows[0].level === 5) {
+            const role = guild.roles.cache.find(
+              (role) => role.name === "Ai Novice"
+            );
+            message.member.roles.add(role);
+          }
+          if (rows[0].level === 10) {
+            const role = guild.roles.cache.find(
+              (role) => role.name === "HiRe Pro"
+            );
+            message.member.roles.add(role);
+          }
+          if (rows[0].level === 15) {
+            const role = message.guild.roles.cache.find(
+              (role) => role.name === "Promptologist"
+            );
+            message.member.roles.add(role);
+          }
+          if (rows[0].level === 20) {
+            const role = guild.roles.cache.find(
+              (role) => role.name === "Ai Pro"
+            );
+            message.member.roles.add(role);
+          }
+          if (rows[0].level === 25) {
+            const role = guild.roles.cache.find(
+              (role) => role.name === "LoRe Expert"
+            );
+            message.member.roles.add(role);
+          }
+          if (rows[0].level === 30) {
+            const role = guild.roles.cache.find(
+              (role) => role.name === "Ultimate Upscale Pro"
+            );
+            message.member.roles.add(role);
+          }
+        }
+      }
+      async function add_experience(rows, user, guild) {
+        try {
+          exp = rows[0].exp;
+          newExp = exp += 5;
+        } catch (e) {
+          console.log(`Error: ${e}`);
+          console.log(`Date/Time: ${CurrentDate}`);
+          conn
+            .promise()
+            .query(
+              `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+              [user.id, user.username]
+            );
+
+          conn
+            .promise()
+            .execute(`SELECT * FROM "${guild}Levels" WHERE id=?`, [user.id])
+            .then(async ([rows, fields]) => {
+              add_experience(rows, user);
+            });
+        }
+        exp = rows[0].exp;
+        newExp = exp += 5;
+
+        conn
+          .promise()
+          .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
+            user.id,
+          ])
+          .then(level_up(rows, user, guild));
+      }
+
+      async function level_up(rows, user, guild) {
+        xp = rows[0].exp;
+        lvl_start = rows[0].level;
+        lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+
+        let round = Math.floor(lvl_end);
+        let lvl_up = Number(round);
+
+        if (lvl_up < 0) {
+          // const channelId = "1173064790340534412";
+          // const channel = await client.channels.cache.get(channelId);
+          conn
+            .promise()
+            .query(
+              `UPDATE ${guild}Levels SET level = ${rows[0].level} + 1 WHERE id = ?`,
+              [user.id]
+            )
+            .then(
+              message.channel.send(
+                `${user} has leveled up to level ${rows[0].level + 1}`
+              )
+            );
+        }
+        //await check_level_reward(rows, message);
+      }
+
+      if (message.content.startsWith(".addBump")) {
+        const roleName = "bumper";
+        const guild = message.guild;
+        const role = guild.roles.cache.find((role) => role.name === roleName);
         if (!role) {
-          guild.roles
+          await guild.roles
             .create({
-              name: roles[i],
+              name: roleName,
             })
             .then((createdRole) => {
               console.log(`Role created: ${createdRole.name}`);
-              // if (roleLevel == 1) roleLevel + 4
-              // else if (roleLevel == 5) roleLevel + 5
-              // else if (roleLevel >= 10) roleLevel + 10
+              message.channel.send(`I created the role ${createdRole.name}`);
+              message.member.roles.add(createdRole);
+              message.reply(
+                `I gave you the role. remove the role using \`.delBump\``
+              );
             })
             .catch((e) => {
               errorHandler(null, e, message);
             });
-        }
-        if (rows[0].level === 1) {
-          const role = guild.roles.cache.find((role) => role.name === "Member");
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 5) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "Ai Novice"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 10) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "HiRe Pro"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 15) {
-          const role = message.guild.roles.cache.find(
-            (role) => role.name === "Promptologist"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 20) {
-          const role = guild.roles.cache.find((role) => role.name === "Ai Pro");
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 25) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "LoRe Expert"
-          );
-          message.member.roles.add(role);
-        }
-        if (rows[0].level === 30) {
-          const role = guild.roles.cache.find(
-            (role) => role.name === "Ultimate Upscale Pro"
-          );
-          message.member.roles.add(role);
-        }
-      }
-    }
-    async function add_experience(rows, user, guild) {
-      try {
-        exp = rows[0].exp;
-        newExp = exp += 5;
-      } catch (e) {
-        console.log(`Error: ${e}`);
-        console.log(`Date/Time: ${CurrentDate}`);
-        conn
-          .promise()
-          .query(
-            `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
-            [user.id, user.username]
-          );
-
-        conn
-          .promise()
-          .execute(`SELECT * FROM "${guild}Levels" WHERE id=?`, [user.id])
-          .then(async ([rows, fields]) => {
-            add_experience(rows, user);
-          });
-      }
-      exp = rows[0].exp;
-      newExp = exp += 5;
-
-      conn
-        .promise()
-        .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
-          user.id,
-        ])
-        .then(level_up(rows, user, guild));
-    }
-
-    async function level_up(rows, user, guild) {
-      xp = rows[0].exp;
-      lvl_start = rows[0].level;
-      lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
-
-      let round = Math.floor(lvl_end);
-      let lvl_up = Number(round);
-
-      if (lvl_up < 0) {
-        // const channelId = "1173064790340534412";
-        // const channel = await client.channels.cache.get(channelId);
-        conn
-          .promise()
-          .query(
-            `UPDATE ${guild}Levels SET level = ${rows[0].level} + 1 WHERE id = ?`,
-            [user.id]
-          )
-          .then(
-            message.channel.send(
-              `${user} has leveled up to level ${rows[0].level + 1}`
-            )
-          );
-      }
-      //await check_level_reward(rows, message);
-    }
-
-    if (message.content.startsWith(".addBump")) {
-      const roleName = "bumper";
-      const guild = message.guild;
-      const role = guild.roles.cache.find((role) => role.name === roleName);
-      if (!role) {
-        await guild.roles
-          .create({
-            name: roleName,
-          })
-          .then((createdRole) => {
-            console.log(`Role created: ${createdRole.name}`);
-            message.channel.send(`I created the role ${createdRole.name}`);
-            message.member.roles.add(createdRole);
+        } else {
+          message.member.roles.add(role).then(() => {
             message.reply(
               `I gave you the role. remove the role using \`.delBump\``
             );
-          })
-          .catch((e) => {
-            errorHandler(null, e, message);
           });
-      } else {
-        message.member.roles.add(role).then(() => {
+        }
+      }
+      if (message.content.startsWith(".delBump")) {
+        const roleName = "bumper";
+        const role = message.guild.roles.cache.find(
+          (role) => role.name === roleName
+        );
+
+        message.member.roles.remove(role).then(() => {
           message.reply(
-            `I gave you the role. remove the role using \`.delBump\``
+            `I removed the role. If you want to be reminded of bumps, use \`.addBump\``
           );
         });
       }
-    }
-    if (message.content.startsWith(".delBump")) {
-      const roleName = "bumper";
-      const role = message.guild.roles.cache.find(
-        (role) => role.name === roleName
-      );
 
-      message.member.roles.remove(role).then(() => {
-        message.reply(
-          `I removed the role. If you want to be reminded of bumps, use \`.addBump\``
-        );
-      });
+      if (message.channel.id === "929352993701253154") return;
+      if (message.channel.id === "929352993701253154") return;
+      if (message.channel.id === "929352994158419971") return;
+      if (message.channel.id === "1085133582596591657") return;
+      if (message.channel.id === "1085129112961691729") return;
+      if (message.channel.id === "1007281491568492634") return;
+      if (message.channel.id === "938036238101921844") return;
+      currDrop(message);
+    } catch (e) {
+      errorHandler(null, e, message);
     }
-
-    if (message.channel.id === "929352993701253154") return;
-    if (message.channel.id === "929352993701253154") return;
-    if (message.channel.id === "929352994158419971") return;
-    if (message.channel.id === "1085133582596591657") return;
-    if (message.channel.id === "1085129112961691729") return;
-    if (message.channel.id === "1007281491568492634") return;
-    if (message.channel.id === "938036238101921844") return;
-    currDrop(message);
   } catch (e) {
-    errorHandler(null, e, message);
+    e;
   }
 });
 

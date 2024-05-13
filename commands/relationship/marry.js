@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const errorHandler = require("../../handlers/errorHandler");
+} from "discord.js";
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("marry")
     .setDescription("marry another user")
@@ -32,9 +32,9 @@ module.exports = {
       "you're now married",
     ];
     let mentioned = interaction.options.getUser("target");
-    mentionedid = mentioned.id;
-    userid = interaction.user.id;
-    user = interaction.user;
+    let mentionedid = mentioned.id;
+    let userid = interaction.user.id;
+    let user = interaction.user;
     let rUser = client.getFamily.get(userid);
     let rMentioned = client.getFamily.get(mentionedid);
     let time = moment().format("MMMM Do YYYY, h:mm:ss a");

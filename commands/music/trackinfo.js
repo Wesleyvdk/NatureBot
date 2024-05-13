@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,11 +10,11 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const moment = require("moment/moment");
+} from "discord.js";
+import moment from "moment/moment.js";
 let CurrentDate = moment().format();
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("trackinfo")
     .setDescription("Show details of a track.")

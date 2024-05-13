@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,17 +10,17 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
+} from "discord.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("playlists")
     .setDescription("show your created playlists on the bot"),
   async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
-    playerid = interaction.user.id;
-    playername = interaction.user.username;
+    let playerid = interaction.user.id;
+    let playername = interaction.user.username;
 
     interaction.editReply("work in progress");
   },

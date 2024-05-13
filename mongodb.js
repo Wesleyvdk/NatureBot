@@ -1,6 +1,8 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
-const mysql = require("mysql2/promise");
+import mongoose from "mongoose";
+import { config } from "dotenv";
+config();
+import mysql from "mysql2/promise";
+
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 Main().catch((e) => console.error(e));
 

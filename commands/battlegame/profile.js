@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,20 +10,20 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const { createCanvas, Image, GlobalFonts } = require("@napi-rs/canvas");
+} from "discord.js";
+import { createCanvas, Image, GlobalFonts } from "@napi-rs/canvas";
 //const { createCanvas, loadImage } = require('@napi-rs/canvas');
-const { readFile } = require("fs/promises");
-const { request } = require("undici");
+import { readFile } from "fs/promises";
+import { request } from "undici";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("profile")
     .setDescription("show's the user's battle profile"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
 
-    user = interaction.user;
+    let user = interaction.user;
     let rUser = client.getBattlePlayer.get(user.id);
     if (!rUser) {
       const canvas = createCanvas(564, 1002);

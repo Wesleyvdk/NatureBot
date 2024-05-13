@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const { useQueue, useMainPlayer } = require("discord-player");
+} from "discord.js";
+import { useQueue, useMainPlayer } from "discord-player";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("play")
     .setDescription("play music from spotify, youtube, or soundcloud")

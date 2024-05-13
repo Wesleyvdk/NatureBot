@@ -1,7 +1,8 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const mysql = require("mysql2");
-require("dotenv").config();
-const moment = require("moment/moment");
+import { MongoClient, ServerApiVersion } from "mongodb";
+import mysql from "mysql2";
+import { config } from "dotenv";
+config();
+import moment from "moment/moment.js";
 async function main() {
   console.log("Started backup at: ", moment().format());
   const conn = mysql.createConnection(process.env.DATABASE_URL);

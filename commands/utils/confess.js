@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -11,10 +11,10 @@ const {
   ComponentType,
   AttachmentBuilder,
   Guild,
-} = require("discord.js");
-const errorHandler = require("../../handlers/errorHandler");
+} from "discord.js";
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("confess")
     .setDescription("list all the active matches")

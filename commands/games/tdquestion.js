@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,9 +10,9 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-lastAsked = "";
-module.exports = {
+} from "discord.js";
+let lastAsked = "";
+export default {
   data: new SlashCommandBuilder()
     .setName("tdquestion")
     .setDescription("asks a user a question")
@@ -33,7 +33,7 @@ module.exports = {
     const asked = interaction.options.getUser("user");
 
     // embed
-    const embed = new EmbedBuilder();
+    let embed = new EmbedBuilder();
 
     // T/D Channel ID
     const channelId = "1087005900352540702";

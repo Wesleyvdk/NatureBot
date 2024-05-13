@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,17 +10,17 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const usageHandler = require("../../handlers/usageHandler");
+} from "discord.js";
+import usageHandler from "../../handlers/usageHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("rob")
     .setDescription("list all the active matches"),
   async execute(client, interaction) {
     await interaction.deferReply();
-    playerid = interaction.user.id;
-    playername = interaction.user.username;
+    let playerid = interaction.user.id;
+    let playername = interaction.user.username;
 
     interaction.editReply("work in progress");
   },

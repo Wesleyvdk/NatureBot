@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,11 +10,11 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
+} from "discord.js";
 
-const errorHandler = require("../../handlers/errorHandler");
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("adopt")
     .setDescription("adopt another user")
@@ -28,9 +28,9 @@ module.exports = {
     await interaction.deferReply();
 
     const mentioned = interaction.options.getUser("target");
-    mentionedid = mentioned.id;
-    userid = interaction.user.id;
-    user = interaction.user;
+    let mentionedid = mentioned.id;
+    let userid = interaction.user.id;
+    let user = interaction.user;
     let rUser = client.getFamily.get(userid);
     let rMentioned = client.getFamily.get(mentionedid);
     if (interaction.user.id == mentioned.id) {

@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,12 +10,13 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-require("dotenv").config();
-const axios = require("axios");
-const errorHandler = require("../../handlers/errorHandler");
+} from "discord.js";
+import { config } from "dotenv";
+config();
+import axios from "axios";
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("cry")
     .setDescription("cry or cries at another user")
@@ -25,8 +26,8 @@ module.exports = {
   async execute(client, interaction, conn) {
     await interaction.deferReply();
 
-    userid = interaction.user.id;
-    user = interaction.user;
+    const userid = interaction.user.id;
+    const user = interaction.user;
     let rUser = client.getRoleplay.get(userid, interaction.guild.id);
     let mentioned = interaction.options.getUser("target");
 
@@ -84,7 +85,7 @@ module.exports = {
           .setImage(random);
         interaction.reply({ embeds: [embed1] });
       } else {
-        mentionedid = mentioned.id;
+        const mentionedid = mentioned.id;
         let rMentioned = client.getRoleplay.get(
           mentionedid,
           interaction.guild.id

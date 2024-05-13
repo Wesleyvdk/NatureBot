@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,9 +10,8 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-
-module.exports = {
+} from "discord.js";
+export default {
   data: new SlashCommandBuilder()
     .setName("skip")
     .setDescription("list all the active matches"),

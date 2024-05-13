@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,9 +10,9 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
+} from "discord.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("disown")
     .setDescription("disown another user")
@@ -28,8 +28,8 @@ module.exports = {
 
     const mentioned = interaction.options.getUser("target");
     const mentionedId = mentioned.id;
-    userid = interaction.user.id;
-    user = interaction.user;
+    const userid = interaction.user.id;
+    const user = interaction.user;
     let rUser = client.getFamily.get(userid);
     let rMentioned = client.getFamily.get(mentionedid);
     if (!rUser) {

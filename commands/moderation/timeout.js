@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -11,9 +11,9 @@ const {
   ComponentType,
   AttachmentBuilder,
   PermissionFlagsBits,
-} = require("discord.js");
+} from "discord.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("timeout")
     .setDescription("time another user out")

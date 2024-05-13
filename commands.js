@@ -13,7 +13,7 @@ import {
   ComponentType,
   AttachmentBuilder,
 } from "discord.js";
-const moment = require("moment/moment");
+import moment from "moment/moment.js";
 const client = new Client({
   intents: [
     GatewayIntentBits.DirectMessages,

@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,11 +10,11 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const { lyricsExtractor } = require("@discord-player/extractor");
+} from "discord.js";
+import { lyricsExtractor } from "@discord-player/extractor";
 const lyricsFinder = lyricsExtractor();
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("lyrics")
     .setDescription("Get and show the lyrics of current playing track.")

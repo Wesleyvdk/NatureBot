@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -11,10 +11,10 @@ const {
   ComponentType,
   AttachmentBuilder,
   PermissionFlagsBits,
-} = require("discord.js");
-const errorHandler = require("../../handlers/errorHandler");
+} from "discord.js";
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("get-confess")
     .setDescription("get the user who posted a confession by confession ID")
@@ -32,10 +32,10 @@ module.exports = {
 
     try {
       const id = interaction.options.getString("id");
-      userid = interaction.user.id;
-      username = interaction.user.username;
-      db = await mongoclient.db("Aylani");
-      collection = await db.collection("confessions");
+      let userid = interaction.user.id;
+      let username = interaction.user.username;
+      let db = await mongoclient.db("Aylani");
+      let collection = await db.collection("confessions");
       const confession = await collection.findOne({ id: parseInt(id) });
       const user = await client.users.fetch(confession.user);
       interaction.editReply(

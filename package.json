@@ -12,6 +12,7 @@
     "dev-commands": "node dev-commands.js",
     "database": "node database.js"
   },
+  "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {

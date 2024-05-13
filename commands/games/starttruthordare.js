@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,11 +10,11 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
+} from "discord.js";
 
-const errorHandler = require("../../handlers/errorHandler");
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("starttruthordare")
     .setDescription(
@@ -23,9 +23,9 @@ module.exports = {
   async execute(client, interaction, conn) {
     await interaction.deferReply();
 
-    const usersIngame = [];
+    let usersIngame = [];
 
-    const embed = new EmbedBuilder();
+    let embed = new EmbedBuilder();
     try {
       const button = new ActionRowBuilder().addComponents(
         new ButtonBuilder()

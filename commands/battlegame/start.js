@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,19 +10,19 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const classes = require("./classes.json");
+} from "discord.js";
+import classes from "./classes.json" assert { type: "json" };
 
-const errorHandler = require("../../handlers/errorHandler");
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("start")
     .setDescription("start your adventure"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
 
-    user = interaction.user;
+    let user = interaction.user;
     conn
       .promise()
       .query(`SELECT * FROM players WHERE id=${user.id}`)

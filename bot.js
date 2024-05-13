@@ -1,26 +1,30 @@
-const fs = require("node:fs");
-require("dotenv").config();
-const path = require("node:path");
-const axios = require("axios");
-const {
+import fs from "node:fs";
+import { config } from "dotenv";
+import path from "node:path";
+import axios from "axios";
+import {
   Client,
   Collection,
   Events,
   GatewayIntentBits,
   Partials,
   EmbedBuilder,
-} = require("discord.js");
-const mysql = require("mysql2");
-const Database = require("better-sqlite3");
-const moment = require("moment/moment");
-const { Player } = require("discord-player");
-const { MongoClient, ObjectId } = require("mongodb");
+} from "discord.js";
+import mysql from "mysql2";
+import Database from "better-sqlite3";
+import moment from "moment/moment.js";
+import { Player } from "discord-player";
+import { MongoClient, ObjectId } from "mongodb";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+config();
 
 const uri = process.env.MONGODB; // Fill in your MongoDB connection string here
 const mongoclient = new MongoClient(uri);
 
-const errorHandler = require("./handlers/errorHandler");
-const usageHandler = require("./handlers/usageHandler");
+import errorHandler from "./handlers/errorHandler.js";
+import usageHandler from "./handlers/usageHandler.js";
 
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 
@@ -80,23 +84,24 @@ const player = new Player(client);
 player.extractors.loadDefault();
 
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, "commands");
-const commandFolders = fs.readdirSync(foldersPath);
+const __dirname = dirname(fileURLToPath(new URL(import.meta.url)));
+//const foldersPath = path.join(__dirname, "commands");
+const commandFolders = fs.readdirSync(`./commands`);
 
 for (const folder of commandFolders) {
-  const commandsPath = path.join(foldersPath, folder);
+  //const commandsPath = path.join(foldersPath, folder);
   const commandFiles = fs
-    .readdirSync(commandsPath)
+    .readdirSync(`./commands/${folder}`)
     .filter((file) => file.endsWith(".js") || file.endsWith(".mjs"));
   for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    const command = require(filePath);
+    const filePath = await import(`./commands/${folder}/${file}`);
+    const command = filePath;
     const commandObject = {
       command: command, // This is your command structure
       category: folder, // Category of the command
     };
-    if ("data" in command && "execute" in command) {
-      client.commands.set(command.data.name, commandObject);
+    if (command.default.data && command.default.execute) {
+      client.commands.set(command.default.data.name, commandObject);
     } else {
       console.log(
         `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
@@ -199,7 +204,7 @@ client.once(Events.ClientReady, async () => {
       conn
         .promise()
         .query(commandSettings, [
-          commandObject.command.data.name,
+          commandObject.command.default.data.name,
           commandObject.category,
         ]);
     });
@@ -325,7 +330,7 @@ client.on("guildCreate", async (guild) => {
     conn
       .promise()
       .query(commandSettings, [
-        commandObject.command.data.name,
+        commandObject.command.default.data.name,
         commandObject.category,
       ]);
   });
@@ -604,7 +609,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       .promise()
       .query(
         `SELECT * FROM ${interaction.guild.id}Settings WHERE command = ?`,
-        [command.command.data.name]
+        [command.command.default.data.name]
       )
       .then(async ([rows, fields]) => {
         if (rows[0].turnedOn == 0) {
@@ -615,16 +620,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
           });
           return;
         } else {
-          const { useQueue } = require("discord-player");
+          const { useQueue } = await import("discord-player");
           const queue = useQueue(interaction.guild.id);
-          await command.command.execute(
+          await command.command.default.execute(
             client,
             interaction,
             conn,
             mongoclient,
             queue
           );
-          usageHandler(command.command.data.name, mongoclient, conn);
+          usageHandler(command.command.default.data.name, mongoclient, conn);
         }
       });
   } catch (e) {

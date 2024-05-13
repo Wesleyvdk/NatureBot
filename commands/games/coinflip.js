@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const usageHandler = require("../../handlers/usageHandler");
+} from "discord.js";
+import usageHandler from "../../handlers/usageHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("coinflip")
     .setDescription("list all the active matches")
@@ -37,8 +37,9 @@ module.exports = {
     await interaction.deferReply();
     let amount = interaction.options.getInteger("bet");
     const option = interaction.options.getString("option");
-    coinFlip = Math.floor(Math.random() * 10);
-    playerid = interaction.user.id;
+    let coinFlip = Math.floor(Math.random() * 10);
+    let playerid = interaction.user.id;
+    let newCash;
     console.log(interaction.guild.id);
 
     conn

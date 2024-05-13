@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const usageHandler = require("../../handlers/usageHandler");
+} from "discord.js";
+import usageHandler from "../../handlers/usageHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("give")
     .setDescription("gives a specific amount to another user")
@@ -34,10 +34,10 @@ module.exports = {
 
     const target = interaction.options.getUser("user");
     const amount = interaction.options.getInteger("amount");
-    userid = interaction.user.id;
-    user = interaction.user;
-    username = user.username;
-    targetid = target.id;
+    let userid = interaction.user.id;
+    let user = interaction.user;
+    let username = user.username;
+    let targetid = target.id;
     // MONGO DB
 
     // mongoclient
@@ -114,8 +114,9 @@ module.exports = {
             } else {
               let oldCashuser = userRows[0].cash;
               let oldCashTarget = targetRows[0].cash;
-              newCashTarget = Number(`${oldCashTarget}`) + Number(`${amount}`);
-              newCashuser = oldCashuser - amount;
+              let newCashTarget =
+                Number(`${oldCashTarget}`) + Number(`${amount}`);
+              let newCashuser = oldCashuser - amount;
               userRows[0].cash = newCashuser;
               targetRows[0].cash = newCashTarget;
               conn

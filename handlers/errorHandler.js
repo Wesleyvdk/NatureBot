@@ -1,15 +1,15 @@
-const {
+import {
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   Colors,
-} = require("discord.js");
-const moment = require("moment/moment");
+} from "discord.js";
+import moment from "moment/moment.js";
 let CurrentDate = moment().format();
 
-module.exports = function handleError(interaction, e, message) {
-  embed = new EmbedBuilder()
+export default function handleError(interaction, e, message) {
+  let embed = new EmbedBuilder()
     .setDescription("There was an error, please notify the creator of the bot")
     .setColor(Colors.Red);
   const buttonComponent = new ActionRowBuilder().addComponents(
@@ -35,4 +35,4 @@ module.exports = function handleError(interaction, e, message) {
     console.log(`Error: ${e}\n in server: ${interaction.guild.name}`);
     console.log(`Date/Time: ${CurrentDate}`);
   }
-};
+}

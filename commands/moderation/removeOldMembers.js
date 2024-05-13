@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -12,10 +12,10 @@ const {
   AttachmentBuilder,
   ButtonComponent,
   PermissionFlagsBits,
-} = require("discord.js");
-const handleError = require("../../handlers/errorHandler");
+} from "discord.js";
+import handleError from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("wipeout")
     .setDescription(

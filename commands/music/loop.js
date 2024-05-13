@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const { QueueRepeatMode } = require("discord-player");
+} from "discord.js";
+import { QueueRepeatMode } from "discord-player";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("loop")
     .setDescription("list all the active matches")

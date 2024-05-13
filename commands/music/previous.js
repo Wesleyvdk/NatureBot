@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,11 +10,11 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
+} from "discord.js";
 
-const { useHistory } = require("discord-player");
+import { useHistory } from "discord-player";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("previous")
     .setDescription("Play the previous track"),

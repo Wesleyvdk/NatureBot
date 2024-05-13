@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,9 +10,9 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
+} from "discord.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("divorce")
     .setDescription("divorce another user"),
@@ -29,10 +29,10 @@ module.exports = {
       `maybe try finding a partner first`,
       `a relationship doesn't come to you like magic`,
     ];
-    userid = interaction.user.id;
-    user = interaction.user;
+    const userid = interaction.user.id;
+    const user = interaction.user;
     let rUser = client.getFamily.get(userid);
-    mentionedid = rUser.partnerID;
+    const mentionedid = rUser.partnerID;
     let rMentioned = client.getFamily.get(mentionedid);
 
     if (!rUser) {

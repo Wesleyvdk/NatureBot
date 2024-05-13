@@ -1,10 +1,10 @@
-const {
+import {
   Client,
   Events,
   GatewayIntentBits,
   Partials,
   EmbedBuilder,
-} = require("discord.js");
+} from "discord.js";
 const client = new Client({
   intents: [
     GatewayIntentBits.DirectMessages,
@@ -15,7 +15,8 @@ const client = new Client({
   ],
   partials: [Partials.Channel],
 });
-require("dotenv").config();
+import { config } from "dotenv";
+config();
 client.once(Events.ClientReady, async (c) => {
   console.log(`Ready! Logged in as ${c.user.tag}`);
 });

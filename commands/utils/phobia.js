@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -11,10 +11,10 @@ const {
   ComponentType,
   AttachmentBuilder,
   PermissionFlagsBits,
-} = require("discord.js");
-const phobias = require("./phobias.json");
+} from "discord.js";
+import phobias from "./phobias.json" assert { type: "json" };
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("phobia")
     .setDescription("shows a random phobia"),

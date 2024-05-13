@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,9 +10,9 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
+} from "discord.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("children")
     .setDescription("shows your children, or the children of another user")
@@ -26,7 +26,7 @@ module.exports = {
 
     const mentioned = interaction.options.getUser("target");
     if (mentioned) {
-      mentionedid = mentioned.id;
+      let mentionedid = mentioned.id;
       let rMentioned = client.getFamily.get(mentionedid);
       if (!rMentioned) {
         rMentioned = {
@@ -58,7 +58,7 @@ module.exports = {
         !rMentioned.child4 &&
         !rMentioned.child5
       ) {
-        embed = new EmbedBuilder().setDescription(
+        let embed = new EmbedBuilder().setDescription(
           `${mentioned.username} doesn't have any children`
         );
         interaction.editReply({ embeds: [embed] });
@@ -69,8 +69,8 @@ module.exports = {
         interaction.editReply({ embeds: [embed] });
       }
     } else {
-      userid = interaction.user.id;
-      user = interaction.user;
+      let userid = interaction.user.id;
+      let user = interaction.user;
       let rUser = client.getFamily.get(userid);
       if (!rUser) {
         rUser = {
@@ -102,7 +102,7 @@ module.exports = {
         !rUser.child4 &&
         !rUser.child5
       ) {
-        embed = new EmbedBuilder().setDescription(
+        let embed = new EmbedBuilder().setDescription(
           `you don't have any children`
         );
         interaction.editReply({ embeds: [embed] });

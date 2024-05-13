@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,12 +10,13 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-require("dotenv").config();
-const axios = require("axios");
-const errorHandler = require("../../handlers/errorHandler");
+} from "discord.js";
+import { config } from "dotenv";
+config();
+import axios from "axios";
+import errorHandler from "../../handlers/errorHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("slap")
     .setDescription("slaps another user")
@@ -51,9 +52,9 @@ module.exports = {
         await interaction.editReply("Sorry but no gifs were found");
       }
       const gif = data.results[0].media_formats.gif.url;
-      mentionedid = mentioned.id;
-      userid = interaction.user.id;
-      user = interaction.user;
+      let mentionedid = mentioned.id;
+      let userid = interaction.user.id;
+      let user = interaction.user;
       let rUser = client.getRoleplay.get(userid, interaction.guild.id);
       let rMentioned = client.getRoleplay.get(
         mentionedid,

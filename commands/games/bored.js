@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const usageHandler = require("../../handlers/usageHandler");
+} from "discord.js";
+import usageHandler from "../../handlers/usageHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("bored")
     .setDescription("Find an activity to do"),

@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const usageHandler = require("../../handlers/usageHandler");
+} from "discord.js";
+import usageHandler from "../../handlers/usageHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("deposit")
     .setDescription("deposits balance to the bank")
@@ -24,9 +24,9 @@ module.exports = {
     await interaction.deferReply();
 
     const amount = interaction.options.getInteger("amount");
-    userid = interaction.user.id;
-    user = interaction.user;
-    username = user.username;
+    let userid = interaction.user.id;
+    let user = interaction.user;
+    let username = user.username;
 
     // MONGO DB
     // mongoclient
@@ -84,10 +84,10 @@ module.exports = {
       ])
       .then(async function ([rows, fields]) {
         if (!amount) {
-          oldCash = rows[0].cash;
-          oldBank = rows[0].bank;
-          newBank = Number(oldCash) + Number(oldBank);
-          newCash = 0;
+          let oldCash = rows[0].cash;
+          let oldBank = rows[0].bank;
+          let newBank = Number(oldCash) + Number(oldBank);
+          let newCash = 0;
           conn
             .promise()
             .query(
@@ -106,7 +106,7 @@ module.exports = {
           let oldBank = rows[0].bank;
           await oldBank;
           await oldCash;
-          deposit(oldCash, oldBank, amount);
+          let { newCash, newBank } = deposit(oldCash, oldBank, amount);
           rows[0].bank = newBank;
           rows[0].cash = newCash;
           const balEmbed = new EmbedBuilder().setDescription(
@@ -119,6 +119,7 @@ module.exports = {
     function deposit(oldCash, oldBank, amount) {
       newCash = oldCash - amount;
       newBank = Number(`${oldBank}`) + Number(`${amount}`);
+      return { newCash, newBank };
     }
   },
 };

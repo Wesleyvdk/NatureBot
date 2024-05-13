@@ -1,4 +1,4 @@
-const {
+import {
   SlashCommandBuilder,
   EmbedBuilder,
   ActionRowBuilder,
@@ -10,10 +10,10 @@ const {
   StringSelectMenuOptionBuilder,
   ComponentType,
   AttachmentBuilder,
-} = require("discord.js");
-const usageHandler = require("../../handlers/usageHandler");
+} from "discord.js";
+import usageHandler from "../../handlers/usageHandler.js";
 
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("balance")
     .setDescription("shows the current balance of the user")
@@ -24,14 +24,14 @@ module.exports = {
     await interaction.deferReply();
 
     const mentioned = interaction.options.getUser("user");
-    userid = interaction.user.id;
+    let userid = interaction.user.id;
 
     // let mentioned = interaction.mentions.users.first();
     const table = mongoclient
       .db("Aylani")
       .collection(`${interaction.guild.id}Currency`);
     if (mentioned) {
-      mentionedid = mentioned.id;
+      let mentionedid = mentioned.id;
 
       if (table.findOne({ _id: mentionedid })) {
         table.insertOne({

@@ -25,6 +25,7 @@ const mongoclient = new MongoClient(uri);
 
 import errorHandler from "./handlers/errorHandler.js";
 import usageHandler from "./handlers/usageHandler.js";
+import { messageCounter } from "./handlers/activityHandler.js";
 
 const conn = mysql.createConnection(process.env.DATABASE_URL);
 
@@ -146,6 +147,15 @@ client.once(Events.ClientReady, async () => {
     .get();
   await createDatabases(familyTable, rpTable, suggestionTable);
   await getDatabases();
+  conn.promise().query(
+    `CREATE TABLE IF NOT EXISTS activity (
+      id INTEGER PRIMARY KEY AUTO_INCREMENT,
+      userID varchar(255),
+      guildID varchar(255),
+      message INTEGER,
+      voice INTEGER
+    );`
+  );
   conn.promise().query(
     `CREATE TABLE IF NOT EXISTS players (
         id char(30) PRIMARY KEY,
@@ -352,6 +362,10 @@ client.on("messageCreate", async (message) => {
       let userid = message.author.id;
       let username = message.author.username;
       let user = message.author;
+
+      // You can use a function to handle database updates
+      await messageCounter(userid, guild, conn, mongoclient);
+
       conn
         .promise()
         .query(
@@ -436,8 +450,8 @@ client.on("messageCreate", async (message) => {
       }
       async function add_experience(rows, user, guild) {
         try {
-          exp = rows[0].exp;
-          newExp = exp += 5;
+          let exp = await rows[0].exp;
+          let newExp = (exp += 5);
         } catch (e) {
           console.log(`Error: ${e}`);
           console.log(`Date/Time: ${CurrentDate}`);
@@ -450,13 +464,13 @@ client.on("messageCreate", async (message) => {
 
           conn
             .promise()
-            .execute(`SELECT * FROM "${guild}Levels" WHERE id=?`, [user.id])
+            .execute(`SELECT * FROM '${guild}Levels' WHERE id=${user.id}`)
             .then(async ([rows, fields]) => {
               add_experience(rows, user);
             });
         }
-        exp = rows[0].exp;
-        newExp = exp += 5;
+        let exp = await rows[0].exp;
+        let newExp = (exp += 5);
 
         conn
           .promise()
@@ -467,9 +481,9 @@ client.on("messageCreate", async (message) => {
       }
 
       async function level_up(rows, user, guild) {
-        xp = rows[0].exp;
-        lvl_start = rows[0].level;
-        lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+        let xp = rows[0].exp;
+        let lvl_start = rows[0].level;
+        let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
 
         let round = Math.floor(lvl_end);
         let lvl_up = Number(round);

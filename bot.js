@@ -345,52 +345,13 @@ client.on("guildDelete", async (guild) => {
 
 client.on("messageCreate", async (message) => {
   try {
-    const keyword = "Bump done";
-    const roleName = "bumper";
-    const role = message.guild.roles.cache.find(
-      (role) => role.name === roleName
-    );
-    const embed = message.embeds[0];
-    try {
-      if (embed && embed.description) {
-        try {
-          if (embed.description.includes(keyword)) {
-            message.channel.send(
-              `thank you for bumping! next bump is ready in 2 hours. to get the bump reminder role, use \`.addBump\`\n
-                  if this role does not exist, the role will be created on first use of the .addBump command`
-            );
-
-            const delay = 2 * 60 * 60 * 1000;
-            // in milliseconds
-            if (role) {
-              const roleMention = role.toString();
-              setTimeout(() => {
-                // Send a message to the channel where the command was used
-                message.channel.send(`bump is ready ${roleMention}`);
-              }, delay);
-            } else {
-              setTimeout(() => {
-                // Send a message to the channel where the command was used
-                message.channel.send("bump is ready");
-              }, delay);
-            }
-          } else {
-            return;
-          }
-        } catch (e) {
-          errorHandler(null, e, message);
-        }
-      }
-    } catch (e) {
-      errorHandler(null, e, message);
-    }
     try {
       if (message.author.bot) return;
 
       let guild = message.guild.id;
-      userid = message.author.id;
-      username = message.author.username;
-      user = message.author;
+      let userid = message.author.id;
+      let username = message.author.username;
+      let user = message.author;
       conn
         .promise()
         .query(
@@ -407,16 +368,6 @@ client.on("messageCreate", async (message) => {
 
       async function check_level_reward(rows, message) {
         // MAKE PREMIUM
-
-        // const roles = [
-        //   "Member",
-        //   "Ai Novice",
-        //   "HiRe Pro",
-        //   "Promptologist",
-        //   "Ai Pro",
-        //   "LoRe Expert",
-        //   "Ultimate Upscale Pro",
-        // ];
         const member = message.member;
         const roleLevel = 1;
         const roleName = `level ${roleLevel}`;
@@ -539,47 +490,6 @@ client.on("messageCreate", async (message) => {
             );
         }
         //await check_level_reward(rows, message);
-      }
-
-      if (message.content.startsWith(".addBump")) {
-        const roleName = "bumper";
-        const guild = message.guild;
-        const role = guild.roles.cache.find((role) => role.name === roleName);
-        if (!role) {
-          await guild.roles
-            .create({
-              name: roleName,
-            })
-            .then((createdRole) => {
-              console.log(`Role created: ${createdRole.name}`);
-              message.channel.send(`I created the role ${createdRole.name}`);
-              message.member.roles.add(createdRole);
-              message.reply(
-                `I gave you the role. remove the role using \`.delBump\``
-              );
-            })
-            .catch((e) => {
-              errorHandler(null, e, message);
-            });
-        } else {
-          message.member.roles.add(role).then(() => {
-            message.reply(
-              `I gave you the role. remove the role using \`.delBump\``
-            );
-          });
-        }
-      }
-      if (message.content.startsWith(".delBump")) {
-        const roleName = "bumper";
-        const role = message.guild.roles.cache.find(
-          (role) => role.name === roleName
-        );
-
-        message.member.roles.remove(role).then(() => {
-          message.reply(
-            `I removed the role. If you want to be reminded of bumps, use \`.addBump\``
-          );
-        });
       }
 
       if (message.channel.id === "929352993701253154") return;

@@ -1,0 +1,41 @@
+{
+  "name": "naturebot",
+  "version": "2.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "start": "npm run deploy && npm run bot",
+    "bot": "node bot.js",
+    "deploy": "node deploy-commands.js",
+    "startdev": "npm run database && npm run dev-commands && npm run dev",
+    "dev": "node dev.js",
+    "dev-commands": "node dev-commands.js",
+    "database": "node database.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discord-player/extractor": "^4.4.6",
+    "@discordjs/voice": "^0.16.1",
+    "@napi-rs/canvas": "^0.1.44",
+    "axios": "^1.6.5",
+    "better-sqlite3": "^9.1.1",
+    "discord-player": "^6.6.7",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1",
+    "fetch": "^1.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "jimp": "^0.22.10",
+    "mediaplex": "^0.0.9",
+    "moment": "^2.29.4",
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.3.1",
+    "mysql2": "^3.6.3",
+    "node-fetch": "^3.3.2",
+    "pokedex-promise-v2": "^4.2.0",
+    "youtube-ext": "^1.1.16"
+  },
+  "devDependencies": {
+    "eslint": "^8.19.0"
+  }
+}

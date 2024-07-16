@@ -36,23 +36,47 @@ export default {
     const system = interaction.options.getString("system");
 
     try {
-      conn
-        .promise()
-        .query(`SELECT * FROM ${interaction.guild.id}${system}`)
-        .then(([rows, fields]) => {
-          const members = interaction.guild.fetch();
-          const guildUserIDs = members.map((member) => member.user.id);
+      // MYSQL DB
+      // conn
+      //   .promise()
+      //   .query(`SELECT * FROM ${interaction.guild.id}${system}`)
+      //   .then(([rows, fields]) => {
+      //     const members = interaction.guild.fetch();
+      //     const guildUserIDs = members.map((member) => member.user.id);
 
-          for (row in rows) {
-            if (!guildUserIDs.includes(row.id)) {
-              conn
-                .promise()
-                .query(
-                  `DELETE FROM ${interaction.guild.id}${system} WHERE id=${row.id};`
-                );
-            }
-          }
-        });
+      //     for (row in rows) {
+      //       if (!guildUserIDs.includes(row.id)) {
+      //         conn
+      //           .promise()
+      //           .query(
+      //             `DELETE FROM ${interaction.guild.id}${system} WHERE id=${row.id};`
+      //           );
+      //       }
+      //     }
+      //   });
+
+      // MONGO DB
+      interaction.guild.members.fetch().then((members) => {
+        const guildUserIDs = members.map((member) => member.user.id);
+        mongoclient
+          .db("Aylani")
+          .collection(`${interaction.guild.id}${system}`)
+          .find()
+          .toArray((err, rows) => {
+            if (err) throw err;
+
+            rows.forEach((row) => {
+              if (!guildUserIDs.includes(row.id)) {
+                mongoclient
+                  .db("Aylani")
+                  .collection(`${interaction.guild.id}${system}`)
+                  .deleteOne({ id: row.id }, function (err, obj) {
+                    if (err) throw err;
+                  });
+              }
+            });
+          });
+      });
     } catch (e) {
       handleError(interaction, e, null);
     }

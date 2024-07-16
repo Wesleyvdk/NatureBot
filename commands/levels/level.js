@@ -11,21 +11,24 @@ export default {
 
     // MONGO DB
 
-    // mongoclient
-    //   .db("Aylani")
-    //   .collection(`${interaction.guild.id}Levels`)
-    //   .findOne({ _id: userid }).then([rows, fields] => {interaction.editReply(
-    //   `${interaction.user}, your current level is ${rows[0].level} and your current exp is ${rows[0].exp}`
-    // );});
-
-    // MYSQL DB
-    conn
-      .promise()
-      .query(`SELECT * FROM ${interaction.guild.id}Levels WHERE id=?`, [userid])
-      .then(function ([rows, fields]) {
+    mongoclient
+      .db("Aylani")
+      .collection(`${interaction.guild.id}Levels`)
+      .findOne({ _id: userid })
+      .then(([rows, fields]) => {
         interaction.editReply(
           `${interaction.user}, your current level is ${rows[0].level} and your current exp is ${rows[0].exp}`
         );
       });
+
+    // MYSQL DB
+    // conn
+    //   .promise()
+    //   .query(`SELECT * FROM ${interaction.guild.id}Levels WHERE id=?`, [userid])
+    //   .then(function ([rows, fields]) {
+    //     interaction.editReply(
+    //       `${interaction.user}, your current level is ${rows[0].level} and your current exp is ${rows[0].exp}`
+    //     );
+    //   });
   },
 };

@@ -27,12 +27,14 @@ import errorHandler from "./handlers/errorHandler.js";
 import usageHandler from "./handlers/usageHandler.js";
 import { messageCounter } from "./handlers/activityHandler.js";
 
-const conn = mysql.createConnection(process.env.DATABASE_URL);
+const conn = "";
 
-conn.connect(function (err) {
-  if (err) throw err;
-  console.log("Succesfully connected to PlanetScale!");
-});
+// const conn = mysql.createConnection(process.env.DATABASE_URL);
+
+// conn.connect(function (err) {
+//   if (err) throw err;
+//   console.log("Succesfully connected to PlanetScale!");
+// });
 // arrays
 const number = [
   50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68,
@@ -147,76 +149,89 @@ client.once(Events.ClientReady, async () => {
     .get();
   await createDatabases(familyTable, rpTable, suggestionTable);
   await getDatabases();
-  conn.promise().query(
-    `CREATE TABLE IF NOT EXISTS activity (
-      id INTEGER PRIMARY KEY AUTO_INCREMENT,
-      userID varchar(255),
-      guildID varchar(255),
-      message INTEGER,
-      voice INTEGER
-    );`
-  );
-  conn.promise().query(
-    `CREATE TABLE IF NOT EXISTS players (
-        id char(30) PRIMARY KEY,
-        user varchar(255),
-        guild varchar(255),
-        level INTEGER,
-        class varchar(255),
-        equipedWeapon varchar(255),
-        equipedHelmet varchar(255),
-        equipedChestplate varchar(255),
-        equipedPants varchar(255),
-        equipedBoots varchar(255)
-        );`
-  );
-  conn.promise().query(
-    `CREATE TABLE IF NOT EXISTS loot (
-        id INTEGER PRIMARY KEY AUTO_INCREMENT,
-        userID varchar(255),
-        item varchar(255),
-        rarity varchar(255)
-        );`
-  );
-  client.guilds.cache.forEach((guild) => {
-    conn.promise().query(
-      `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
-        id char(30) NOT NULL PRIMARY KEY UNIQUE, 
-        user varchar(255), 
-        guild varchar(255), 
-        userName varchar(255), 
-        bank Integer, 
-        cash Integer, 
-        bitcoin Integer
-        );`
-    );
-    conn.promise().query(
-      `CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
-      id char(30) NOT NULL PRIMARY KEY UNIQUE,
-      name varchar(255) NOT NULL,
-      level int NOT NULL,
-      exp int NOT NULL
-      );`
-    );
 
-    const settingsTable = `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
-      id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE, 
-      command varchar(255) NOT NULL UNIQUE, 
-      category varchar(255) NOT NULL,
-      turnedOn bool NOT NULL
-      );`;
-    conn.promise().query(settingsTable);
+  // MONGO DB
+  // Happens automatically on insertion
+
+  // MYSQL DB
+  // conn.promise().query(
+  //   `CREATE TABLE IF NOT EXISTS activity (
+  //     id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  //     userID varchar(255),
+  //     guildID varchar(255),
+  //     message INTEGER,
+  //     voice INTEGER
+  //   );`
+  // );
+  // conn.promise().query(
+  //   `CREATE TABLE IF NOT EXISTS players (
+  //       id char(30) PRIMARY KEY,
+  //       user varchar(255),
+  //       guild varchar(255),
+  //       level INTEGER,
+  //       class varchar(255),
+  //       equipedWeapon varchar(255),
+  //       equipedHelmet varchar(255),
+  //       equipedChestplate varchar(255),
+  //       equipedPants varchar(255),
+  //       equipedBoots varchar(255)
+  //       );`
+  // );
+  // conn.promise().query(
+  //   `CREATE TABLE IF NOT EXISTS loot (
+  //       id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  //       userID varchar(255),
+  //       item varchar(255),
+  //       rarity varchar(255)
+  //       );`
+  // );
+  client.guilds.cache.forEach((guild) => {
+    // conn.promise().query(
+    //   `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
+    //     id char(30) NOT NULL PRIMARY KEY UNIQUE,
+    //     user varchar(255),
+    //     guild varchar(255),
+    //     userName varchar(255),
+    //     bank Integer,
+    //     cash Integer,
+    //     bitcoin Integer
+    //     );`
+    // );
+    // conn.promise().query(
+    //   `CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
+    //   id char(30) NOT NULL PRIMARY KEY UNIQUE,
+    //   name varchar(255) NOT NULL,
+    //   level int NOT NULL,
+    //   exp int NOT NULL
+    //   );`
+    // );
+
+    // const settingsTable = `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
+    //   id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE,
+    //   command varchar(255) NOT NULL UNIQUE,
+    //   category varchar(255) NOT NULL,
+    //   turnedOn bool NOT NULL
+    //   );`;
+    // conn.promise().query(settingsTable);
 
     client.commands.forEach((commandObject) => {
-      const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
-        command, category, turnedOn) VALUES (?, ?, True);
-      `;
-      conn
-        .promise()
-        .query(commandSettings, [
-          commandObject.command.default.data.name,
-          commandObject.category,
-        ]);
+      // MONGO DB
+      mongoclient.db("Aylani").collection(`${guild.id}Settings`).insertOne({
+        command: commandObject.command.default.data.name,
+        category: commandObject.category,
+        turnedOn: true,
+      });
+
+      // MYSQL DB
+      // const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
+      //     command, category, turnedOn) VALUES (?, ?, True);
+      // `;
+      // conn
+      //   .promise()
+      //   .query(commandSettings, [
+      //     commandObject.command.default.data.name,
+      //     commandObject.category,
+      //   ]);
     });
   });
   const Guilds = client.guilds.cache.map((guild) => [
@@ -307,50 +322,66 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 });
 
 client.on("guildCreate", async (guild) => {
-  conn.promise().query(
-    `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
-      id char(30) NOT NULL PRIMARY KEY UNIQUE, 
-      user varchar(255), 
-      guild varchar(255), 
-      userName varchar(255), 
-      bank Integer, 
-      cash Integer, 
-      bitcoin Integer)`
-  );
-  conn.promise().query(`CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
-    id char(30) NOT NULL PRIMARY KEY UNIQUE,
-    name varchar(255) NOT NULL,
-    level int NOT NULL,
-    exp int NOT NULL
-    );`);
+  // MONGO DB
+  // Happens automatically on insertion
+  // MYSQL DB
+  // conn.promise().query(
+  //   `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
+  //     id char(30) NOT NULL PRIMARY KEY UNIQUE,
+  //     user varchar(255),
+  //     guild varchar(255),
+  //     userName varchar(255),
+  //     bank Integer,
+  //     cash Integer,
+  //     bitcoin Integer)`
+  // );
+  // conn.promise().query(`CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
+  //   id char(30) NOT NULL PRIMARY KEY UNIQUE,
+  //   name varchar(255) NOT NULL,
+  //   level int NOT NULL,
+  //   exp int NOT NULL
+  //   );`);
 
-  conn.promise().query(
-    `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
-        id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE, 
-        command varchar(255) NOT NULL, 
-        category varchar(255) NOT NULL, 
-        turnedOn bool NOT NULL
-        );`
-  );
+  // conn.promise().query(
+  //   `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
+  //       id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE,
+  //       command varchar(255) NOT NULL,
+  //       category varchar(255) NOT NULL,
+  //       turnedOn bool NOT NULL
+  //       );`
+  // );
 
   client.commands.forEach((commandObject) => {
-    const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
-        command, category, turnedOn) VALUES (?, ?, True);
-      `;
-    conn
-      .promise()
-      .query(commandSettings, [
-        commandObject.command.default.data.name,
-        commandObject.category,
-      ]);
+    // MONGO DB
+    mongoclient.db("Aylani").collection(`${guild.id}Settings`).insertOne({
+      command: commandObject.command.default.data.name,
+      category: commandObject.category,
+      turnedOn: true,
+    });
+
+    // MYSQL DB
+    // const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
+    //     command, category, turnedOn) VALUES (?, ?, True);
+    //   `;
+    // conn
+    //   .promise()
+    //   .query(commandSettings, [
+    //     commandObject.command.default.data.name,
+    //     commandObject.category,
+    //   ]);
   });
   // send "hello" message
 });
 
 client.on("guildDelete", async (guild) => {
-  conn.promise().query(`DROP TABLE ${guild.id}Currency`);
-  conn.promise().query(`DROP TABLE ${guild.id}Levels`);
-  conn.promise().query(`DROP TABLE ${guild.id}Settings`);
+  // MONGO DB
+  mongoclient.db("Aylani").collection(`${guild.id}Currency`).drop();
+  mongoclient.db("Aylani").collection(`${guild.id}Levels`).drop();
+  mongoclient.db("Aylani").collection(`${guild.id}Settings`).drop();
+  // MYSQL DB
+  // conn.promise().query(`DROP TABLE ${guild.id}Currency`);
+  // conn.promise().query(`DROP TABLE ${guild.id}Levels`);
+  // conn.promise().query(`DROP TABLE ${guild.id}Settings`);
 });
 
 client.on("messageCreate", async (message) => {
@@ -366,19 +397,22 @@ client.on("messageCreate", async (message) => {
       // You can use a function to handle database updates
       await messageCounter(userid, guild, conn, mongoclient);
 
-      conn
-        .promise()
-        .query(
-          `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
-          [userid, username]
-        );
+      // MONGO DB
+      addExperienceMongoDB(user, guild);
+      // MYSQL DB
+      // conn
+      //   .promise()
+      //   .query(
+      //     `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+      //     [userid, username]
+      //   );
 
-      conn
-        .promise()
-        .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
-        .then(async ([rows, fields]) => {
-          add_experience(rows, user, guild);
-        });
+      // conn
+      //   .promise()
+      //   .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
+      //   .then(async ([rows, fields]) => {
+      //     addExperienceMySQL(rows, user, guild);
+      //   });
 
       async function check_level_reward(rows, message) {
         // MAKE PREMIUM
@@ -448,7 +482,20 @@ client.on("messageCreate", async (message) => {
           }
         }
       }
-      async function add_experience(rows, user, guild) {
+
+      async function addExperienceMongoDB(user, guild) {
+        // MONGO DB
+        const filter = { _id: user.id };
+        const update = { $inc: { exp: 5 }, $setOnInsert: { exp: 5 } };
+        const options = { upsert: true };
+        mongoclient
+          .db("Aylani")
+          .collection(`${guild}Levels`)
+          .updateOne(filter, update, options)
+          .then(levelUpMongoDB(user, guild));
+      }
+
+      async function addExperienceMySQL(rows, user, guild) {
         try {
           let exp = await rows[0].exp;
           let newExp = (exp += 5);
@@ -466,7 +513,7 @@ client.on("messageCreate", async (message) => {
             .promise()
             .execute(`SELECT * FROM '${guild}Levels' WHERE id=${user.id}`)
             .then(async ([rows, fields]) => {
-              add_experience(rows, user);
+              addExperienceMySQL(rows, user);
             });
         }
         let exp = await rows[0].exp;
@@ -477,10 +524,41 @@ client.on("messageCreate", async (message) => {
           .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
             user.id,
           ])
-          .then(level_up(rows, user, guild));
+          .then(levelUpMySQL(rows, user, guild));
       }
 
-      async function level_up(rows, user, guild) {
+      // MONGO DB
+      async function levelUpMongoDB(user, guild) {
+        mongoclient
+          .db("Aylani")
+          .collection(`${guild}Levels`)
+          .findOne({ _id: user.id })
+          .then((doc) => {
+            let lvl_start = doc.level;
+            let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+
+            let round = Math.floor(lvl_end);
+            let lvl_up = Number(round);
+
+            if (lvl_up < 0) {
+              const filter = { _id: user.id };
+              const update = { $inc: { level: 1 }, $setOnInsert: { level: 1 } };
+              const options = { upsert: true };
+              mongoclient
+                .db("Aylani")
+                .collection(`${guild}Levels`)
+                .updateOne(filter, update, options)
+                .then(
+                  message.channel.send(
+                    `${user} has leveled up to level ${rows[0].level + 1}`
+                  )
+                );
+              //await check_level_reward(rows, message);
+            }
+          });
+      }
+      // MYSQL DB
+      async function levelUpMySQL(rows, user, guild) {
         let xp = rows[0].exp;
         let lvl_start = rows[0].level;
         let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
@@ -529,14 +607,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
   if (!command) return;
 
   try {
-    conn
-      .promise()
-      .query(
-        `SELECT * FROM ${interaction.guild.id}Settings WHERE command = ?`,
-        [command.command.default.data.name]
-      )
-      .then(async ([rows, fields]) => {
-        if (rows[0].turnedOn == 0) {
+    // MONGO DB
+    mongoclient
+      .db("Aylani")
+      .collection(`${interaction.guild.id}Settings`)
+      .find({ command: commandName })
+      .toArray(async (err, docs) => {
+        if (err) throw err;
+        if (docs[0].turnedOn === 0) {
           interaction.reply({
             content:
               "This command is not turned on in this server. Contact the server owner if you're interested in this command.",
@@ -556,6 +634,35 @@ client.on(Events.InteractionCreate, async (interaction) => {
           usageHandler(command.command.default.data.name, mongoclient, conn);
         }
       });
+
+    // MYSQL DB
+    // conn
+    //   .promise()
+    //   .query(
+    //     `SELECT * FROM ${interaction.guild.id}Settings WHERE command = ?`,
+    //     [command.command.default.data.name]
+    //   )
+    //   .then(async ([rows, fields]) => {
+    //     if (rows[0].turnedOn == 0) {
+    //       interaction.reply({
+    //         content:
+    //           "This command is not turned on in this server. Contact the server owner if you're interested in this command.",
+    //         ephemeral: true,
+    //       });
+    //       return;
+    //     } else {
+    //       const { useQueue } = await import("discord-player");
+    //       const queue = useQueue(interaction.guild.id);
+    //       await command.command.default.execute(
+    //         client,
+    //         interaction,
+    //         conn,
+    //         mongoclient,
+    //         queue
+    //       );
+    //       usageHandler(command.command.default.data.name, mongoclient, conn);
+    //     }
+    //   });
   } catch (e) {
     errorHandler(interaction, e, null);
     if (interaction.replied || interaction.deferred) {
@@ -743,115 +850,51 @@ function currDrop(message) {
           setTimeout(() => message.delete(), 10000)
         ); /*Time until delete in milliseconds*/
       dropMessage = false;
-      conn
-        .promise()
-        .query(`SELECT * FROM ${message.guild.id}Currency WHERE id=?`, [userid])
+
+      // MONGO DB
+      mongoclient
+        .db("Aylani")
+        .collection(`${message.guild.id}Currency`)
+        .findOne({ id: userid })
         .then(async function ([rows, fields]) {
-          console.log(rows);
           try {
             oldCash = rows[0].cash;
             newCash = oldCash + randomMoney;
-            conn
-              .promise()
-              .query(
-                `UPDATE ${message.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
-              );
+            mongoclient
+              .db("Aylani")
+              .collection(`${message.guild.id}Currency`)
+              .updateOne({ id: userid }, { $set: { cash: newCash } });
             counter = 0;
             randNumber = number[Math.floor(Math.random() * number.length)];
           } catch (e) {
             console.log(`Error: ${e}\nUser: ${user}\nrows: ${rows}`);
           }
         });
+
+      // MYSQL DB
+      // conn
+      //   .promise()
+      //   .query(`SELECT * FROM ${message.guild.id}Currency WHERE id=?`, [userid])
+      //   .then(async function ([rows, fields]) {
+      //     console.log(rows);
+      //     try {
+      //       oldCash = rows[0].cash;
+      //       newCash = oldCash + randomMoney;
+      //       conn
+      //         .promise()
+      //         .query(
+      //           `UPDATE ${message.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
+      //         );
+      //       counter = 0;
+      //       randNumber = number[Math.floor(Math.random() * number.length)];
+      //     } catch (e) {
+      //       console.log(`Error: ${e}\nUser: ${user}\nrows: ${rows}`);
+      //     }
+      //   });
     } else {
       //console.log(`nothing to pick: ${dropMessage}`)
       message.delete();
     }
   }
 }
-
-async function checkBotCommits() {
-  try {
-    const response = await axios.get(
-      `https://api.github.com/repos/${botREPO}/commits?sha=${botBRANCH}`,
-      {
-        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
-      }
-    );
-
-    const latestCommit = response.data[0];
-    if (lastBotCommitSha == null) {
-      lastCommitSha = latestCommit.sha;
-    }
-    if (latestCommit.sha !== lastBotCommitSha) {
-      lastBotCommitSha = latestCommit.sha;
-      // Fetch detailed commit data
-      const commitDetailsResponse = await axios.get(latestCommit.url, {
-        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
-      });
-      const files = commitDetailsResponse.data.files.map(
-        (file) => file.filename
-      );
-      // .join(", ");
-
-      // const commitMessage = `New commit in ${REPO} on branch ${BRANCH}: ${latestCommit.commit.message}\nAffected files: ${files}`;
-      console.log(files);
-      let embed = new EmbedBuilder()
-        .setTitle("New Bot Update")
-        .setDescription(`Update: ${latestCommit.commit.message}`);
-      for (i = 0; i < files.length; i++) {
-        let file = files[i].replace("commands/", "");
-        file = file.replace(".js", "");
-        if (files[i].includes("commands")) {
-          embed.addFields({
-            name: `${file}`,
-            value: "Command",
-            inline: true,
-          });
-        } else {
-          embed.addFields({
-            name: `${files[i]}`,
-            value: "other",
-            inline: true,
-          });
-        }
-      }
-
-      const channel = await client.channels.cache.get("929363312527953950");
-      channel.send({ embeds: [embed] });
-    }
-  } catch (error) {
-    console.error("Error fetching commits:", error);
-  }
-}
-
-async function checkWebCommits() {
-  try {
-    const response = await axios.get(
-      `https://api.github.com/repos/${webREPO}/commits?sha=${webBRANCH}`,
-      {
-        headers: { Authorization: `token ${process.env.GITHUB_TOKEN}` },
-      }
-    );
-
-    const latestCommit = response.data[0];
-    if (lastWebCommitSha == null) {
-      lastWebCommitSha = latestCommit.sha;
-    }
-    if (latestCommit.sha !== lastWebCommitSha) {
-      lastWebCommitSha = latestCommit.sha;
-
-      // const commitMessage = `New commit in ${REPO} on branch ${BRANCH}: ${latestCommit.commit.message}\nAffected files: ${files}`;
-
-      let embed = new EmbedBuilder()
-        .setTitle("New Web Update")
-        .setDescription(`Update: ${latestCommit.commit.message}`);
-
-      const channel = await client.channels.cache.get("929363312527953950");
-      channel.send({ embeds: [embed] });
-    }
-  } catch (error) {
-    console.error("Error fetching commits:", error);
-  }
-}
-
 client.login(process.env.BOT_TOKEN);

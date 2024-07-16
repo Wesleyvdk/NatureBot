@@ -21,7 +21,8 @@ export default {
     .setDescription("start your adventure"),
   async execute(client, interaction, conn) {
     await interaction.deferReply();
-
+    interaction.reply("work in progress");
+    return;
     let user = interaction.user;
     conn
       .promise()

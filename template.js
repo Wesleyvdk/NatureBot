@@ -17,16 +17,10 @@ export default {
   data: new SlashCommandBuilder()
     .setName("active")
     .setDescription("list all the active matches"),
-  async execute(client, interaction, conn, queue) {
+  async execute(client, interaction, conn, mongoclient, queue) {
     await interaction.deferReply();
 
     try {
-      conn
-        .promise()
-        .query(
-          `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = "template"`
-        );
-
       playerid = interaction.user.id;
       playername = interaction.user.username;
 

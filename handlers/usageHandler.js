@@ -4,9 +4,9 @@ export default async function handleUsage(interaction, mongoclient, conn) {
     .collection("botcommands")
     .updateOne({ command: `${interaction}` }, { $inc: { usage_count: 1 } });
 
-  conn
-    .promise()
-    .query(
-      `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = '${interaction}'`
-    );
+  // conn
+  //   .promise()
+  //   .query(
+  //     `UPDATE bot_commands SET usage_count = usage_count + 1 WHERE command_name = '${interaction}'`
+  //   );
 }

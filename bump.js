@@ -25,7 +25,7 @@ client.once(Events.ClientReady, async (c) => {
 });
 
 client.on("messageCreate", async (message) => {
-  bumpHandler();
+  bumpHandler(message);
   if (message.content.startsWith(".addBump")) {
     const roleName = "bumper";
     const guild = message.guild;

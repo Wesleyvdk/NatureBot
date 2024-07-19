@@ -1,4 +1,4 @@
-export default async function bumpHandler() {
+export default async function bumpHandler(message) {
   const keyword = "Bump done";
   const roleName = "bumper";
   const role = message.guild.roles.cache.find((role) => role.name === roleName);

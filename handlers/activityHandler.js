@@ -28,7 +28,7 @@ export async function messageCounter(userid, guild, conn, mongoclient) {
   mongoclient
     .db("Aylani")
     .collection("activity")
-    .UpdateOne(filter, update, options);
+    .updateOne(filter, update, options);
 }
 export async function voiceCounter() {}
 export async function joinCounter() {}

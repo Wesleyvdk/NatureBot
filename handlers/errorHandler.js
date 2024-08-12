@@ -20,7 +20,7 @@ export default function handleError(interaction, e, message) {
   );
 
   if (!interaction) {
-    message.editReply({
+    message.reply({
       embeds: [embed],
       components: [buttonComponent],
     });

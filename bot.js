@@ -608,13 +608,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   try {
     // MONGO DB
-    mongoclient
+    await mongoclient
       .db("Aylani")
       .collection(`${interaction.guild.id}Settings`)
-      .find({ command: commandName })
-      .toArray(async (err, docs) => {
-        if (err) throw err;
-        if (docs[0].turnedOn === 0) {
+      .findOne({ command: command.command.default.data.name })
+      .then(async (doc) => {
+        if (doc.turnedOn === 0) {
           interaction.reply({
             content:
               "This command is not turned on in this server. Contact the server owner if you're interested in this command.",
@@ -622,16 +621,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
           });
           return;
         } else {
-          const { useQueue } = await import("discord-player");
-          const queue = useQueue(interaction.guild.id);
-          await command.command.default.execute(
-            client,
-            interaction,
-            conn,
-            mongoclient,
-            queue
-          );
-          usageHandler(command.command.default.data.name, mongoclient, conn);
         }
       });
 
@@ -856,9 +845,9 @@ function currDrop(message) {
         .db("Aylani")
         .collection(`${message.guild.id}Currency`)
         .findOne({ id: userid })
-        .then(async function ([rows, fields]) {
+        .then(async function (doc) {
           try {
-            oldCash = rows[0].cash;
+            oldCash = doc.cash;
             newCash = oldCash + randomMoney;
             mongoclient
               .db("Aylani")

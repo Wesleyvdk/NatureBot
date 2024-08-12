@@ -7,7 +7,7 @@ export default {
   async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
 
-    userid = interaction.user.id;
+    let userid = interaction.user.id;
 
     // MONGO DB
 
@@ -15,9 +15,9 @@ export default {
       .db("Aylani")
       .collection(`${interaction.guild.id}Levels`)
       .findOne({ _id: userid })
-      .then(([rows, fields]) => {
+      .then((doc) => {
         interaction.editReply(
-          `${interaction.user}, your current level is ${rows[0].level} and your current exp is ${rows[0].exp}`
+          `${interaction.user}, your current level is ${doc.level} and your current exp is ${doc.exp}`
         );
       });
 

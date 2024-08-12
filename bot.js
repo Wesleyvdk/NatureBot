@@ -532,7 +532,7 @@ client.on(Events.MessageCreate, async (message) => {
         .findOne({ _id: user.id })
         .then((doc) => {
           let lvl_start = doc.level;
-          let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+          let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - doc.exp;
 
           let round = Math.floor(lvl_end);
           let lvl_up = Number(round);
@@ -547,7 +547,7 @@ client.on(Events.MessageCreate, async (message) => {
               .updateOne(filter, update, options)
               .then(
                 message.channel.send(
-                  `${user} has leveled up to level ${rows[0].level + 1}`
+                  `${user} has leveled up to level ${doc.level + 1}`
                 )
               );
             //await check_level_reward(rows, message);

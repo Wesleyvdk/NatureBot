@@ -482,7 +482,7 @@ client.on(Events.MessageCreate, async (message) => {
     // MONGO DB
     async function addExperienceMongoDB(user, guild) {
       const filter = { _id: user.id };
-      const update = { $inc: { exp: 5 }, $setOnInsert: { exp: 5 } };
+      const update = { $inc: { exp: 5 } };
       const options = { upsert: true };
       mongoclient
         .db("Aylani")
@@ -504,7 +504,7 @@ client.on(Events.MessageCreate, async (message) => {
 
           if (lvl_up < 0) {
             const filter = { _id: user.id };
-            const update = { $inc: { level: 1 }, $setOnInsert: { level: 1 } };
+            const update = { $inc: { level: 1 } };
             const options = { upsert: true };
             mongoclient
               .db("Aylani")

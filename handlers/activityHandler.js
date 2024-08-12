@@ -19,12 +19,12 @@ export async function messageCounter(userid, guild, conn, mongoclient) {
   //         );
   //     }
   //   });
-  // Create a filter for movies with the title "Random Harvest"
+  // Create a filter for user and guild
   const filter = { userID: `${userid}`, guildID: `${guild}` };
   // Insert if not exists
   const options = { upsert: true };
   // Increase the message count by 1
-  const update = { $inc: { message: 1 }, $setOnInsert: { message: 1 } };
+  const update = { $inc: { message: 1 } };
   mongoclient
     .db("Aylani")
     .collection("activity")

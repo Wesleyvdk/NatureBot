@@ -479,9 +479,8 @@ client.on(Events.MessageCreate, async (message) => {
         }
       }
     }
-
+    // MONGO DB
     async function addExperienceMongoDB(user, guild) {
-      // MONGO DB
       const filter = { _id: user.id };
       const update = { $inc: { exp: 5 }, $setOnInsert: { exp: 5 } };
       const options = { upsert: true };
@@ -491,40 +490,6 @@ client.on(Events.MessageCreate, async (message) => {
         .updateOne(filter, update, options)
         .then(levelUpMongoDB(user, guild));
     }
-
-    async function addExperienceMySQL(rows, user, guild) {
-      try {
-        let exp = await rows[0].exp;
-        let newExp = (exp += 5);
-      } catch (e) {
-        console.log(`Error: ${e}`);
-        console.log(`Date/Time: ${CurrentDate}`);
-        conn
-          .promise()
-          .query(
-            `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
-            [user.id, user.username]
-          );
-
-        conn
-          .promise()
-          .execute(`SELECT * FROM '${guild}Levels' WHERE id=${user.id}`)
-          .then(async ([rows, fields]) => {
-            addExperienceMySQL(rows, user);
-          });
-      }
-      let exp = await rows[0].exp;
-      let newExp = (exp += 5);
-
-      conn
-        .promise()
-        .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
-          user.id,
-        ])
-        .then(levelUpMySQL(rows, user, guild));
-    }
-
-    // MONGO DB
     async function levelUpMongoDB(user, guild) {
       mongoclient
         .db("Aylani")
@@ -579,6 +544,37 @@ client.on(Events.MessageCreate, async (message) => {
           );
       }
       //await check_level_reward(rows, message);
+    }
+    async function addExperienceMySQL(rows, user, guild) {
+      try {
+        let exp = await rows[0].exp;
+        let newExp = (exp += 5);
+      } catch (e) {
+        console.log(`Error: ${e}`);
+        console.log(`Date/Time: ${CurrentDate}`);
+        conn
+          .promise()
+          .query(
+            `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+            [user.id, user.username]
+          );
+
+        conn
+          .promise()
+          .execute(`SELECT * FROM '${guild}Levels' WHERE id=${user.id}`)
+          .then(async ([rows, fields]) => {
+            addExperienceMySQL(rows, user);
+          });
+      }
+      let exp = await rows[0].exp;
+      let newExp = (exp += 5);
+
+      conn
+        .promise()
+        .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
+          user.id,
+        ])
+        .then(levelUpMySQL(rows, user, guild));
     }
 
     if (message.channel.id === "929352993701253154") return;

@@ -395,11 +395,9 @@ client.on(Events.MessageCreate, async (message) => {
 
     // You can use a function to handle database updates
     await messageCounter(userid, guild, conn, mongoclient);
-    console.log("message counter ran");
 
     // MONGO DB
     addExperienceMongoDB(user, guild);
-    console.log("addExperienceMongoDB ran");
     // MYSQL DB
     // conn
     //   .promise()
@@ -482,7 +480,10 @@ client.on(Events.MessageCreate, async (message) => {
     // MONGO DB
     async function addExperienceMongoDB(user, guild) {
       const filter = { _id: user.id };
-      const update = { $inc: { exp: 5 } };
+      const update = {
+        $inc: { exp: 5 },
+        $setOnInsert: { name: user.username, level: 1 },
+      };
       const options = { upsert: true };
       mongoclient
         .db("Aylani")

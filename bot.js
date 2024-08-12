@@ -396,9 +396,11 @@ client.on("messageCreate", async (message) => {
 
       // You can use a function to handle database updates
       await messageCounter(userid, guild, conn, mongoclient);
+      console.log("message counter ran");
 
       // MONGO DB
       addExperienceMongoDB(user, guild);
+      console.log("addExperienceMongoDB ran");
       // MYSQL DB
       // conn
       //   .promise()

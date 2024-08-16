@@ -497,26 +497,32 @@ client.on(Events.MessageCreate, async (message) => {
         .collection(`${guild}Levels`)
         .findOne({ _id: user.id })
         .then((doc) => {
-          let lvl_start = doc.level;
-          let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - doc.exp;
+          try {
+            let lvl_start = doc.level;
+            let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - doc.exp;
 
-          let round = Math.floor(lvl_end);
-          let lvl_up = Number(round);
+            let round = Math.floor(lvl_end);
+            let lvl_up = Number(round);
 
-          if (lvl_up < 0) {
-            const filter = { _id: user.id };
-            const update = { $inc: { level: 1 } };
-            const options = { upsert: true };
-            mongoclient
-              .db("Aylani")
-              .collection(`${guild}Levels`)
-              .updateOne(filter, update, options)
-              .then(
-                message.channel.send(
-                  `${user} has leveled up to level ${doc.level + 1}`
-                )
-              );
-            //await check_level_reward(rows, message);
+            if (lvl_up < 0) {
+              const filter = { _id: user.id };
+              const update = { $inc: { level: 1 } };
+              const options = { upsert: true };
+              mongoclient
+                .db("Aylani")
+                .collection(`${guild}Levels`)
+                .updateOne(filter, update, options)
+                .then(
+                  message.channel.send(
+                    `${user} has leveled up to level ${doc.level + 1}`
+                  )
+                );
+              //await check_level_reward(rows, message);
+            }
+          } catch (e) {
+            console.log(`Error: ${e}`);
+            console.log(`On: ${user} ${doc}`);
+            console.log(`Date/Time: ${CurrentDate}`);
           }
         });
     }
@@ -857,7 +863,7 @@ function currDrop(message) {
             counter = 0;
             randNumber = number[Math.floor(Math.random() * number.length)];
           } catch (e) {
-            console.log(`Error: ${e}\nUser: ${user}\nrows: ${rows}`);
+            console.log(`Error: ${e}\nUser: ${user}\nrows: ${doc}`);
           }
         });
 

@@ -126,7 +126,7 @@ client.once(Events.ClientReady, async () => {
       collection.insertOne({
         command: commandObject.command.default.data.name,
         category: commandObject.category,
-        turnedOn: true,
+        usage_count: 0,
       });
     }
   });

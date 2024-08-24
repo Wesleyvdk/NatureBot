@@ -115,22 +115,21 @@ for (const folder of commandFolders) {
 
 client.once(Events.ClientReady, async () => {
   await mongoclient.connect().then(() => console.log("Connected to MongoDB!"));
-  let i = 0;
-  for (const [commandName, commandInfo] of client.commands) {
-    if (
-      !mongoclient.db("Aylani").collection("botcommands").findOne({ _id: i })
-    ) {
-      try {
-        mongoclient.db("Aylani").collection("botcommands").insertOne({
-          _id: i,
-          command: commandName,
-          usage_count: 0,
-          category: commandInfo.category,
-        });
-      } catch (e) {}
+  client.commands.forEach(async (commandObject) => {
+    // MONGO DB
+    const collection = mongoclient.db("Aylani").collection(`botcommands`);
+    const existingCommand = await collection.findOne({
+      command: commandObject.command.default.data.name,
+    });
+
+    if (!existingCommand) {
+      collection.insertOne({
+        command: commandObject.command.default.data.name,
+        category: commandObject.category,
+        turnedOn: true,
+      });
     }
-    i++;
-  }
+  });
 
   const familyTable = fdb
     .prepare(
@@ -214,25 +213,35 @@ client.once(Events.ClientReady, async () => {
     //   );`;
     // conn.promise().query(settingsTable);
 
-    client.commands.forEach((commandObject) => {
+    client.commands.forEach(async (commandObject) => {
       // MONGO DB
-      mongoclient.db("Aylani").collection(`${guild.id}Settings`).insertOne({
+      const collection = mongoclient
+        .db("Aylani")
+        .collection(`${guild.id}Settings`);
+      const existingCommand = await collection.findOne({
         command: commandObject.command.default.data.name,
-        category: commandObject.category,
-        turnedOn: true,
       });
 
-      // MYSQL DB
-      // const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
-      //     command, category, turnedOn) VALUES (?, ?, True);
-      // `;
-      // conn
-      //   .promise()
-      //   .query(commandSettings, [
-      //     commandObject.command.default.data.name,
-      //     commandObject.category,
-      //   ]);
+      if (!existingCommand) {
+        collection.insertOne({
+          command: commandObject.command.default.data.name,
+          category: commandObject.category,
+          turnedOn: true,
+        });
+      }
     });
+
+    // MYSQL DB
+    // const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
+    //     command, category, turnedOn) VALUES (?, ?, True);
+    // `;
+    // conn
+    //   .promise()
+    //   .query(commandSettings, [
+    //     commandObject.command.default.data.name,
+    //     commandObject.category,
+    //   ]);
+    // });
   });
   const Guilds = client.guilds.cache.map((guild) => [
     guild.id,

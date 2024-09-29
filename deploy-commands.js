@@ -27,6 +27,7 @@ for (const folder of commandFolders) {
   for (const file of commandFiles) {
     const filePath = await import(`./commands/${folder}/${file}`);
     const command = filePath;
+    console.log(command);
     if (command.default.data && command.default.execute) {
       commands.push(command.default.data.toJSON());
     } else {

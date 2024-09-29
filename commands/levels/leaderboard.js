@@ -24,6 +24,8 @@ export default {
       .db("Aylani")
       .collection(`${interaction.guild.id}Levels`)
       .find()
+      .sort({ level: -1, exp: -1 })
+      .limit(10)
       .toArray()
       .then((rows) => {
         // Now shake it and show it! (as a nice embed, too!)

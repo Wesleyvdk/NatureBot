@@ -25,7 +25,6 @@ const mongoclient = new MongoClient(uri);
 
 import errorHandler from "./handlers/errorHandler.js";
 import usageHandler from "./handlers/usageHandler.js";
-import levelRoleHandler from "./handlers/levelHandler.js";
 import { messageCounter } from "./handlers/activityHandler.js";
 
 const conn = "";

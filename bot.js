@@ -395,181 +395,185 @@ client.on("guildDelete", async (guild) => {
 });
 
 client.on(Events.MessageCreate, async (message) => {
-  if (message.author.bot) return;
+  try {
+    if (message.author.bot) return;
 
-  let guild = message.guild.id;
-  let userid = message.author.id;
-  let username = message.author.username;
-  let user = message.author;
+    let guild = message.guild.id;
+    let userid = message.author.id;
+    let username = message.author.username;
+    let user = message.author;
 
-  // You can use a function to handle database updates
-  await messageCounter(userid, guild, conn, mongoclient);
+    // You can use a function to handle database updates
+    await messageCounter(userid, guild, conn, mongoclient);
 
-  // MONGO DB
-  addExperienceMongoDB(user, guild);
-  levelRoleHandler(user, guild, mongoclient);
-  // MYSQL DB
-  // conn
-  //   .promise()
-  //   .query(
-  //     `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
-  //     [userid, username]
-  //   );
+    // MONGO DB
+    addExperienceMongoDB(user, guild);
+    levelRoleHandler(user, guild, mongoclient);
+    // MYSQL DB
+    // conn
+    //   .promise()
+    //   .query(
+    //     `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+    //     [userid, username]
+    //   );
 
-  // conn
-  //   .promise()
-  //   .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
-  //   .then(async ([rows, fields]) => {
-  //     addExperienceMySQL(rows, user, guild);
-  //   });
+    // conn
+    //   .promise()
+    //   .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
+    //   .then(async ([rows, fields]) => {
+    //     addExperienceMySQL(rows, user, guild);
+    //   });
 
-  // NEED TO BE FIXED
-  // MAKE PREMIUM
-  // const member = message.member;
-  // for (const i = 0; i < roles.length; i++) {
-  //   const role = message.guild.roles.cache.find(
-  //     (role) => role.name === roles[i]
-  //   );
-  //   if (!role) {
-  //     guild.roles
-  //       .create({
-  //         name: roles[i],
-  //       })
-  //       .then((createdRole) => {
-  //         console.log(`Role created: ${createdRole.name}`);
-  //         // if (roleLevel == 1) roleLevel + 4
-  //         // else if (roleLevel == 5) roleLevel + 5
-  //         // else if (roleLevel >= 10) roleLevel + 10
-  //       })
-  //       .catch((e) => {
-  //         errorHandler(null, e, message);
-  //       });
-  //   }
-  // }
+    // MAKE PREMIUM
+    // NEED TO BE FIXED
+    // const member = message.member;
+    // for (i = 0; i < roles.length; i++) {
+    //   const role = message.guild.roles.cache.find(
+    //     (role) => role.name === roles[i]
+    //   );
+    //   if (!role) {
+    //     guild.roles
+    //       .create({
+    //         name: roles[i],
+    //       })
+    //       .then((createdRole) => {
+    //         console.log(`Role created: ${createdRole.name}`);
+    //         // if (roleLevel == 1) roleLevel + 4
+    //         // else if (roleLevel == 5) roleLevel + 5
+    //         // else if (roleLevel >= 10) roleLevel + 10
+    //       })
+    //       .catch((e) => {
+    //         errorHandler(null, e, message);
+    //       });
+    //   }
+    // }
 
-  // MONGO DB
-  async function addExperienceMongoDB(user, guild) {
-    const filter = { _id: user.id };
-    const update = {
-      $inc: { exp: 5 },
-      $setOnInsert: { name: user.username, level: 1 },
-    };
-    const options = { upsert: true };
-    mongoclient
-      .db("Aylani")
-      .collection(`${guild}Levels`)
-      .updateOne(filter, update, options)
-      .then(levelUpMongoDB(user, guild));
-  }
-  async function levelUpMongoDB(user, guild) {
-    try {
+    // MONGO DB
+    async function addExperienceMongoDB(user, guild) {
+      const filter = { _id: user.id };
+      const update = {
+        $inc: { exp: 5 },
+        $setOnInsert: { name: user.username, level: 1 },
+      };
+      const options = { upsert: true };
       mongoclient
         .db("Aylani")
         .collection(`${guild}Levels`)
-        .findOne({ _id: user.id })
-        .then((doc) => {
-          try {
-            let lvl_start = doc.level;
-            let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - doc.exp;
-
-            let round = Math.floor(lvl_end);
-            let lvl_up = Number(round);
-
-            if (lvl_up < 0) {
-              const filter = { _id: user.id };
-              const update = { $inc: { level: 1 } };
-              const options = { upsert: true };
-              mongoclient
-                .db("Aylani")
-                .collection(`${guild}Levels`)
-                .updateOne(filter, update, options)
-                .then(
-                  message.channel.send(
-                    `${user} has leveled up to level ${doc.level + 1}`
-                  )
-                );
-              //await check_level_reward(rows, message);
-            }
-          } catch (e) {
-            console.log(`Error: ${e}`);
-            console.log(`On: ${user} ${doc}`);
-            console.log(`Date/Time: ${CurrentDate}`);
-          }
-        });
-    } catch (e) {
-      errorHandler(null, e, message);
+        .updateOne(filter, update, options)
+        .then(levelUpMongoDB(user, guild));
     }
-  }
-  // MYSQL DB
-  async function levelUpMySQL(rows, user, guild) {
-    try {
-      let xp = rows[0].exp;
-      let lvl_start = rows[0].level;
-      let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+    async function levelUpMongoDB(user, guild) {
+      try {
+        mongoclient
+          .db("Aylani")
+          .collection(`${guild}Levels`)
+          .findOne({ _id: user.id })
+          .then((doc) => {
+            try {
+              let lvl_start = doc.level;
+              let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - doc.exp;
 
-      let round = Math.floor(lvl_end);
-      let lvl_up = Number(round);
+              let round = Math.floor(lvl_end);
+              let lvl_up = Number(round);
 
-      if (lvl_up < 0) {
-        // const channelId = "1173064790340534412";
-        // const channel = await client.channels.cache.get(channelId);
+              if (lvl_up < 0) {
+                const filter = { _id: user.id };
+                const update = { $inc: { level: 1 } };
+                const options = { upsert: true };
+                mongoclient
+                  .db("Aylani")
+                  .collection(`${guild}Levels`)
+                  .updateOne(filter, update, options)
+                  .then(
+                    message.channel.send(
+                      `${user} has leveled up to level ${doc.level + 1}`
+                    )
+                  );
+                //await check_level_reward(rows, message);
+              }
+            } catch (e) {
+              console.log(`Error: ${e}`);
+              console.log(`On: ${user} ${doc}`);
+              console.log(`Date/Time: ${CurrentDate}`);
+            }
+          });
+      } catch (e) {
+        errorHandler(null, e, message);
+      }
+    }
+    // MYSQL DB
+    async function levelUpMySQL(rows, user, guild) {
+      try {
+        let xp = rows[0].exp;
+        let lvl_start = rows[0].level;
+        let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - xp;
+
+        let round = Math.floor(lvl_end);
+        let lvl_up = Number(round);
+
+        if (lvl_up < 0) {
+          // const channelId = "1173064790340534412";
+          // const channel = await client.channels.cache.get(channelId);
+          conn
+            .promise()
+            .query(
+              `UPDATE ${guild}Levels SET level = ${rows[0].level} + 1 WHERE id = ?`,
+              [user.id]
+            )
+            .then(
+              message.channel.send(
+                `${user} has leveled up to level ${rows[0].level + 1}`
+              )
+            );
+        }
+      } catch (e) {
+        errorHandler(null, e, message);
+      }
+      //await check_level_reward(rows, message);
+    }
+    async function addExperienceMySQL(rows, user, guild) {
+      try {
+        let exp = await rows[0].exp;
+        let newExp = (exp += 5);
+      } catch (e) {
+        console.log(`Error: ${e}`);
+        console.log(`Date/Time: ${CurrentDate}`);
         conn
           .promise()
           .query(
-            `UPDATE ${guild}Levels SET level = ${rows[0].level} + 1 WHERE id = ?`,
-            [user.id]
-          )
-          .then(
-            message.channel.send(
-              `${user} has leveled up to level ${rows[0].level + 1}`
-            )
+            `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
+            [user.id, user.username]
           );
+
+        conn
+          .promise()
+          .execute(`SELECT * FROM '${guild}Levels' WHERE id=${user.id}`)
+          .then(async ([rows, fields]) => {
+            addExperienceMySQL(rows, user);
+          });
       }
-    } catch (e) {
-      errorHandler(null, e, message);
-    }
-    //await check_level_reward(rows, message);
-  }
-  async function addExperienceMySQL(rows, user, guild) {
-    try {
       let exp = await rows[0].exp;
       let newExp = (exp += 5);
-    } catch (e) {
-      console.log(`Error: ${e}`);
-      console.log(`Date/Time: ${CurrentDate}`);
-      conn
-        .promise()
-        .query(
-          `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
-          [user.id, user.username]
-        );
 
       conn
         .promise()
-        .execute(`SELECT * FROM '${guild}Levels' WHERE id=${user.id}`)
-        .then(async ([rows, fields]) => {
-          addExperienceMySQL(rows, user);
-        });
+        .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
+          user.id,
+        ])
+        .then(levelUpMySQL(rows, user, guild));
     }
-    let exp = await rows[0].exp;
-    let newExp = (exp += 5);
 
-    conn
-      .promise()
-      .query(`UPDATE ${guild}Levels SET exp = ${newExp} WHERE id = ?`, [
-        user.id,
-      ])
-      .then(levelUpMySQL(rows, user, guild));
+    if (message.channel.id === "929352993701253154") return;
+    if (message.channel.id === "929352993701253154") return;
+    if (message.channel.id === "929352994158419971") return;
+    if (message.channel.id === "1085133582596591657") return;
+    if (message.channel.id === "1085129112961691729") return;
+    if (message.channel.id === "1007281491568492634") return;
+    if (message.channel.id === "938036238101921844") return;
+    currDrop(message);
+  } catch (e) {
+    errorHandler(null, e, message);
   }
-
-  if (message.channel.id === "929352993701253154") return;
-  if (message.channel.id === "929352993701253154") return;
-  if (message.channel.id === "929352994158419971") return;
-  if (message.channel.id === "1085133582596591657") return;
-  if (message.channel.id === "1085129112961691729") return;
-  if (message.channel.id === "1007281491568492634") return;
-  if (message.channel.id === "938036238101921844") return;
-  currDrop(message);
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {

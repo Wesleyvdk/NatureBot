@@ -422,6 +422,8 @@ client.on(Events.MessageCreate, async (message) => {
   //   .then(async ([rows, fields]) => {
   //     addExperienceMySQL(rows, user, guild);
   //   });
+
+  // NEED TO BE FIXED
   // MAKE PREMIUM
   // const member = message.member;
   // for (const i = 0; i < roles.length; i++) {

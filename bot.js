@@ -423,27 +423,27 @@ client.on(Events.MessageCreate, async (message) => {
   //     addExperienceMySQL(rows, user, guild);
   //   });
   // MAKE PREMIUM
-  const member = message.member;
-  for (const i = 0; i < roles.length; i++) {
-    const role = message.guild.roles.cache.find(
-      (role) => role.name === roles[i]
-    );
-    if (!role) {
-      guild.roles
-        .create({
-          name: roles[i],
-        })
-        .then((createdRole) => {
-          console.log(`Role created: ${createdRole.name}`);
-          // if (roleLevel == 1) roleLevel + 4
-          // else if (roleLevel == 5) roleLevel + 5
-          // else if (roleLevel >= 10) roleLevel + 10
-        })
-        .catch((e) => {
-          errorHandler(null, e, message);
-        });
-    }
-  }
+  // const member = message.member;
+  // for (const i = 0; i < roles.length; i++) {
+  //   const role = message.guild.roles.cache.find(
+  //     (role) => role.name === roles[i]
+  //   );
+  //   if (!role) {
+  //     guild.roles
+  //       .create({
+  //         name: roles[i],
+  //       })
+  //       .then((createdRole) => {
+  //         console.log(`Role created: ${createdRole.name}`);
+  //         // if (roleLevel == 1) roleLevel + 4
+  //         // else if (roleLevel == 5) roleLevel + 5
+  //         // else if (roleLevel >= 10) roleLevel + 10
+  //       })
+  //       .catch((e) => {
+  //         errorHandler(null, e, message);
+  //       });
+  //   }
+  // }
 
   // MONGO DB
   async function addExperienceMongoDB(user, guild) {

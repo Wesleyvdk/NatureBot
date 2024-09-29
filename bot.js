@@ -424,7 +424,7 @@ client.on(Events.MessageCreate, async (message) => {
   //   });
   // MAKE PREMIUM
   const member = message.member;
-  for (i = 0; i < roles.length; i++) {
+  for (const i = 0; i < roles.length; i++) {
     const role = message.guild.roles.cache.find(
       (role) => role.name === roles[i]
     );

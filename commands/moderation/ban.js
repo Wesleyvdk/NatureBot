@@ -31,7 +31,7 @@ export default {
 
     try {
       let bannedMember = await interaction.guild.members.ban(option);
-      if (option == interaction.author.id) {
+      if (option == interaction.user.id) {
         interaction.editReply({
           content: "you can't ban yourself",
           ephemeral: true,

@@ -47,6 +47,7 @@ const fdb = new Database("./databases/family.sqlite");
 const rdb = new Database("./databases/roleplay.sqlite");
 const battleDB = new Database("./databases/battlegame.sqlite");
 const suggestionDB = new Database("./databases/suggestion.sqlite");
+const leaveDB = new Database("./databases/leave.sqlite");
 // variables
 let counter = 0;
 let dropMessage = false;
@@ -132,6 +133,12 @@ client.once(Events.ClientReady, async () => {
     }
   });
 
+  const leaveTable = leaveDB
+    .prepare(
+      "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'leave';"
+    )
+    .get();
+
   const familyTable = fdb
     .prepare(
       "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'family';"
@@ -147,7 +154,7 @@ client.once(Events.ClientReady, async () => {
       "SELECT count() FROM sqlite_master WHERE type='table' AND name = 'suggestion';"
     )
     .get();
-  await createDatabases(familyTable, rpTable, suggestionTable);
+  await createDatabases(leaveTable, familyTable, rpTable, suggestionTable);
   await getDatabases();
 
   // MONGO DB
@@ -255,6 +262,23 @@ client.once(Events.ClientReady, async () => {
   );
 });
 
+client.on(Events.GuildMemberRemove, async (member) => {
+  let userId = member.id;
+  let guildId = member.guild.id;
+  let leaveTime = new Date();
+
+  db.run(
+    `INSERT INTO leavers(userId, guildId, leaveTime) VALUES(?, ?, ?)`,
+    [userId, guildId, leaveTime],
+    function (err) {
+      if (err) {
+        return console.log(err.message);
+      }
+      console.log(`A row has been inserted with rowid ${this.lastID}`);
+    }
+  );
+});
+
 client.on("guildMemberAdd", async (member) => {
   let joiner = member.user;
   let joinerid = member.user.id;
@@ -264,6 +288,18 @@ client.on("guildMemberAdd", async (member) => {
     const search_term = "anime_wave";
     const limit = 1;
     const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
+    let totalLeave = 0;
+    db.get(
+      `SELECT COUNT(*) as total FROM leavers WHERE guildId = ?`,
+      [member.guild.id],
+      (err, row) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log(`Total members that left: ${row.total}`);
+        totalLeave = row.total;
+      }
+    );
 
     try {
       const response = await axios({
@@ -300,7 +336,9 @@ client.on("guildMemberAdd", async (member) => {
         .setImage(
           "https://media2.giphy.com/media/3ov9jIYPU7NMT6TS7K/giphy.gif?cid=ecf05e47dp3ynov4tbepk3akc4wb7kpiv7l0jq5p6526jzi9&rid=giphy.gif&ct=g"
         )
-        .setFooter({ text: `We now have ${member.guild.memberCount} Members` })
+        .setFooter({
+          text: `We now have ${member.guild.memberCount} Members. ${totalLeave} members have left.`,
+        })
         .setTimestamp();
       channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
     }
@@ -716,8 +754,19 @@ player.events.on("audioTracksAdd", (queue, tracks) => {
 
   return queue.metadata.send({ embeds: [embed] }).catch(console.error);
 });
-function createDatabases(familyTable, rpTable, suggestionTable) {
+function createDatabases(leaveTable, familyTable, rpTable, suggestionTable) {
   // ------------------ Family Table ----------------
+  if (!leaveTable["count()"]) {
+    // If the table isn't there, create it and setup the database correctly.
+    leaveDB
+      .prepare(
+        "CREATE TABLE leave (id TEXT PRIMARY KEY, user TEXT, guild TEXT, date TEXT);"
+      )
+      .run();
+    // Ensure that the "id" row is always unique and indexed.
+    leaveDB.prepare("CREATE UNIQUE INDEX idx_leave_id ON leave (id);").run();
+    leaveDB.exec("PRAGMA journal_mode = WAL;");
+  }
   if (!familyTable["count()"]) {
     // If the table isn't there, create it and setup the database correctly.
     fdb
@@ -757,6 +806,11 @@ function createDatabases(familyTable, rpTable, suggestionTable) {
 }
 
 function getDatabases() {
+  client.getLeave = leaveDB.prepare("SELECT * FROM leave WHERE user = ?");
+  client.setLeave = leaveDB.prepare(
+    "INSERT OR REPLACE INTO leave (id, user, guild, date) VALUES (@id, @user, @guild, @date);"
+  );
+  console.log(`suggestion table loaded successfully`);
   client.getFamily = fdb.prepare("SELECT * FROM family WHERE user = ?");
   client.setFamily = fdb.prepare(
     "INSERT OR REPLACE INTO family (id, user, partnerID, partnerName, date, parent1 , parent1Name , parent2, parent2Name, child1, child1Name, child2, child2Name, child3, child3Name, child4, child4Name, child5, child5Name) VALUES (@id, @user, @partnerID, @partnerName, @date, @parent1, @parent1Name, @parent2, @parent2Name,@child1, @child1Name, @child2, @child2Name, @child3, @child3Name, @child4, @child4Name, @child5, @child5Name);"

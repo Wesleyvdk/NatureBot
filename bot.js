@@ -810,7 +810,7 @@ function getDatabases() {
   client.setLeave = leaveDB.prepare(
     "INSERT OR REPLACE INTO leave (id, user, guild, date) VALUES (@id, @user, @guild, @date);"
   );
-  console.log(`suggestion table loaded successfully`);
+  console.log(`leaveDB table loaded successfully`);
   client.getFamily = fdb.prepare("SELECT * FROM family WHERE user = ?");
   client.setFamily = fdb.prepare(
     "INSERT OR REPLACE INTO family (id, user, partnerID, partnerName, date, parent1 , parent1Name , parent2, parent2Name, child1, child1Name, child2, child2Name, child3, child3Name, child4, child4Name, child5, child5Name) VALUES (@id, @user, @partnerID, @partnerName, @date, @parent1, @parent1Name, @parent2, @parent2Name,@child1, @child1Name, @child2, @child2Name, @child3, @child3Name, @child4, @child4Name, @child5, @child5Name);"

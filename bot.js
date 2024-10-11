@@ -263,13 +263,15 @@ client.once(Events.ClientReady, async () => {
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {
+  console.log(member);
   let userId = member.id;
   let guildId = member.guild.id;
+  let username = member.username;
   let leaveTime = new Date();
 
   leaveDB.prepare(
-    `INSERT INTO leave(userId, guildId, leaveTime) VALUES(?, ?, ?)`,
-    [userId, guildId, leaveTime],
+    `INSERT INTO leave(id, user, guild, leaveTime) VALUES(?, ?, ?, ?)`,
+    [userId, username, guildId, leaveTime],
     function (err) {
       if (err) {
         return console.log(err.message);

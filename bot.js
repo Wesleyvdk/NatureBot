@@ -263,21 +263,13 @@ client.once(Events.ClientReady, async () => {
 });
 
 client.on(Events.GuildMemberRemove, async (member) => {
-  console.log(member);
   let userId = member.id;
   let guildId = member.guild.id;
   let username = member.username;
   let leaveTime = new Date();
 
   leaveDB.prepare(
-    `INSERT INTO leave(id, user, guild, date) VALUES(?, ?, ?, ?)`,
-    [userId, username, guildId, leaveTime],
-    function (err) {
-      if (err) {
-        return console.log(err.message);
-      }
-      console.log(`A row has been inserted with rowid ${this.lastID}`);
-    }
+    `INSERT INTO leave(id, user, guild, date) VALUES(${userId}, ${username}, ${guildId}, ${leaveTime})`
   );
 });
 
@@ -294,13 +286,7 @@ client.on("guildMemberAdd", async (member) => {
     let totalLeavers;
     leaveDB
       .prepare(`SELECT COUNT(*) as total FROM leave WHERE guild = ?`)
-      .get(member.guild.id, function (err, row) {
-        if (err) {
-          console.error(err.message);
-          return;
-        }
-        totalLeavers = row.total;
-      });
+      .all(member.guild.id);
 
     try {
       const response = await axios({

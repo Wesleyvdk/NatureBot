@@ -311,7 +311,7 @@ client.on("guildMemberAdd", async (member) => {
         )
         .setImage(gif)
         .setFooter({
-          text: `We now have ${member.guild.memberCount} Members. ${totalLeavers} members have left.`,
+          text: `We now have ${member.guild.memberCount} Members. ${totalLeavers.length} members have left.`,
         })
         .setTimestamp();
       channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });

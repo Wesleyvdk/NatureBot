@@ -265,7 +265,7 @@ client.once(Events.ClientReady, async () => {
 client.on(Events.GuildMemberRemove, async (member) => {
   let userId = member.id;
   let guildId = member.guild.id;
-  let username = member.username;
+  let username = member.user.username;
   let leaveTime = new Date().toString();
 
   await leaveDB

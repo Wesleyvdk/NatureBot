@@ -270,7 +270,7 @@ client.on(Events.GuildMemberRemove, async (member) => {
   let leaveTime = new Date();
 
   leaveDB.prepare(
-    `INSERT INTO leave(id, user, guild, leaveTime) VALUES(?, ?, ?, ?)`,
+    `INSERT INTO leave(id, user, guild, date) VALUES(?, ?, ?, ?)`,
     [userId, username, guildId, leaveTime],
     function (err) {
       if (err) {
@@ -292,7 +292,7 @@ client.on("guildMemberAdd", async (member) => {
     const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
 
     const leavers = leaveDB
-      .prepare(`SELECT COUNT(*) as total FROM leavers WHERE guildId = ?`)
+      .prepare(`SELECT COUNT(*) as total FROM leave WHERE guildId = ?`)
       .get(member.guild.id);
     console.log(`Total members that left: ${leavers.length}`);
 

@@ -328,7 +328,7 @@ client.on("guildMemberAdd", async (member) => {
           "https://media2.giphy.com/media/3ov9jIYPU7NMT6TS7K/giphy.gif?cid=ecf05e47dp3ynov4tbepk3akc4wb7kpiv7l0jq5p6526jzi9&rid=giphy.gif&ct=g"
         )
         .setFooter({
-          text: `We now have ${member.guild.memberCount} Members. ${totalLeave} members have left.`,
+          text: `We now have ${member.guild.memberCount} Members. ${totalLeavers.length} members have left.`,
         })
         .setTimestamp();
       channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });

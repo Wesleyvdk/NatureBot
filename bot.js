@@ -291,10 +291,16 @@ client.on("guildMemberAdd", async (member) => {
     const limit = 1;
     const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
 
-    const leavers = leaveDB
+    let totalLeavers;
+    leaveDB
       .prepare(`SELECT COUNT(*) as total FROM leave WHERE guild = ?`)
-      .get(member.guild.id);
-    console.log(`Total members that left: ${leavers.length}`);
+      .get(member.guild.id, function (err, row) {
+        if (err) {
+          console.error(err.message);
+          return;
+        }
+        totalLeavers = row.total;
+      });
 
     try {
       const response = await axios({
@@ -316,7 +322,9 @@ client.on("guildMemberAdd", async (member) => {
           `Welcome to ${member.guild.name}\n\nMake sure to check out:\n-> <#929352994158419968>\n-> <#982734226808012801>\n\nEnjoy your stay!`
         )
         .setImage(gif)
-        .setFooter({ text: `We now have ${member.guild.memberCount} Members` })
+        .setFooter({
+          text: `We now have ${member.guild.memberCount} Members. ${totalLeavers} members have left.`,
+        })
         .setTimestamp();
       channel.send({ content: welcomeMessage, embeds: [welcomeEmbed] });
     } catch (e) {

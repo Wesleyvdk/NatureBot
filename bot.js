@@ -268,7 +268,7 @@ client.on(Events.GuildMemberRemove, async (member) => {
   let leaveTime = new Date();
 
   leaveDB.run(
-    `INSERT INTO leavers(userId, guildId, leaveTime) VALUES(?, ?, ?)`,
+    `INSERT INTO leave(userId, guildId, leaveTime) VALUES(?, ?, ?)`,
     [userId, guildId, leaveTime],
     function (err) {
       if (err) {

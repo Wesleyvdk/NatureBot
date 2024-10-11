@@ -268,9 +268,9 @@ client.on(Events.GuildMemberRemove, async (member) => {
   let username = member.username;
   let leaveTime = new Date();
 
-  leaveDB.prepare(
-    `INSERT INTO leave(id, user, guild, date) VALUES(${userId}, ${username}, ${guildId}, ${leaveTime})`
-  );
+  await leaveDB
+    .prepare(`INSERT INTO leave(id, user, guild, date) VALUES (?, ?, ?, ?)`)
+    .run(userId, username, guildId, leaveTime);
 });
 
 client.on("guildMemberAdd", async (member) => {

@@ -289,7 +289,7 @@ client.on("guildMemberAdd", async (member) => {
     const limit = 1;
     const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
     let totalLeave = 0;
-    db.get(
+    leaveDB.get(
       `SELECT COUNT(*) as total FROM leavers WHERE guildId = ?`,
       [member.guild.id],
       (err, row) => {

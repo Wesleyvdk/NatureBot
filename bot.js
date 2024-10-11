@@ -288,18 +288,11 @@ client.on("guildMemberAdd", async (member) => {
     const search_term = "anime_wave";
     const limit = 1;
     const url = `https://tenor.googleapis.com/v2/search?q=${search_term}&key=${api_key}&limit=${limit}&random=true`;
-    let totalLeave = 0;
-    leaveDB.get(
-      `SELECT COUNT(*) as total FROM leavers WHERE guildId = ?`,
-      [member.guild.id],
-      (err, row) => {
-        if (err) {
-          return console.error(err.message);
-        }
-        console.log(`Total members that left: ${row.total}`);
-        totalLeave = row.total;
-      }
-    );
+
+    const leavers = leaveDB
+      .prepare(`SELECT COUNT(*) as total FROM leavers WHERE guildId = ?`)
+      .get(member.guild.id);
+    console.log(`Total members that left: ${leavers.length}`);
 
     try {
       const response = await axios({

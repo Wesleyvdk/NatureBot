@@ -27,6 +27,7 @@ import errorHandler from "./handlers/errorHandler.js";
 import usageHandler from "./handlers/usageHandler.js";
 import { messageCounter } from "./handlers/activityHandler.js";
 import levelRoleHandler from "./handlers/levelRoleHandler.js";
+import addExistingRolesToMongoDB from "./handlers/levelRoleHandler.js";
 
 const conn = "";
 
@@ -132,6 +133,10 @@ client.once(Events.ClientReady, async () => {
       });
     }
   });
+
+  // await addExistingRolesToMongoDB(mongoclient, "929352993655124000").then(
+  //   console.log("added roles")
+  // );
 
   const leaveTable = leaveDB
     .prepare(
@@ -425,8 +430,8 @@ client.on("guildDelete", async (guild) => {
 client.on(Events.MessageCreate, async (message) => {
   try {
     if (message.author.bot) return;
-
-    let guild = message.guild.id;
+    let guild = message.guild;
+    let guildId = message.guild.id;
     let userid = message.author.id;
     let username = message.author.username;
     let user = message.author;
@@ -436,7 +441,7 @@ client.on(Events.MessageCreate, async (message) => {
 
     // MONGO DB
     addExperienceMongoDB(user, guild);
-    levelRoleHandler(user, guild, mongoclient);
+    // levelRoleHandler(user, guild, mongoclient);
     // MYSQL DB
     // conn
     //   .promise()
@@ -486,7 +491,7 @@ client.on(Events.MessageCreate, async (message) => {
       const options = { upsert: true };
       mongoclient
         .db("Aylani")
-        .collection(`${guild}Levels`)
+        .collection(`${guild.id}Levels`)
         .updateOne(filter, update, options)
         .then(levelUpMongoDB(user, guild));
     }
@@ -494,9 +499,9 @@ client.on(Events.MessageCreate, async (message) => {
       try {
         mongoclient
           .db("Aylani")
-          .collection(`${guild}Levels`)
+          .collection(`${guild.id}Levels`)
           .findOne({ _id: user.id })
-          .then((doc) => {
+          .then(async (doc) => {
             try {
               let lvl_start = doc.level;
               let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - doc.exp;
@@ -508,16 +513,19 @@ client.on(Events.MessageCreate, async (message) => {
                 const filter = { _id: user.id };
                 const update = { $inc: { level: 1 } };
                 const options = { upsert: true };
-                mongoclient
+                await mongoclient
                   .db("Aylani")
-                  .collection(`${guild}Levels`)
-                  .updateOne(filter, update, options)
-                  .then(
-                    message.channel.send(
-                      `${user} has leveled up to level ${doc.level + 1}`
-                    )
-                  );
-                //await check_level_reward(rows, message);
+                  .collection(`${guild.id}Levels`)
+                  .updateOne(filter, update, options);
+
+                const newLevel = doc.level + 1;
+                message.channel.send(
+                  `${user} has leveled up to level ${newLevel}`
+                );
+                // Check if the new level is a multiple of 10
+                if (newLevel % 10 === 0) {
+                  await levelRoleHandler(user, guild, mongoclient, newLevel);
+                }
               }
             } catch (e) {
               console.log(`Error: ${e}`);

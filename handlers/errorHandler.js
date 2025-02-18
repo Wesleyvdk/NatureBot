@@ -55,7 +55,7 @@ export default function handleError(interaction, e, message) {
     console.log(chalk.red(`Date/Time: ${CurrentDate}`));
   }
   if (!message) {
-    interaction.editReply({
+    interaction.followUp({
       embeds: [embed],
       components: [buttonComponent],
     });

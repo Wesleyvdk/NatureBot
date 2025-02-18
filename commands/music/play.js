@@ -17,7 +17,7 @@ import handleError from "../../handlers/handleError.js";
 export default {
   data: new SlashCommandBuilder()
     .setName("play")
-    .setDescription("play music from spotify, youtube, or soundcloud")
+    .setDescription("play music from spotify or soundcloud")
     .addStringOption((option) =>
       option
         .setName("query")

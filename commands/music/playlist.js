@@ -16,7 +16,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName("playlist")
     .setDescription(
-      "play a playlist from spotify, youtube, or soundcloud, or your own playlist on the bot"
+      "play a playlist from spotify, or soundcloud, or your own playlist on the bot"
     ),
   async execute(client, interaction, mongoclient, conn) {
     await interaction.deferReply();

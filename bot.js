@@ -15,6 +15,7 @@ import mysql from "mysql2";
 import Database from "better-sqlite3";
 import moment from "moment/moment.js";
 import { Player } from "discord-player";
+import { DefaultExtractors } from "@discord-player/extractor";
 import { MongoClient, ObjectId } from "mongodb";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
@@ -88,7 +89,7 @@ let CurrentDate = moment().format();
 
 const player = new Player(client);
 
-player.extractors.loadDefault();
+await player.extractors.loadMulti(DefaultExtractors);
 
 client.commands = new Collection();
 const __dirname = dirname(fileURLToPath(new URL(import.meta.url)));

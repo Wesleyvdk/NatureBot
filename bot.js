@@ -23,7 +23,7 @@ config();
 const uri = process.env.MONGODB; // Fill in your MongoDB connection string here
 const mongoclient = new MongoClient(uri);
 
-import handleError from "./handlers/handleError.js";
+import handleError from "./handlers/errorHandler.js";
 import usageHandler from "./handlers/usageHandler.js";
 import { messageCounter } from "./handlers/activityHandler.js";
 import levelRoleHandler from "./handlers/levelRoleHandler.js";

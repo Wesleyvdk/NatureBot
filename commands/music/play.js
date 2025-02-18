@@ -81,7 +81,7 @@ export default {
       return interaction.followUp(`**${track.title}** enqueued!`);
     } catch (e) {
       // let's return error if something failed
-      return errorHandler(interaction, e, null);
+      return handleError(interaction, e, null);
     }
   },
 };

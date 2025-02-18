@@ -11,7 +11,7 @@ import {
   ComponentType,
   AttachmentBuilder,
 } from "discord.js";
-import errorHandler from "../../handlers/errorHandler.js";
+import handleError from "../../handlers/handleError.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -135,7 +135,7 @@ export default {
             return diff(marriedDate);
         }
       } catch (e) {
-        errorHandler(interaction, e, null);
+        handleError(interaction, e, null);
       }
     }
     function diff(marriedDate) {

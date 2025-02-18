@@ -12,7 +12,7 @@ import {
   AttachmentBuilder,
   PermissionFlagsBits,
 } from "discord.js";
-import errorHandler from "../../handlers/errorHandler.js";
+import handleError from "../../handlers/handleError.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -42,7 +42,7 @@ export default {
         `confession with id: ${id} was posted by ${user.username} (id: ${confession.user})`
       );
     } catch (e) {
-      errorHandler(interaction, e, null);
+      handleError(interaction, e, null);
     }
   },
 };

@@ -12,7 +12,7 @@ import {
   AttachmentBuilder,
   Guild,
 } from "discord.js";
-import errorHandler from "../../handlers/errorHandler.js";
+import handleError from "../../handlers/handleError.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -70,7 +70,7 @@ export default {
           });
         }
       } catch (e) {
-        errorHandler(interaction, e, null);
+        handleError(interaction, e, null);
       }
     } else interaction.editReply("work in progress");
   },

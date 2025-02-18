@@ -11,7 +11,7 @@ import {
   ComponentType,
   AttachmentBuilder,
 } from "discord.js";
-import errorHandler from "../../handlers/errorHandler.js";
+import handleError from "../../handlers/handleError.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -147,7 +147,7 @@ export default {
           console.log(`Collected ${collected.size} interactions.`);
         });
       } catch (e) {
-        errorHandler(interaction, e, null);
+        handleError(interaction, e, null);
       }
     }
   },

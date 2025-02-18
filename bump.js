@@ -44,7 +44,7 @@ client.on("messageCreate", async (message) => {
           );
         })
         .catch((e) => {
-          errorHandler(null, e, message);
+          handleError(null, e, message);
         });
     } else {
       message.member.roles.add(role).then(() => {

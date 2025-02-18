@@ -23,7 +23,7 @@ config();
 const uri = process.env.MONGODB; // Fill in your MongoDB connection string here
 const mongoclient = new MongoClient(uri);
 
-import errorHandler from "./handlers/errorHandler.js";
+import handleError from "./handlers/handleError.js";
 import usageHandler from "./handlers/usageHandler.js";
 import { messageCounter } from "./handlers/activityHandler.js";
 import levelRoleHandler from "./handlers/levelRoleHandler.js";
@@ -476,7 +476,7 @@ client.on(Events.MessageCreate, async (message) => {
     //         // else if (roleLevel >= 10) roleLevel + 10
     //       })
     //       .catch((e) => {
-    //         errorHandler(null, e, message);
+    //         handleError(null, e, message);
     //       });
     //   }
     // }
@@ -526,9 +526,9 @@ client.on(Events.MessageCreate, async (message) => {
                       console.error(
                         `Missing Permissions to send message in channel ${message.channel.id}`
                       );
-                      errorHandler(null, error, message);
+                      handleError(null, error, message);
                     } else {
-                      errorHandler(null, error, message);
+                      handleError(null, error, message);
                     }
                   });
                 // Check if the new level is a multiple of 10
@@ -537,14 +537,14 @@ client.on(Events.MessageCreate, async (message) => {
                 }
               }
             } catch (e) {
-              errorHandler(null, e, message);
+              handleError(null, e, message);
               console.log(`Error: ${e}`);
               console.log(`On: ${user} ${doc}`);
               console.log(`Date/Time: ${CurrentDate}`);
             }
           });
       } catch (e) {
-        errorHandler(null, e, message);
+        handleError(null, e, message);
       }
     }
     // MYSQL DB
@@ -573,7 +573,7 @@ client.on(Events.MessageCreate, async (message) => {
             );
         }
       } catch (e) {
-        errorHandler(null, e, message);
+        handleError(null, e, message);
       }
       //await check_level_reward(rows, message);
     }
@@ -618,7 +618,7 @@ client.on(Events.MessageCreate, async (message) => {
     if (message.channel.id === "938036238101921844") return;
     currDrop(message);
   } catch (e) {
-    errorHandler(null, e, message);
+    handleError(null, e, message);
   }
 });
 
@@ -685,7 +685,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     //     }
     //   });
   } catch (e) {
-    errorHandler(interaction, e, null);
+    handleError(interaction, e, null);
   }
 });
 

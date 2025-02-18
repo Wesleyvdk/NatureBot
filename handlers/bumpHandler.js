@@ -30,10 +30,10 @@ export default async function bumpHandler(message) {
           return;
         }
       } catch (e) {
-        errorHandler(null, e, message);
+        handleError(null, e, message);
       }
     }
   } catch (e) {
-    errorHandler(null, e, message);
+    handleError(null, e, message);
   }
 }

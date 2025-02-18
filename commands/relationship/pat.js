@@ -14,7 +14,7 @@ import {
 import { config } from "dotenv";
 config();
 import axios from "axios";
-import errorHandler from "../../handlers/errorHandler.js";
+import handleError from "../../handlers/handleError.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -125,7 +125,7 @@ export default {
       embed.setImage(gif);
       interaction.editReply({ embeds: [embed] });
     } catch (e) {
-      errorHandler(interaction, e, null);
+      handleError(interaction, e, null);
     }
   },
 };

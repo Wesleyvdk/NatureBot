@@ -12,7 +12,7 @@ import {
   AttachmentBuilder,
   PermissionFlagsBits,
 } from "discord.js";
-import errorHandler from "../../handlers/errorHandler.js";
+import handleError from "../../handlers/handleError.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -41,7 +41,7 @@ export default {
         await member.kick();
         interaction.editReply({ content: `${member.name} was kicked.` });
       } catch (e) {
-        errorHandler(interaction, e, null);
+        handleError(interaction, e, null);
       }
     }
   },

@@ -55,11 +55,13 @@ export default function handleError(interaction, e, message) {
     console.log(chalk.red(`Date/Time: ${CurrentDate}`));
   }
   if (!message) {
-    if (!interaction.deferred) interaction.deferReply();
-    interaction.followUp({
-      embeds: [embed],
-      components: [buttonComponent],
-    });
+    if (!interaction.deferred) message.channel.send({ embeds: [embed] });
+    else {
+      interaction.followUp({
+        embeds: [embed],
+        components: [buttonComponent],
+      });
+    }
     console.log(chalk.red.bold("Error Details:"));
     console.log(chalk.red(`Error: ${e.message}`));
     console.log(chalk.red(`Code: ${e.code || "N/A"}`));

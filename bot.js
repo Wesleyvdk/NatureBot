@@ -645,19 +645,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
           return;
         } else {
           const { useQueue } = await import("discord-player");
-          const queue = useQueue();
+          const queue = useQueue(interaction.guild.id);
           const data = {
             guild: interaction.guild,
           };
-          await player.context.provide(data, async () =>
-            command.command.default.execute(
-              client,
-              interaction,
-              conn,
-              mongoclient,
-              queue
-            )
+
+          command.command.default.execute(
+            client,
+            interaction,
+            conn,
+            mongoclient,
+            queue
           );
+
           usageHandler(command.command.default.data.name, mongoclient, conn);
         }
       });

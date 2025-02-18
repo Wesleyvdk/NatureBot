@@ -9,6 +9,7 @@ import {
   GatewayIntentBits,
   Partials,
   EmbedBuilder,
+  Colors,
 } from "discord.js";
 import mysql from "mysql2";
 import Database from "better-sqlite3";

@@ -42,31 +42,31 @@ export default {
         /\(lyrics|lyric|official music video|official video hd|official video|audio|official|clip officiel|clip|extended|hq\)/g,
         ""
       );
-    const lyrics = await player.lyrics.search({
-      q: query,
+    const results = await player.lyrics.search({
+      q: queryFormated,
     });
-    if (!lyrics.length)
-      return interaction.editReply({
-        content: "No lyrics found",
-        ephemeral: true,
+    const first = results[0];
+
+    if (!first.syncedLyrics) {
+      return; // no synced lyrics available
+    }
+
+    const syncedLyrics = queue.syncedLyrics(lyrics);
+
+    syncedLyrics.at(timestampInMilliseconds); // manually get a line at a specific timestamp
+
+    // Listen to live updates. This will be called whenever discord-player detects a new line in the lyrics
+    syncedLyrics.onChange(async (lyrics, timestamp) => {
+      // timestamp = timestamp in lyrics (not queue's time)
+      // lyrics = line in that timestamp
+      console.log(timestamp, lyrics);
+      await interaction.channel?.send({
+        content: `[${timestamp}]: ${lyrics}`,
       });
+    });
 
-    const trimmedLyrics = lyrics[0].plainLyrics.substring(0, 1997);
+    const unsubscribe = syncedLyrics.subscribe(); // start watching the queue for live updates. The onChange will not be called unless subscribe() has been called.
 
-    const embed = new EmbedBuilder()
-      .setTitle(lyrics[0].title)
-      .setURL(lyrics[0].url)
-      .setThumbnail(lyrics[0].thumbnail)
-      .setAuthor({
-        name: lyrics[0].artist.name,
-        iconURL: lyrics[0].artist.image,
-        url: lyrics[0].artist.url,
-      })
-      .setDescription(
-        trimmedLyrics.length === 1997 ? `${trimmedLyrics}...` : trimmedLyrics
-      )
-      .setColor("Yellow");
-
-    return interaction.editReply({ embeds: [embed] });
+    unsubscribe(); // stop watching the queue for live updates
   },
 };

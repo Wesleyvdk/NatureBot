@@ -14,7 +14,7 @@ import {
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("lyrics")
+    .setName("synced-lyrics")
     .setDescription("Get and show the lyrics of current playing track.")
     .addStringOption((option) =>
       option

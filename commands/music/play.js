@@ -74,14 +74,14 @@ export default {
         });
       const { track } = await player.play(channel, searchResult, {
         nodeOptions: {
-          // nodeOptions are the options for guild node (aka your queue in simple word)
-          metadata: interaction, // we can access this metadata object using queue.metadata later on
+          metadata: interaction,
+          channel: interaction.channel,
+          user: interaction.user,
         },
       });
 
       return interaction.followUp(`**${track.title}** enqueued!`);
     } catch (e) {
-      // let's return error if something failed
       return handleError(interaction, e, null);
     }
   },

@@ -519,15 +519,25 @@ client.on(Events.MessageCreate, async (message) => {
                   .updateOne(filter, update, options);
 
                 const newLevel = doc.level + 1;
-                message.channel.send(
-                  `${user} has leveled up to level ${newLevel}`
-                );
+                message.channel
+                  .send(`${user} has leveled up to level ${newLevel}`)
+                  .catch((error) => {
+                    if (error.code === 50013) {
+                      console.error(
+                        `Missing Permissions to send message in channel ${message.channel.id}`
+                      );
+                      errorHandler(null, error, message);
+                    } else {
+                      errorHandler(null, error, message);
+                    }
+                  });
                 // Check if the new level is a multiple of 10
                 if (newLevel % 10 === 0) {
                   await levelRoleHandler(user, guild, mongoclient, newLevel);
                 }
               }
             } catch (e) {
+              errorHandler(null, e, message);
               console.log(`Error: ${e}`);
               console.log(`On: ${user} ${doc}`);
               console.log(`Date/Time: ${CurrentDate}`);

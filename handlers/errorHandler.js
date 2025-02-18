@@ -10,11 +10,30 @@ let CurrentDate = moment().format();
 
 export default function handleError(interaction, e, message) {
   let embed = new EmbedBuilder()
+    .setTitle("An Error Occurred")
     .setDescription("There was an error, please notify the creator of the bot")
-    .setColor(Colors.Red);
+    .setColor(Colors.Red)
+    .addFields(
+      {
+        name: "Error Message",
+        value: `\`\`\`${e.message}\`\`\``,
+        inline: false,
+      },
+      { name: "Error Code", value: `\`${e.code || "N/A"}\``, inline: true },
+      { name: "Status", value: `\`${e.status || "N/A"}\``, inline: true },
+      { name: "Method", value: `\`${e.method || "N/A"}\``, inline: true },
+      { name: "URL", value: `\`${e.url || "N/A"}\``, inline: false },
+      {
+        name: "Server",
+        value: `\`${message ? message.guild.name : interaction.guild.name}\``,
+        inline: true,
+      },
+      { name: "Date/Time", value: `\`${CurrentDate}\``, inline: true }
+    );
+
   const buttonComponent = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
-      .setLabel("support")
+      .setLabel("Support")
       .setURL("https://discord.gg/pYzZd3DbDq")
       .setStyle(ButtonStyle.Link)
   );

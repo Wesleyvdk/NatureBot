@@ -685,7 +685,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     //     }
     //   });
   } catch (e) {
-    let embed = errorHandler(interaction, e, null);
+    errorHandler(interaction, e, null);
   }
 });
 

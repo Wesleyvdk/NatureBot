@@ -742,7 +742,7 @@ player.events.on("audioTrackAdd", (queue, track) => {
     .setTitle(`${track.title}`)
     .setURL(`${track.url}`)
     .setFooter({
-      text: `Requested by: ${track.requestedBy.tag}`,
+      text: `Requested by: ${track.requestedBy.displayName}`,
       iconURL: track.requestedBy.displayAvatarURL({ dynamic: true }),
     });
 
@@ -753,7 +753,7 @@ player.events.on("audioTracksAdd", (queue, tracks) => {
   const embed = new EmbedBuilder()
     .setTitle(`${tracks.length} tracks queued.`)
     .setFooter({
-      text: `Requested by: ${tracks[0].requestedBy.tag}`,
+      text: `Requested by: ${tracks[0].requestedBy.displayName}`,
       iconURL: tracks[0].requestedBy.displayAvatarURL({ dynamic: true }),
     });
 

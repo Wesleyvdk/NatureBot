@@ -76,7 +76,7 @@ export default {
 
     const embed = new EmbedBuilder()
       .setDescription(`<@${member.user.id}>`)
-      .setAuthor(`${member.user.tag}`, member.user.displayAvatarURL)
+      .setAuthor(`${member.user.name}`, member.user.displayAvatarURL)
       .setColor(randomColor)
       .setFooter(`ID: ${interaction.author.id}`)
       .setThumbnail(member.user.displayAvatarURL)

@@ -706,7 +706,7 @@ player.events.on("playerStart", (queue, track) => {
 player.events.on("emptyQueue", (queue) => {
   queue.metadata.channel.send(`No more tracks to play, leaving now.`);
 });
-player.events.on("error", (queue) => {
+player.events.on("error", (queue, error) => {
   const embed = new EmbedBuilder()
     .setTitle("An error occured while playing")
     .setDescription(`Reason: \`${error.message}\``)
@@ -714,7 +714,7 @@ player.events.on("error", (queue) => {
 
   queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
 });
-player.events.on("playerError", (queue) => {
+player.events.on("playerError", (queue, error) => {
   const embed = new EmbedBuilder()
     .setTitle("An error occured while playing")
     .setDescription(`Reason: \`${error.message}\``)

@@ -42,6 +42,8 @@ export default {
         /\(lyrics|lyric|official music video|official video hd|official video|audio|official|clip officiel|clip|extended|hq\)/g,
         ""
       );
+
+    console.log(queryFormated);
     const lyrics = await player.lyrics.search({
       q: queryFormated,
     });

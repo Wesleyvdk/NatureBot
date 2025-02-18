@@ -12,7 +12,7 @@ import {
   AttachmentBuilder,
 } from "discord.js";
 
-import handleError from "../../handlers/handleError.js";
+import handleError from "../../handlers/errorHandler.js";
 
 export default {
   data: new SlashCommandBuilder()

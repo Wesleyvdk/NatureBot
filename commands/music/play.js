@@ -12,6 +12,7 @@ import {
   AttachmentBuilder,
 } from "discord.js";
 import { useQueue, useMainPlayer } from "discord-player";
+import handleError from "../../handlers/errorHandler";
 
 export default {
   data: new SlashCommandBuilder()

@@ -24,12 +24,12 @@ export default {
         .setDescription("Enter the song you want to play")
         .setRequired(true)
     )
-    .addStringOption((option) => {
+    .addStringOption((option) =>
       option
         .setName("artist")
-        .setDescription("Enter the artist of the song you want to play")
-        .setRequired(false);
-    }),
+        .setDescription("Enter the artist of the song")
+        .setRequired(true)
+    ),
   async execute(client, interaction, mongoclient, conn) {
     await interaction.deferReply();
 

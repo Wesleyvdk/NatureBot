@@ -705,9 +705,9 @@ player.events.on("playerStart", (queue, track) => {
   queue.metadata.channel.send({ embeds: [embed] });
 });
 
-// player.events.on("emptyQueue", (queue) => {
-//   queue.metadata.channel.send(`No more tracks to play, leaving now.`);
-// });
+player.events.on("emptyQueue", (queue) => {
+  queue.metadata.channel.send(`No more tracks to play, leaving now.`);
+});
 
 player.events.on("error", (queue, error) => {
   const embed = new EmbedBuilder()
@@ -760,69 +760,6 @@ player.events.on("audioTracksAdd", (queue, tracks) => {
   return queue.metadata.send({ embeds: [embed] }).catch(console.error);
 });
 
-player.events.on("playerStart", (queue, track) => {
-  if (!track.requestedBy) track.requestedBy = bot.user;
-
-  const embed = new EmbedBuilder()
-    .setAuthor({ name: "Now playing" })
-    .setTitle(`${track.title}`)
-    .setURL(`${track.url}`)
-    .setThumbnail(`${track.thumbnail}`)
-    .setFooter({
-      text: `Played by: ${track.requestedBy.username}`,
-      iconURL: `${track.requestedBy.displayAvatarURL({ dynamic: true })}`,
-    });
-  queue.metadata.channel.send({ embeds: [embed] });
-});
-// player.events.on("emptyQueue", (queue) => {
-//   queue.metadata.channel.send(`No more tracks to play, leaving now.`);
-// });
-player.events.on("error", (queue, error) => {
-  const embed = new EmbedBuilder()
-    .setTitle("An error occured while playing")
-    .setDescription(`Reason: \`${error.message}\``)
-    .setColor(Colors.Red);
-
-  queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
-});
-player.events.on("playerError", (queue, error) => {
-  const embed = new EmbedBuilder()
-    .setTitle("An error occured while playing")
-    .setDescription(`Reason: \`${error.message}\``)
-    .setColor(Colors.Red);
-  queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
-});
-
-player.events.on("playerSkip", (queue, track) => {
-  queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
-});
-player.events.on("emptyChannel", (queue) => {
-  queue.metadata.channel.send("Feeling lonely, leaving now.");
-});
-player.events.on("audioTrackAdd", (queue, track) => {
-  const embed = new EmbedBuilder()
-    .setAuthor({
-      name: `Track queued - Position ${queue.node.getTrackPosition(track) + 1}`,
-    })
-    .setTitle(`${track.title}`)
-    .setURL(`${track.url}`)
-    .setFooter({
-      text: `Requested by: ${track.requestedBy.tag}`,
-      iconURL: track.requestedBy.displayAvatarURL({ dynamic: true }),
-    });
-
-  queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
-});
-player.events.on("audioTracksAdd", (queue, tracks) => {
-  const embed = new EmbedBuilder()
-    .setTitle(`${tracks.length} tracks queued.`)
-    .setFooter({
-      text: `Requested by: ${tracks[0].requestedBy.tag}`,
-      iconURL: tracks[0].requestedBy.displayAvatarURL({ dynamic: true }),
-    });
-
-  return queue.metadata.send({ embeds: [embed] }).catch(console.error);
-});
 function createDatabases(leaveTable, familyTable, rpTable, suggestionTable) {
   // ------------------ Family Table ----------------
   if (!leaveTable["count()"]) {

@@ -57,14 +57,7 @@ export default {
     const trimmedLyrics = lyrics[0].plainLyrics.substring(0, 1997);
 
     const embed = new EmbedBuilder()
-      .setTitle(lyrics[0].title)
-      .setURL(lyrics[0].url)
-      .setThumbnail(lyrics[0].thumbnail)
-      .setAuthor({
-        name: lyrics[0].artist.name,
-        iconURL: lyrics[0].artist.image,
-        url: lyrics[0].artist.url,
-      })
+      .setTitle(lyrics[0].name)
       .setDescription(
         trimmedLyrics.length === 1997 ? `${trimmedLyrics}...` : trimmedLyrics
       )

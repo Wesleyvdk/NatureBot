@@ -42,10 +42,10 @@ export default {
         /\(lyrics|lyric|official music video|official video hd|official video|audio|official|clip officiel|clip|extended|hq\)/g,
         ""
       );
-    const results = await player.lyrics.search({
+    const lyrics = await player.lyrics.search({
       q: queryFormated,
     });
-    const first = results[0];
+    const first = lyrics[0];
 
     if (!first.syncedLyrics) {
       return; // no synced lyrics available

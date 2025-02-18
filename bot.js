@@ -644,8 +644,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
           });
           return;
         } else {
-          const { useQueue } = await import("discord-player");
-          const queue = useQueue();
           const data = {
             guild: interaction.guild,
           };

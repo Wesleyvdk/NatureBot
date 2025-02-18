@@ -66,7 +66,6 @@ async function createRole(guild, level) {
     .sort((a, b) => b.position - a.position)
     .first();
 
-  console.log(highestLevelRole);
   const role = await guild.roles.create({
     name: roleName,
     reason: `Role for level ${level}`,

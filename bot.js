@@ -705,9 +705,9 @@ player.events.on("playerStart", (queue, track) => {
   queue.metadata.channel.send({ embeds: [embed] });
 });
 
-player.events.on("emptyQueue", (queue) => {
-  queue.metadata.channel.send(`No more tracks to play, leaving now.`);
-});
+// player.events.on("emptyQueue", (queue) => {
+//   queue.metadata.channel.send(`No more tracks to play, leaving now.`);
+// });
 
 player.events.on("error", (queue, error) => {
   const embed = new EmbedBuilder()

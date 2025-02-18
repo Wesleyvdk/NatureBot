@@ -45,6 +45,7 @@ export default {
     const lyrics = await player.lyrics.search({
       q: queryFormated,
     });
+    console.log(lyrics);
     if (!lyrics.length)
       return interaction.editReply({
         content: "No lyrics found",

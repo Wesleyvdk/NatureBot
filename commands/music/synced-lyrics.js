@@ -53,6 +53,8 @@ export default {
 
     const syncedLyrics = queue.syncedLyrics(lyrics);
 
+    console.log(syncedLyrics);
+
     syncedLyrics.at(timestampInMilliseconds); // manually get a line at a specific timestamp
 
     // Listen to live updates. This will be called whenever discord-player detects a new line in the lyrics

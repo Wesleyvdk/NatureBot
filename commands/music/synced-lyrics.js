@@ -11,8 +11,6 @@ import {
   ComponentType,
   AttachmentBuilder,
 } from "discord.js";
-import { lyricsExtractor } from "@discord-player/extractor";
-const lyricsFinder = lyricsExtractor();
 
 export default {
   data: new SlashCommandBuilder()

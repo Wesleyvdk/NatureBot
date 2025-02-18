@@ -1,4 +1,4 @@
-import { useQueue } from "discord-player";
+import { useQueue, useMainPlayer } from "discord-player";
 import {
   SlashCommandBuilder,
   EmbedBuilder,

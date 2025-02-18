@@ -43,7 +43,7 @@ export default {
         ""
       );
     const lyrics = await player.lyrics.search({
-      q: query,
+      q: queryFormated,
     });
     if (!lyrics.length)
       return interaction.editReply({

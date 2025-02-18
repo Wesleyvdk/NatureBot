@@ -692,7 +692,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-player.events.on("PlayerStart", (queue, track) => {
+player.events.on("playerStart", (queue, track) => {
   const embed = new EmbedBuilder()
     .setAuthor({ name: "Now playing" })
     .setTitle(`${track.title}`)
@@ -705,11 +705,11 @@ player.events.on("PlayerStart", (queue, track) => {
   queue.metadata.channel.send({ embeds: [embed] });
 });
 
-player.events.on("EmptyQueue", (queue) => {
+player.events.on("emptyQueue", (queue) => {
   queue.metadata.channel.send(`No more tracks to play, leaving now.`);
 });
 
-player.events.on("Error", (queue, error) => {
+player.events.on("error", (queue, error) => {
   const embed = new EmbedBuilder()
     .setTitle("An error occurred while playing")
     .setDescription(`Reason: \`${error.message}\``)
@@ -718,7 +718,7 @@ player.events.on("Error", (queue, error) => {
   queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
 });
 
-player.events.on("PlayerError", (queue, error) => {
+player.events.on("playerError", (queue, error) => {
   const embed = new EmbedBuilder()
     .setTitle("An error occurred while playing")
     .setDescription(`Reason: \`${error.message}\``)
@@ -726,15 +726,15 @@ player.events.on("PlayerError", (queue, error) => {
   queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
 });
 
-player.events.on("PlayerSkip", (queue, track) => {
+player.events.on("playerSkip", (queue, track) => {
   queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
 });
 
-player.events.on("EmptyChannel", (queue) => {
+player.events.on("emptyChannel", (queue) => {
   queue.metadata.channel.send("Feeling lonely, leaving now.");
 });
 
-player.events.on("AudioTrackAdd", (queue, track) => {
+player.events.on("audioTrackAdd", (queue, track) => {
   const embed = new EmbedBuilder()
     .setAuthor({
       name: `Track queued - Position ${queue.node.getTrackPosition(track) + 1}`,
@@ -749,7 +749,7 @@ player.events.on("AudioTrackAdd", (queue, track) => {
   queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
 });
 
-player.events.on("AudioTracksAdd", (queue, tracks) => {
+player.events.on("audioTracksAdd", (queue, tracks) => {
   const embed = new EmbedBuilder()
     .setTitle(`${tracks.length} tracks queued.`)
     .setFooter({

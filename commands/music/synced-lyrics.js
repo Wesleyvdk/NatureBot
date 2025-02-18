@@ -25,6 +25,7 @@ export default {
   async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
     const queue = useQueue();
+    const player = useMainPlayer();
     const query =
       interaction.options.getString("query", false) ??
       queue?.currentTrack?.title;

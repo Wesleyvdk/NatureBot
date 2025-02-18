@@ -77,7 +77,7 @@ export default {
           metadata: {
             channel: interaction.channel,
           },
-          enableStreamInterceptor: true,
+          enableStreamInterceptor: false,
           volume: 50,
           disableReverb: true,
           disableCompressor: false,

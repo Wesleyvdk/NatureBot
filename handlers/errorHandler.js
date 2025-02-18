@@ -55,7 +55,7 @@ export default function handleError(interaction, e, message) {
     console.log(chalk.red(`Date/Time: ${CurrentDate}`));
   }
   if (!message) {
-    if (!interaction.deferred) message.channel.send({ embeds: [embed] });
+    if (!interaction.deferred) interaction.channel.send({ embeds: [embed] });
     else {
       interaction.followUp({
         embeds: [embed],

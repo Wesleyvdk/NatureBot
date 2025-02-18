@@ -1,3 +1,4 @@
+import { useQueue } from "discord-player";
 import {
   SlashCommandBuilder,
   EmbedBuilder,
@@ -15,8 +16,9 @@ export default {
   data: new SlashCommandBuilder()
     .setName("skip")
     .setDescription("list all the active matches"),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
+    const queue = useQueue();
 
     if (queue.size < 1 && queue.repeatMode !== 3)
       return interaction.editReply("The queue has no more tracks.");

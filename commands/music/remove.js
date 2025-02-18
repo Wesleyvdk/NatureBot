@@ -1,3 +1,4 @@
+import { useQueue } from "discord-player";
 import {
   SlashCommandBuilder,
   EmbedBuilder,
@@ -24,9 +25,9 @@ export default {
         )
         .setRequired(true)
     ),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
-
+    const queue = useQueue();
     if (queue.size < 1)
       return interaction.editReply("The queue has no more track.");
 

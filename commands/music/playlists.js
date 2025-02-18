@@ -11,13 +11,15 @@ import {
   ComponentType,
   AttachmentBuilder,
 } from "discord.js";
+import { useQueue } from "discord-player";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("playlists")
     .setDescription("show your created playlists on the bot"),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
+    const queue = useQueue();
 
     let playerid = interaction.user.id;
     let playername = interaction.user.username;

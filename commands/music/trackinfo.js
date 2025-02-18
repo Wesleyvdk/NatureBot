@@ -1,3 +1,4 @@
+import { useQueue } from "discord-player";
 import {
   SlashCommandBuilder,
   EmbedBuilder,
@@ -24,8 +25,9 @@ export default {
         .setDescription("That track's index.")
         .setRequired(true)
     ),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
+    const queue = useQueue();
 
     const index = interaction.options.getNumber("index", true) - 1;
 

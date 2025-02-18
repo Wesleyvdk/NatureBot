@@ -16,7 +16,7 @@ export default {
   data: new SlashCommandBuilder()
     .setName("pause")
     .setDescription("Pauses the playback"),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
 
     if (queue.node.isPaused())

@@ -652,8 +652,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
               client,
               interaction,
               conn,
-              mongoclient,
-              queue
+              mongoclient
             )
           );
           usageHandler(command.command.default.data.name, mongoclient, conn);

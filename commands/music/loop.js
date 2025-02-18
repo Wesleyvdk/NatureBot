@@ -11,7 +11,7 @@ import {
   ComponentType,
   AttachmentBuilder,
 } from "discord.js";
-import { QueueRepeatMode } from "discord-player";
+import { QueueRepeatMode, useQueue } from "discord-player";
 
 export default {
   data: new SlashCommandBuilder()
@@ -36,9 +36,9 @@ export default {
           "Play related songs automatically based on your existing queue"
         )
     ),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
-
+    const queue = useQueue();
     const subCmd = await interaction.options.getSubcommand(true);
     let description;
     switch (subCmd) {

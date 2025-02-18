@@ -1,3 +1,4 @@
+import { useQueue } from "discord-player";
 import {
   SlashCommandBuilder,
   EmbedBuilder,
@@ -21,9 +22,9 @@ export default {
         .setName("query")
         .setDescription("Choose a song you want the lyrics of")
     ),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
-
+    const queue = useQueue();
     const query =
       interaction.options.getString("query", false) ??
       queue?.currentTrack?.title;

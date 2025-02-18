@@ -1,3 +1,4 @@
+import { useQueue } from "discord-player";
 import {
   SlashCommandBuilder,
   EmbedBuilder,
@@ -16,8 +17,10 @@ export default {
   data: new SlashCommandBuilder()
     .setName("nowplaying")
     .setDescription("Show the currentp playing track."),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
+    const queue = useQueue();
+
     const track = queue.currentTrack;
 
     const embed = new EmbedBuilder()

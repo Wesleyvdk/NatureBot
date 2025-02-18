@@ -1,3 +1,4 @@
+import { useQueue } from "discord-player";
 import {
   SlashCommandBuilder,
   EmbedBuilder,
@@ -20,8 +21,9 @@ export default {
       option.setName("page").setDescription("choose the queue page")
     ),
 
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
+    const queue = useQueue();
 
     if (!queue.size)
       return interaction.editReply("There is no track in the queue.");

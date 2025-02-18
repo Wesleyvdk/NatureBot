@@ -12,14 +12,15 @@ import {
   AttachmentBuilder,
 } from "discord.js";
 
-import { useHistory } from "discord-player";
+import { useHistory, useQueue } from "discord-player";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("previous")
     .setDescription("Play the previous track"),
-  async execute(client, interaction, conn, mongoclient, queue) {
+  async execute(client, interaction, conn, mongoclient) {
     await interaction.deferReply();
+    const queue = useQueue();
 
     const history = useHistory(interaction.guild.id);
 

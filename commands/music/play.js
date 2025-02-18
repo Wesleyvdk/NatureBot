@@ -28,7 +28,7 @@ export default {
     await interaction.deferReply();
 
     const player = useMainPlayer();
-    const queue = useQueue(interaction.guild.id);
+    const queue = useQueue();
 
     const channel = interaction.member.voice.channel;
     if (!channel)
@@ -72,15 +72,20 @@ export default {
           content: `No track was found for ${query}!`,
           ephemeral: true,
         });
-      const { track } = await player.play(channel, searchResult, {
+      const { track } = await player.play(channel, query, {
         nodeOptions: {
-          metadata: interaction,
-          channel: interaction.channel,
-          user: interaction.user,
+          metadata: {
+            channel: interaction.channel,
+          },
+          enableStreamInterceptor: true,
+          volume: 50,
+          disableReverb: true,
+          disableCompressor: false,
+          disableSeeker: true,
         },
       });
 
-      return interaction.followUp(`**${track.title}** enqueued!`);
+      return interaction.followUp(`**${track.cleanTitle}** enqueued!`);
     } catch (e) {
       return handleError(interaction, e, null);
     }

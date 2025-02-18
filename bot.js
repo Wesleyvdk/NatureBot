@@ -792,6 +792,7 @@ player.events.on("playerError", (queue, error) => {
     .setColor(Colors.Red);
   queue.metadata.channel.send({ embeds: [embed] }).catch(console.error);
 });
+
 player.events.on("playerSkip", (queue, track) => {
   queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
 });

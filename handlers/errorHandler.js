@@ -6,6 +6,8 @@ import {
   Colors,
 } from "discord.js";
 import moment from "moment/moment.js";
+import chalk from "chalk"; // Add chalk for console colors
+
 let CurrentDate = moment().format();
 
 export default function handleError(interaction, e, message) {
@@ -43,15 +45,27 @@ export default function handleError(interaction, e, message) {
       embeds: [embed],
       components: [buttonComponent],
     });
-    console.log(`Error: ${e}\n in server: ${message.guild.name}`);
-    console.log(`Date/Time: ${CurrentDate}`);
+    console.log(chalk.red.bold("Error Details:"));
+    console.log(chalk.red(`Error: ${e.message}`));
+    console.log(chalk.red(`Code: ${e.code || "N/A"}`));
+    console.log(chalk.red(`Status: ${e.status || "N/A"}`));
+    console.log(chalk.red(`Method: ${e.method || "N/A"}`));
+    console.log(chalk.red(`URL: ${e.url || "N/A"}`));
+    console.log(chalk.red(`Server: ${message.guild.name}`));
+    console.log(chalk.red(`Date/Time: ${CurrentDate}`));
   }
   if (!message) {
     interaction.editReply({
       embeds: [embed],
       components: [buttonComponent],
     });
-    console.log(`Error: ${e}\n in server: ${interaction.guild.name}`);
-    console.log(`Date/Time: ${CurrentDate}`);
+    console.log(chalk.red.bold("Error Details:"));
+    console.log(chalk.red(`Error: ${e.message}`));
+    console.log(chalk.red(`Code: ${e.code || "N/A"}`));
+    console.log(chalk.red(`Status: ${e.status || "N/A"}`));
+    console.log(chalk.red(`Method: ${e.method || "N/A"}`));
+    console.log(chalk.red(`URL: ${e.url || "N/A"}`));
+    console.log(chalk.red(`Server: ${interaction.guild.name}`));
+    console.log(chalk.red(`Date/Time: ${CurrentDate}`));
   }
 }

@@ -20,10 +20,16 @@ export default {
     .setDescription("play music from spotify or soundcloud")
     .addStringOption((option) =>
       option
-        .setName("query")
+        .setName("song")
         .setDescription("Enter the song you want to play")
         .setRequired(true)
-    ),
+    )
+    .addStringOption((option) => {
+      option
+        .setName("artist")
+        .setDescription("Enter the artist of the song you want to play")
+        .setRequired(false);
+    }),
   async execute(client, interaction, mongoclient, conn) {
     await interaction.deferReply();
 
@@ -62,7 +68,12 @@ export default {
         ephemeral: true,
       });
 
-    const query = interaction.options.getString("query", true);
+    const song = interaction.options.getString("song", true);
+    const artist = interaction.options.getString("artist", false);
+    const query = {
+      title: song,
+      author: artist,
+    };
     try {
       const searchResult = await player
         .search(query, { requestedBy: interaction.user })

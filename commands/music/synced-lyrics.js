@@ -51,9 +51,9 @@ export default {
       return; // no synced lyrics available
     }
 
-    const syncedLyrics = queue.syncedLyrics(lyrics);
+    const syncedLyrics = queue.syncedLyrics(first.syncedLyrics); // get synced lyrics from the queue
 
-    console.log(syncedLyrics);
+    console.log(queue.syncedLyrics);
 
     syncedLyrics.at(timestampInMilliseconds); // manually get a line at a specific timestamp
 

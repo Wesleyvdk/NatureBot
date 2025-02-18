@@ -72,7 +72,7 @@ export default {
           content: `No track was found for ${query}!`,
           ephemeral: true,
         });
-      const { track } = await player.play(channel, query, {
+      const { track } = await player.play(channel, searchResult, {
         nodeOptions: {
           metadata: {
             channel: interaction.channel,

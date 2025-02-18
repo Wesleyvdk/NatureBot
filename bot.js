@@ -14,7 +14,7 @@ import {
 import mysql from "mysql2";
 import Database from "better-sqlite3";
 import moment from "moment/moment.js";
-import { Player } from "discord-player";
+import { useMainPlayer } from "discord-player";
 import { DefaultExtractors } from "@discord-player/extractor";
 import { MongoClient, ObjectId } from "mongodb";
 import { fileURLToPath } from "url";
@@ -87,7 +87,10 @@ let lastWebCommitSha = null;
 
 let CurrentDate = moment().format();
 
-const player = new Player(client);
+const player = useMainPlayer();
+const data = {
+  guild: interaction.guild,
+};
 
 await player.extractors.loadMulti(DefaultExtractors);
 
@@ -647,12 +650,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
         } else {
           const { useQueue } = await import("discord-player");
           const queue = useQueue(interaction.guild.id);
-          await command.command.default.execute(
-            client,
-            interaction,
-            conn,
-            mongoclient,
-            queue
+          await player.context.provide(data, async () =>
+            command.command.default.execute(
+              client,
+              interaction,
+              conn,
+              mongoclient,
+              queue
+            )
           );
           usageHandler(command.command.default.data.name, mongoclient, conn);
         }

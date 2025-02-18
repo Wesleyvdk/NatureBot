@@ -14,7 +14,7 @@ import {
 import mysql from "mysql2";
 import Database from "better-sqlite3";
 import moment from "moment/moment.js";
-import { useMainPlayer } from "discord-player";
+import { Player, useMainPlayer } from "discord-player";
 import { DefaultExtractors } from "@discord-player/extractor";
 import { MongoClient, ObjectId } from "mongodb";
 import { fileURLToPath } from "url";
@@ -86,8 +86,8 @@ let lastBotCommitSha = null;
 let lastWebCommitSha = null;
 
 let CurrentDate = moment().format();
+const player = new Player(client);
 
-const player = useMainPlayer();
 const data = {
   guild: interaction.guild,
 };

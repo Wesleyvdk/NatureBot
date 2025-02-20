@@ -1,178 +1,84 @@
+import { PrismaClient } from "@prisma/client";
 import { MongoClient, ServerApiVersion } from "mongodb";
-import mysql from "mysql2";
 import { config } from "dotenv";
-config();
-import moment from "moment/moment.js";
+import moment from "moment";
+
+config(); // Load .env variables
+
+const prisma = new PrismaClient();
+const mongoClient = new MongoClient(process.env.MONGODB || "", {
+  serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
+});
+
 async function main() {
   console.log("Started backup at: ", moment().format());
-  const conn = mysql.createConnection(process.env.DATABASE_URL);
-  const uri = process.env.MONGODB;
 
-  // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-  const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    },
-  });
   try {
-    await client.connect();
-    console.log("Connected successfully to MongoDB server");
-    conn.connect(function (err) {
-      if (err) throw err;
-      console.log("Succesfully connected to PlanetScale!");
-    });
-    const db = client.db("Aylani");
+    await mongoClient.connect();
+    console.log("Connected to MongoDB");
 
-    const [tables] = await conn
-      .promise()
-      .query(
-        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'naturebot'"
-      );
+    const db = mongoClient.db("Aylani");
+    const collections = await db.listCollections().toArray();
 
-    for (table of tables) {
-      const [rows] = await conn
-        .promise()
-        .query(`SELECT * FROM \`${table.TABLE_NAME}\``);
+    for (const collection of collections) {
+      const collectionName = collection.name;
+      const match = collectionName.match(/^(\d+)([A-Za-z]+)$/); // Extract guildId and type (e.g., "1124304256518848543Levels")
 
-      for (row of rows) {
-        if (table.TABLE_NAME.includes("Levels")) {
-          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
-            await client
-              .db("Aylani")
-              .collection(table.TABLE_NAME)
-              .updateOne(
-                { _id: row.id },
-                { $set: { name: row.name, exp: row.exp, level: row.level } }
-              );
-          } else {
-            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
-              _id: row.id,
-              name: row.name,
-              exp: row.exp,
-              level: row.level,
-            });
-          }
-        }
-        if (table.TABLE_NAME.includes("Currency")) {
-          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
-            await client
-              .db("Aylani")
-              .collection(table.TABLE_NAME)
-              .updateOne(
-                { _id: row.id },
-                { $set: { name: row.userName, exp: row.exp, level: row.level } }
-              );
-          } else {
-            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
-              _id: row.id,
-              name: row.userName,
-              bank: row.bank,
-              cash: row.cash,
-              bitcoin: row.bitcoin,
-            });
-          }
-        }
-        if (table.TABLE_NAME.includes("Settings")) {
-          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
-            await client
-              .db("Aylani")
-              .collection(table.TABLE_NAME)
-              .updateOne(
-                { _id: row.id },
-                {
-                  $set: {
-                    command: row.command,
-                    category: row.category,
-                    turnedOn: row.turnedOn,
-                  },
-                }
-              );
-          } else {
-            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
-              _id: row.id,
-              command: row.command,
-              category: row.category,
-              turnedOn: row.turnedOn,
-            });
-          }
-        }
-        if (table.TABLE_NAME.includes("sixmans")) {
-          if (db.collection(table.TABLE_NAME).findOne({ _id: row.id })) {
-            await client
-              .db("Aylani")
-              .collection(table.TABLE_NAME)
-              .updateOne(
-                { _id: row.id },
-                {
-                  $set: {
-                    name: row.name,
-                    amount: row.amount,
-                    wins: row.wins,
-                    loss: row.loss,
-                    perc: row.perc,
-                  },
-                }
-              );
-          } else {
-            await client.db("Aylani").collection(table.TABLE_NAME).insertOne({
-              _id: row.id,
-              name: row.name,
-              amount: row.amount,
-              wins: row.wins,
-              loss: row.loss,
-              perc: row.perc,
-            });
-          }
-        }
+      if (!match) continue; // Skip if not matching expected format
 
-        if (
-          table.TABLE_NAME.includes("stories") ||
-          table.TABLE_NAME.includes("users") ||
-          table.TABLE_NAME.includes("config") ||
-          table.TABLE_NAME.includes("bot_commands")
-        ) {
-        }
-      }
-    }
+      const guildId = match[1]; // Extract guild ID from collection name
+      const type = match[2]; // Extract type (Levels, Currency, etc.)
 
-    const [rows] = await conn.promise().query("SELECT * FROM levels");
-    for (row of rows) {
-      if (db.collection("ophiussaLevels").findOne({ _id: row.id })) {
-        await client
-          .db("Aylani")
-          .collection("ophiussaLevels")
-          .updateOne(
-            { _id: row.id },
-            {
-              $set: {
-                name: row.name,
-                exp: row.exp,
-                level: row.level,
-              },
-            }
-          );
-      } else {
-        let instered = await client
-          .db("Aylani")
-          .collection("ophiussaLevels")
-          .insertOne({
-            _id: row.id,
-            name: row.name,
-            exp: row.exp,
-            level: row.level,
+      console.log(`Processing: Guild ${guildId}, Type: ${type}`);
+
+      const documents = await db.collection(collectionName).find().toArray();
+
+      for (const doc of documents) {
+        if (type === "Levels") {
+          await prisma.levels.upsert({
+            where: { id: doc._id.toString() },
+            update: { userId: doc._id.toString(), guildId, name: doc.name, exp: doc.exp, level: doc.level },
+            create: { id: doc._id.toString(), userId: doc._id.toString(), guildId, name: doc.name, exp: doc.exp, level: doc.level },
           });
+        } else if (type === "Currency") {
+          await prisma.currency.upsert({
+            where: { id: doc._id.toString() },
+            update: { userId: doc._id.toString(), guildId, name: doc.name, bank: doc.bank, cash: doc.cash, bitcoin: doc.bitcoin },
+            create: { id: doc._id.toString(), userId: doc._id.toString(), guildId, name: doc.name, bank: doc.bank, cash: doc.cash, bitcoin: doc.bitcoin },
+          });
+        } else if (type === "Settings") {
+          await prisma.settings.upsert({
+            where: { id: doc._id.toString() },
+            update: {
+              guildId,
+              command: doc.command,
+              category: doc.category,
+              turnedOn: Boolean(doc.turnedOn) // Convert int to boolean
+            },
+            create: {
+              id: doc._id.toString(),
+              guildId,
+              command: doc.command,
+              category: doc.category,
+              turnedOn: Boolean(doc.turnedOn) // Convert int to boolean
+            },
+          });
+        }
       }
     }
+
+    console.log("Backup completed successfully at: ", moment().format());
+  } catch (error) {
+    console.error("Error during backup:", error);
   } finally {
-    await client.close().then(() => console.log("MongoDB connection closed"));
-    await conn.end();
-    console.log("Backup completed at: ", moment().format());
+    await mongoClient.close();
+    await prisma.$disconnect();
+    console.log("Connections closed.");
   }
 }
 
-main().catch(console.dir);
+// Run backup every 12 hours
+main().catch(console.error);
 setInterval(() => {
-  main().catch(console.dir);
+  main().catch(console.error);
 }, 12 * 60 * 60 * 1000);

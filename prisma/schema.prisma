@@ -1,0 +1,34 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Levels {
+  id      String @id
+  userId  String
+  guildId String
+  name    String
+  exp     Int
+  level   Int
+}
+
+model Currency {
+  id       String @id
+  userId   String
+  guildId  String
+  name     String
+  bank     Int
+  cash     Int
+  bitcoin  Int
+}
+
+model Settings {
+  id        String @id
+  guildId   String
+  command   String
+  category  String
+  turnedOn  Boolean
+}

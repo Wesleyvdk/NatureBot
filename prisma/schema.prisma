@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model Levels {
-  id      String @id
+  id      String  @id @default(uuid())
   userId  String
   guildId String
   name    String
@@ -16,7 +16,7 @@ model Levels {
 }
 
 model Currency {
-  id       String @id
+  id       String  @id @default(uuid())
   userId   String
   guildId  String
   name     String
@@ -26,7 +26,7 @@ model Currency {
 }
 
 model Settings {
-  id        String @id
+  id        String  @id @default(uuid())
   guildId   String
   command   String
   category  String

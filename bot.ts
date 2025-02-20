@@ -30,15 +30,10 @@ import usageHandler from "./handlers/usageHandler";
 import { messageCounter } from "./handlers/activityHandler";
 import levelRoleHandler from "./handlers/levelRoleHandler";
 import addExistingRolesToMongoDB from "./handlers/levelRoleHandler";
+import * as db from './handlers/databaseHandler'
 
 const conn = "";
 
-// const conn = mysql.createConnection(process.env.DATABASE_URL);
-
-// conn.connect(function (err) {
-//   if (err) throw err;
-//   console.log("Succesfully connected to PlanetScale!");
-// });
 // arrays
 const number = [
   50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68,
@@ -51,6 +46,7 @@ const rdb = new Database("./databases/roleplay.sqlite");
 const battleDB = new Database("./databases/battlegame.sqlite");
 const suggestionDB = new Database("./databases/suggestion.sqlite");
 const leaveDB = new Database("./databases/leave.sqlite");
+
 // variables
 let counter = 0;
 let dropMessage = false;
@@ -164,69 +160,7 @@ client.once(Events.ClientReady, async () => {
   await createDatabases(leaveTable, familyTable, rpTable, suggestionTable);
   await getDatabases();
 
-  // MONGO DB
-  // Happens automatically on insertion
-
-  // MYSQL DB
-  // conn.promise().query(
-  //   `CREATE TABLE IF NOT EXISTS activity (
-  //     id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  //     userID varchar(255),
-  //     guildID varchar(255),
-  //     message INTEGER,
-  //     voice INTEGER
-  //   );`
-  // );
-  // conn.promise().query(
-  //   `CREATE TABLE IF NOT EXISTS players (
-  //       id char(30) PRIMARY KEY,
-  //       user varchar(255),
-  //       guild varchar(255),
-  //       level INTEGER,
-  //       class varchar(255),
-  //       equipedWeapon varchar(255),
-  //       equipedHelmet varchar(255),
-  //       equipedChestplate varchar(255),
-  //       equipedPants varchar(255),
-  //       equipedBoots varchar(255)
-  //       );`
-  // );
-  // conn.promise().query(
-  //   `CREATE TABLE IF NOT EXISTS loot (
-  //       id INTEGER PRIMARY KEY AUTO_INCREMENT,
-  //       userID varchar(255),
-  //       item varchar(255),
-  //       rarity varchar(255)
-  //       );`
-  // );
   client.guilds.cache.forEach((guild: any) => {
-    // conn.promise().query(
-    //   `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
-    //     id char(30) NOT NULL PRIMARY KEY UNIQUE,
-    //     user varchar(255),
-    //     guild varchar(255),
-    //     userName varchar(255),
-    //     bank Integer,
-    //     cash Integer,
-    //     bitcoin Integer
-    //     );`
-    // );
-    // conn.promise().query(
-    //   `CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
-    //   id char(30) NOT NULL PRIMARY KEY UNIQUE,
-    //   name varchar(255) NOT NULL,
-    //   level int NOT NULL,
-    //   exp int NOT NULL
-    //   );`
-    // );
-
-    // const settingsTable = `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
-    //   id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE,
-    //   command varchar(255) NOT NULL UNIQUE,
-    //   category varchar(255) NOT NULL,
-    //   turnedOn bool NOT NULL
-    //   );`;
-    // conn.promise().query(settingsTable);
 
     client.commands.forEach(async (commandObject: any) => {
       // MONGO DB
@@ -246,17 +180,30 @@ client.once(Events.ClientReady, async () => {
       }
     });
 
-    // MYSQL DB
-    // const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
-    //     command, category, turnedOn) VALUES (?, ?, True);
-    // `;
-    // conn
-    //   .promise()
-    //   .query(commandSettings, [
-    //     commandObject.command.default.data.name,
-    //     commandObject.category,
-    //   ]);
-    // });
+    // PSQL WITH PRISMA
+    client.commands.forEach(async (commandObject: any) => {
+      try {
+        const guildId = guild.id;
+        const commandName = commandObject.command.default.data.name;
+
+        // Check if the command already exists for this guild
+        const existingCommand = await db.getSettingByCommand(guildId, commandName);
+
+        // If the command does not exist, insert it
+        if (!existingCommand) {
+          await db.createSetting({
+            guildId,
+            command: commandName,
+            category: commandObject.category,
+            turnedOn: true,
+          });
+          console.log(`Inserted command: ${commandName} for Guild: ${guildId}`);
+        }
+      } catch (error) {
+        console.error(`Error processing command ${commandObject.command.default.data.name}:`, error);
+      }
+    });
+
   });
   const Guilds = client.guilds.cache.map((guild: any) => [
     guild.id,
@@ -367,34 +314,6 @@ client.on("guildMemberUpdate", async (oldMember: any, newMember: any) => {
 });
 
 client.on("guildCreate", async (guild: any) => {
-  // MONGO DB
-  // Happens automatically on insertion
-  // MYSQL DB
-  // conn.promise().query(
-  //   `CREATE TABLE IF NOT EXISTS ${guild.id}Currency(
-  //     id char(30) NOT NULL PRIMARY KEY UNIQUE,
-  //     user varchar(255),
-  //     guild varchar(255),
-  //     userName varchar(255),
-  //     bank Integer,
-  //     cash Integer,
-  //     bitcoin Integer)`
-  // );
-  // conn.promise().query(`CREATE TABLE IF NOT EXISTS ${guild.id}Levels(
-  //   id char(30) NOT NULL PRIMARY KEY UNIQUE,
-  //   name varchar(255) NOT NULL,
-  //   level int NOT NULL,
-  //   exp int NOT NULL
-  //   );`);
-
-  // conn.promise().query(
-  //   `CREATE TABLE IF NOT EXISTS ${guild.id}Settings(
-  //       id int AUTO_INCREMENT NOT NULL PRIMARY KEY UNIQUE,
-  //       command varchar(255) NOT NULL,
-  //       category varchar(255) NOT NULL,
-  //       turnedOn bool NOT NULL
-  //       );`
-  // );
 
   client.commands.forEach((commandObject: any) => {
     // MONGO DB
@@ -404,16 +323,6 @@ client.on("guildCreate", async (guild: any) => {
       turnedOn: true,
     });
 
-    // MYSQL DB
-    // const commandSettings = `INSERT IGNORE INTO ${guild.id}Settings(
-    //     command, category, turnedOn) VALUES (?, ?, True);
-    //   `;
-    // conn
-    //   .promise()
-    //   .query(commandSettings, [
-    //     commandObject.command.default.data.name,
-    //     commandObject.category,
-    //   ]);
   });
   // send "hello" message
 });
@@ -443,45 +352,6 @@ client.on(Events.MessageCreate, async (message: any) => {
 
     // MONGO DB
     addExperienceMongoDB(user, guild);
-    // levelRoleHandler(user, guild, mongoclient);
-    // MYSQL DB
-    // conn
-    //   .promise()
-    //   .query(
-    //     `INSERT IGNORE INTO ${guild}Levels(id, name, level, exp) VALUES (?,?, 1, 0)`,
-    //     [userid, username]
-    //   );
-
-    // conn
-    //   .promise()
-    //   .execute(`SELECT * FROM ${guild}Levels WHERE id=?`, [userid])
-    //   .then(async ([rows, fields]) => {
-    //     addExperienceMySQL(rows, user, guild);
-    //   });
-
-    // MAKE PREMIUM
-    // NEED TO BE FIXED
-    // const member = message.member;
-    // for (i = 0; i < roles.length; i++) {
-    //   const role = message.guild.roles.cache.find(
-    //     (role) => role.name === roles[i]
-    //   );
-    //   if (!role) {
-    //     guild.roles
-    //       .create({
-    //         name: roles[i],
-    //       })
-    //       .then((createdRole) => {
-    //         console.log(`Role created: ${createdRole.name}`);
-    //         // if (roleLevel == 1) roleLevel + 4
-    //         // else if (roleLevel == 5) roleLevel + 5
-    //         // else if (roleLevel >= 10) roleLevel + 10
-    //       })
-    //       .catch((e) => {
-    //         handleError(null, e, message);
-    //       });
-    //   }
-    // }
 
     // MONGO DB
     async function addExperienceMongoDB(user: any, guild: any) {
@@ -599,34 +469,6 @@ client.on(Events.InteractionCreate, async (interaction: any) => {
         }
       });
 
-    // MYSQL DB
-    // conn
-    //   .promise()
-    //   .query(
-    //     `SELECT * FROM ${interaction.guild.id}Settings WHERE command = ?`,
-    //     [command.command.default.data.name]
-    //   )
-    //   .then(async ([rows, fields]) => {
-    //     if (rows[0].turnedOn == 0) {
-    //       interaction.reply({
-    //         content:
-    //           "This command is not turned on in this server. Contact the server owner if you're interested in this command.",
-    //         ephemeral: true,
-    //       });
-    //       return;
-    //     } else {
-    //       const { useQueue } = await import("discord-player");
-    //       const queue = useQueue(interaction.guild.id);
-    //       await command.command.default.execute(
-    //         client,
-    //         interaction,
-    //         conn,
-    //         mongoclient,
-    //         queue
-    //       );
-    //       usageHandler(command.command.default.data.name, mongoclient, conn);
-    //     }
-    //   });
   } catch (e) {
     handleError(interaction, e, null);
   }
@@ -846,26 +688,6 @@ function currDrop(message: any) {
           }
         });
 
-      // MYSQL DB
-      // conn
-      //   .promise()
-      //   .query(`SELECT * FROM ${message.guild.id}Currency WHERE id=?`, [userid])
-      //   .then(async function ([rows, fields]) {
-      //     console.log(rows);
-      //     try {
-      //       oldCash = rows[0].cash;
-      //       newCash = oldCash + randomMoney;
-      //       conn
-      //         .promise()
-      //         .query(
-      //           `UPDATE ${message.guild.id}Currency SET cash = ${newCash} WHERE id=${userid}`
-      //         );
-      //       counter = 0;
-      //       randNumber = number[Math.floor(Math.random() * number.length)];
-      //     } catch (e) {
-      //       console.log(`Error: ${e}\nUser: ${user}\nrows: ${rows}`);
-      //     }
-      //   });
     } else {
       //console.log(`nothing to pick: ${dropMessage}`)
       message.delete();

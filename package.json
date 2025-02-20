@@ -2,17 +2,16 @@
   "name": "naturebot",
   "version": "2.0.0",
   "description": "",
-  "main": "bot.js",
+  "main": "bot.ts",
   "scripts": {
     "start": "npm run deploy && npm run bot",
-    "bot": "node bot.js",
-    "deploy": "node deploy-commands.js",
+    "bot": "ts-node bot.ts",
+    "deploy": "ts-node deploy-commands.ts",
     "startdev": "npm run database && npm run dev-commands && npm run dev",
-    "dev": "node dev.js",
-    "dev-commands": "node dev-commands.js",
-    "database": "node database.js"
+    "dev": "ts-node dev.ts",
+    "dev-commands": "ts-node dev-commands.ts",
+    "database": "ts-node database.ts"
   },
-  "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -37,6 +36,9 @@
     "youtube-ext": "^1.1.16"
   },
   "devDependencies": {
-    "eslint": "^8.19.0"
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.10.2",
+    "eslint": "^8.19.0",
+    "ts-node": "^10.9.2"
   }
 }

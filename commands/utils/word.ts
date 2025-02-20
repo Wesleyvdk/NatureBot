@@ -1,0 +1,40 @@
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  Embed,
+  ButtonInteraction,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  ComponentType,
+  AttachmentBuilder,
+  PermissionFlagsBits,
+} from "discord.js";
+import words from "./words.json"
+
+export default {
+  data: new SlashCommandBuilder()
+    .setName("word")
+    .setDescription("list all the active matches"),
+  async execute(client: any, interaction: any) {
+    await interaction.deferReply();
+    function getRandomWord() {
+      const wordsList = Object(words);
+      const keys = Object.keys(words);
+      const randomIndex = Math.floor(Math.random() * keys.length);
+      const randomKey = keys[randomIndex];
+      return { word: randomKey, description: wordsList[randomKey] };
+    }
+    const randomWord = getRandomWord();
+    const embed = new EmbedBuilder()
+      .setTitle(randomWord.word)
+      .setDescription(randomWord.description)
+      .setColor("#FF0000")
+      .setFooter({
+        text: "if any of the descriptions is wrong, please let the creator know",
+      });
+    interaction.editReply({ embeds: [embed] });
+  },
+};

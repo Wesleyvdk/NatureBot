@@ -18,7 +18,7 @@ const client = new Client({
 import { config } from "dotenv";
 config();
 
-import bumpHandler from "./handlers/bumpHandler.js";
+import bumpHandler from "./handlers/bumpHandler.ts";
 
 client.once(Events.ClientReady, async (c) => {
   console.log(`Ready! Logged in as ${c.user.tag}`);

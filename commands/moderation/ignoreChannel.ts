@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from "discord.js";
 import * as db from "../../handlers/databaseHandler";
 
-export const command = {
+export default {
   data: new SlashCommandBuilder()
     .setName("ignorechannel")
     .setDescription("Set ignore status for this channel.")

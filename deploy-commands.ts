@@ -20,16 +20,29 @@ const clientId: string = process.env.CLIENTID || "";
     for (const file of commandFiles) {
       const filePath = await import(`./commands/${folder}/${file}`);
       const command = filePath;
-      if (command.default.data && command.default.execute) {
-        commands.push({
-          data: command.default.data.toJSON(),
-          execute: command.default.execute,
-        });
-        tempCommands.push(command.default.data.toJSON());
-      } else {
-        console.log(
-          `[WARNING] The command at ${filePath} is missing a required data or execute property`
-        );
+      try {
+        if (command.default.data && command.default.execute) {
+          commands.push({
+            data: command.default.data.toJSON(),
+            execute: command.default.execute,
+          });
+          tempCommands.push(command.default.data.toJSON());
+        } else {
+          if (!command.default.data)
+            console.log(
+              `[WARNING] The command at ${JSON.stringify(
+                filePath
+              )} is missing a required data property`
+            );
+          if (!command.default.execute)
+            console.log(
+              `[WARNING] The command at ${JSON.stringify(
+                filePath
+              )} is missing a required execute property`
+            );
+        }
+      } catch (e) {
+        console.log(`failed for command ${JSON.stringify(command)} at ${JSON.stringify(file)}`)
       }
     }
   }

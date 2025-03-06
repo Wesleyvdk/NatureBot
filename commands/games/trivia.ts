@@ -4,12 +4,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  Embed,
-  ButtonInteraction,
-  StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
   ComponentType,
-  AttachmentBuilder,
 } from "discord.js";
 
 import handleError from "../../handlers/errorHandler";

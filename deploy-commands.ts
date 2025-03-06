@@ -20,12 +20,12 @@ const clientId: string = process.env.CLIENTID || "";
     for (const file of commandFiles) {
       const filePath = await import(`./commands/${folder}/${file}`);
       const command = filePath;
-      if (command.data && command.execute) {
+      if (command.default.data && command.default.execute) {
         commands.push({
-          data: command.data.toJSON(),
-          execute: command.execute,
+          data: command.default.data.toJSON(),
+          execute: command.default.execute,
         });
-        tempCommands.push(command.data.toJSON());
+        tempCommands.push(command.default.data.toJSON());
       } else {
         console.log(
           `[WARNING] The command at ${filePath} is missing a required data or execute property`

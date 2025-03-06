@@ -7,7 +7,11 @@ config(); // Load .env variables
 
 const prisma = new PrismaClient();
 const mongoClient = new MongoClient(process.env.MONGODB || "", {
-  serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
 });
 
 async function main() {
@@ -22,6 +26,25 @@ async function main() {
 
     for (const collection of collections) {
       const collectionName = collection.name;
+      if (collectionName === "botcommands") {
+        console.log(`Processing: botcommands`);
+        const documents = await db.collection(collectionName).find().toArray();
+
+        for (const doc of documents) {
+          await prisma.commandUsage.upsert({
+            where: { command: doc.command },
+            update: {
+              usageCount: doc.usage_count,
+            },
+            create: {
+              id: doc._id.toString(),
+              command: doc.command,
+              category: doc.category,
+              usageCount: doc.usage_count,
+            },
+          });
+        }
+      }
       const match = collectionName.match(/^(\d+)([A-Za-z]+)$/); // Extract guildId and type (e.g., "1124304256518848543Levels")
 
       if (!match) continue; // Skip if not matching expected format
@@ -37,14 +60,42 @@ async function main() {
         if (type === "Levels") {
           await prisma.levels.upsert({
             where: { id: doc._id.toString() },
-            update: { userId: doc._id.toString(), guildId, name: doc.name, exp: doc.exp, level: doc.level },
-            create: { id: doc._id.toString(), userId: doc._id.toString(), guildId, name: doc.name, exp: doc.exp, level: doc.level },
+            update: {
+              userId: doc._id.toString(),
+              guildId,
+              name: doc.name,
+              exp: doc.exp,
+              level: doc.level,
+            },
+            create: {
+              id: doc._id.toString(),
+              userId: doc._id.toString(),
+              guildId,
+              name: doc.name,
+              exp: doc.exp,
+              level: doc.level,
+            },
           });
         } else if (type === "Currency") {
           await prisma.currency.upsert({
             where: { id: doc._id.toString() },
-            update: { userId: doc._id.toString(), guildId, name: doc.name, bank: doc.bank, cash: doc.cash, bitcoin: doc.bitcoin },
-            create: { id: doc._id.toString(), userId: doc._id.toString(), guildId, name: doc.name, bank: doc.bank, cash: doc.cash, bitcoin: doc.bitcoin },
+            update: {
+              userId: doc._id.toString(),
+              guildId,
+              name: doc.name,
+              bank: doc.bank,
+              cash: doc.cash,
+              bitcoin: doc.bitcoin,
+            },
+            create: {
+              id: doc._id.toString(),
+              userId: doc._id.toString(),
+              guildId,
+              name: doc.name,
+              bank: doc.bank,
+              cash: doc.cash,
+              bitcoin: doc.bitcoin,
+            },
           });
         } else if (type === "Settings") {
           await prisma.settings.upsert({
@@ -53,14 +104,14 @@ async function main() {
               guildId,
               command: doc.command,
               category: doc.category,
-              turnedOn: Boolean(doc.turnedOn) // Convert int to boolean
+              turnedOn: Boolean(doc.turnedOn), // Convert int to boolean
             },
             create: {
               id: doc._id.toString(),
               guildId,
               command: doc.command,
               category: doc.category,
-              turnedOn: Boolean(doc.turnedOn) // Convert int to boolean
+              turnedOn: Boolean(doc.turnedOn), // Convert int to boolean
             },
           });
         }

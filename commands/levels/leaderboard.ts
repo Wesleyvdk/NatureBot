@@ -1,74 +1,44 @@
-import {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  Embed,
-  ButtonInteraction,
-  StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
-  ComponentType,
-  AttachmentBuilder,
-} from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
+import * as db from "../../handlers/databaseHandler";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("leaderboard")
-    .setDescription("shows the leaderboard"),
-  async execute(client: any, interaction: any, conn: any, mongoclient: any) {
+    .setDescription("Shows the top 10 leaderboard"),
+
+  async execute(client: any, interaction: any) {
     await interaction.deferReply();
 
-    // MONGO DB
-    mongoclient
-      .db("Aylani")
-      .collection(`${interaction.guild.id}Levels`)
-      .find()
-      .sort({ level: -1, exp: -1 })
-      .limit(10)
-      .toArray()
-      .then((rows: any) => {
-        // Now shake it and show it! (as a nice embed, too!)
-        const embed = new EmbedBuilder()
-          .setTitle("Leaderboard")
-          //.setAuthor(client.user.username, client.user.displayAvatarURL())
-          .setDescription("Our top 10 level leaders!")
-          .setColor(0x00ae86);
+    const guildId = interaction.guild.id;
 
-        for (const data of rows) {
-          //const user = client.users.cache.get(data.user);
-          embed.addFields({
-            name: data.name,
-            value: `level: ${data.level}  exp:   ${data.exp}`,
-          });
-        }
-        return interaction.editReply({ embeds: [embed] });
+    try {
+      // Fetch leaderboard data
+      const leaderboard = await db.getLeaderboard(guildId);
+
+      if (leaderboard.length === 0) {
+        return interaction.editReply("No leaderboard data available yet.");
+      }
+
+      // Create leaderboard embed
+      const embed = new EmbedBuilder()
+        .setTitle("🏆 Leaderboard")
+        .setDescription("Top 10 level leaders in the server!")
+        .setColor(0x00ae86);
+
+      for (const [index, data] of leaderboard.entries()) {
+        embed.addFields({
+          name: `#${index + 1} - ${data.name}`,
+          value: `Level: **${data.level}** | Exp: **${data.exp}**`,
+        });
+      }
+
+      return interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      await interaction.editReply({
+        content: "An error occurred while fetching the leaderboard.",
+        ephemeral: true,
       });
-
-    // MYSQL DB
-    // conn
-    //   .promise()
-    //   .query(
-    //     `SELECT * FROM ${interaction.guild.id}Levels ORDER BY exp DESC LIMIT 10;`
-    //   )
-    //   .then(([rows, fields]) => {
-    //     // let user = client.getLevels.get(userid, interaction.guild.id);
-    //     // Now shake it and show it! (as a nice embed, too!)
-    //     const embed = new EmbedBuilder()
-    //       .setTitle("Leaderboard")
-    //       //.setAuthor(client.user.username, client.user.displayAvatarURL())
-    //       .setDescription("Our top 10 level leaders!")
-    //       .setColor(0x00ae86);
-
-    //     for (const data of rows) {
-    //       //const user = client.users.cache.get(data.user);
-    //       //console.log(data.user, user)
-    //       embed.addFields({
-    //         name: data.name,
-    //         value: `level: ${data.level}  exp:   ${data.exp}`,
-    //       });
-    //     }
-    //     return interaction.editReply({ embeds: [embed] });
-    //   });
+      console.error("Leaderboard Error:", error);
+    }
   },
 };

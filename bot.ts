@@ -22,15 +22,16 @@ import { dirname } from "path";
 
 config();
 
-const uri: string = process.env.MONGODB || ''; // Fill in your MongoDB connection string here
+const uri: string = process.env.MONGODB || ""; // Fill in your MongoDB connection string here
 const mongoclient = new MongoClient(uri);
 
 import handleError from "./handlers/errorHandler";
-import usageHandler from "./handlers/usageHandler";
 import { messageCounter } from "./handlers/activityHandler";
-import levelRoleHandler from "./handlers/levelRoleHandler";
+import levelRoleHandler, {
+  addExistingRolesToPostgreSQL,
+} from "./handlers/levelRoleHandler";
 import addExistingRolesToMongoDB from "./handlers/levelRoleHandler";
-import * as db from './handlers/databaseHandler'
+import * as db from "./handlers/databaseHandler";
 
 const conn = "";
 
@@ -117,24 +118,25 @@ const player = new Player(client);
 client.once(Events.ClientReady, async () => {
   await mongoclient.connect().then(() => console.log("Connected to MongoDB!"));
   client.commands.forEach(async (commandObject: any) => {
-    // MONGO DB
-    const collection = mongoclient.db("Aylani").collection(`botcommands`);
-    const existingCommand = await collection.findOne({
-      command: commandObject.command.default.data.name,
-    });
+    // Check if the command already exists
+    const existingCommand = await db.getCommandUsage(
+      commandObject.command.default.data.name
+    );
 
+    // If the command does not exist, insert it
     if (!existingCommand) {
-      collection.insertOne({
+      await db.createCommandUsage({
         command: commandObject.command.default.data.name,
         category: commandObject.category,
-        usage_count: 0,
+        usageCount: 0,
       });
+      console.log(
+        `Inserted command: ${commandObject.command.default.data.name} for category ${commandObject.category}`
+      );
     }
   });
 
-  // await addExistingRolesToMongoDB(mongoclient, "929352993655124000").then(
-  //   console.log("added roles")
-  // );
+  await addExistingRolesToPostgreSQL("929352993655124000");
 
   const leaveTable = leaveDB
     .prepare(
@@ -161,7 +163,6 @@ client.once(Events.ClientReady, async () => {
   await getDatabases();
 
   client.guilds.cache.forEach((guild: any) => {
-
     client.commands.forEach(async (commandObject: any) => {
       // MONGO DB
       const collection = mongoclient
@@ -187,7 +188,10 @@ client.once(Events.ClientReady, async () => {
         const commandName = commandObject.command.default.data.name;
 
         // Check if the command already exists for this guild
-        const existingCommand = await db.getSettingByCommand(guildId, commandName);
+        const existingCommand = await db.getSettingByCommand(
+          guildId,
+          commandName
+        );
 
         // If the command does not exist, insert it
         if (!existingCommand) {
@@ -200,10 +204,12 @@ client.once(Events.ClientReady, async () => {
           console.log(`Inserted command: ${commandName} for Guild: ${guildId}`);
         }
       } catch (error) {
-        console.error(`Error processing command ${commandObject.command.default.data.name}:`, error);
+        console.error(
+          `Error processing command ${commandObject.command.default.data.name}:`,
+          error
+        );
       }
     });
-
   });
   const Guilds = client.guilds.cache.map((guild: any) => [
     guild.id,
@@ -314,125 +320,79 @@ client.on("guildMemberUpdate", async (oldMember: any, newMember: any) => {
 });
 
 client.on("guildCreate", async (guild: any) => {
-
-  client.commands.forEach((commandObject: any) => {
-    // MONGO DB
-    mongoclient.db("Aylani").collection(`${guild.id}Settings`).insertOne({
+  try {
+    // Loop through all commands and add default settings for the guild
+    const commandSettings = client.commands.map((commandObject: any) => ({
+      guildId: guild.id,
       command: commandObject.command.default.data.name,
       category: commandObject.category,
       turnedOn: true,
-    });
+    }));
 
-  });
-  // send "hello" message
+    // Bulk insert all default settings
+    await db.createMultipleSettings(commandSettings);
+
+    console.log(`Initialized settings for Guild ID: ${guild.id}`);
+
+    // Send a welcome message in the system channel if available
+    const systemChannel = guild.systemChannel;
+    if (systemChannel) {
+      systemChannel.send(
+        "Hello! I'm now set up in your server. Use `/help` to see available commands!"
+      );
+    }
+  } catch (error) {
+    console.error(
+      `Error initializing settings for Guild ID ${guild.id}:`,
+      error
+    );
+  }
 });
 
 client.on("guildDelete", async (guild: any) => {
-  // MONGO DB
-  mongoclient.db("Aylani").collection(`${guild.id}Currency`).drop();
-  mongoclient.db("Aylani").collection(`${guild.id}Levels`).drop();
-  mongoclient.db("Aylani").collection(`${guild.id}Settings`).drop();
-  // MYSQL DB
-  // conn.promise().query(`DROP TABLE ${guild.id}Currency`);
-  // conn.promise().query(`DROP TABLE ${guild.id}Levels`);
-  // conn.promise().query(`DROP TABLE ${guild.id}Settings`);
+  try {
+    // Delete all Currency, Levels, and Settings for this guild
+    await db.deleteGuildData(guild.id);
+    console.log(`Successfully removed all data for Guild ID: ${guild.id}`);
+  } catch (error) {
+    console.error(`Error deleting guild data for ${guild.id}:`, error);
+  }
 });
 
 client.on(Events.MessageCreate, async (message: any) => {
   try {
     if (message.author.bot) return;
-    let guild = message.guild;
+
     let guildId = message.guild.id;
-    let userid = message.author.id;
+    let userId = message.author.id;
     let username = message.author.username;
-    let user = message.author;
+    let channelId = message.channel.id;
 
-    // You can use a function to handle database updates
-    await messageCounter(userid, guild, conn, mongoclient);
-
-    // MONGO DB
-    addExperienceMongoDB(user, guild);
-
-    // MONGO DB
-    async function addExperienceMongoDB(user: any, guild: any) {
-      const filter = { _id: user.id };
-      const update = {
-        $inc: { exp: 5 },
-        $setOnInsert: { name: user.username, level: 1 },
-      };
-      const options = { upsert: true };
-      mongoclient
-        .db("Aylani")
-        .collection(`${guild.id}Levels`)
-        .updateOne(filter, update, options)
-        .then(levelUpMongoDB(user, guild));
-    }
-    async function levelUpMongoDB(user: any, guild: any) {
-      try {
-        mongoclient
-          .db("Aylani")
-          .collection(`${guild.id}Levels`)
-          .findOne({ _id: user.id })
-          .then(async (doc: any) => {
-            try {
-              let lvl_start = doc.level;
-              let lvl_end = 5 * lvl_start ** 2 + 50 * lvl_start + 100 - doc.exp;
-
-              let round = Math.floor(lvl_end);
-              let lvl_up = Number(round);
-
-              if (lvl_up < 0) {
-                const filter = { _id: user.id };
-                const update = { $inc: { level: 1 } };
-                const options = { upsert: true };
-                await mongoclient
-                  .db("Aylani")
-                  .collection(`${guild.id}Levels`)
-                  .updateOne(filter, update, options);
-
-                const newLevel = doc.level + 1;
-                message.channel
-                  .send(`${user} has leveled up to level ${newLevel}`)
-                  .catch((error: any) => {
-                    if (error.code === 50013) {
-                      console.error(
-                        `Missing Permissions to send message in channel ${message.channel.id}`
-                      );
-                      handleError(null, error, message);
-                    } else {
-                      handleError(null, error, message);
-                    }
-                  });
-                // Check if the new level is a multiple of 10
-                if (newLevel % 10 === 0) {
-                  await levelRoleHandler(user, guild, mongoclient, newLevel);
-                }
-              }
-            } catch (e) {
-              handleError(null, e, message);
-              console.log(`Error: ${e}`);
-              console.log(`On: ${user} ${doc}`);
-              console.log(`Date/Time: ${CurrentDate}`);
-            }
-          });
-      } catch (e) {
-        handleError(null, e, message);
+    // Check if the channel is ignored
+    const ignoredChannel = await db.getIgnoredChannelStatus(guildId, channelId);
+    if (ignoredChannel) {
+      if (
+        ignoredChannel.status === "ignore messages" ||
+        ignoredChannel.status === "ignore all"
+      ) {
+        return; // Stop processing if messages are ignored
       }
     }
 
-    if (message.channel.id === "929352993701253154") return;
-    if (message.channel.id === "929352993701253154") return;
-    if (message.channel.id === "929352994158419971") return;
-    if (message.channel.id === "1085133582596591657") return;
-    if (message.channel.id === "1085129112961691729") return;
-    if (message.channel.id === "1007281491568492634") return;
-    if (message.channel.id === "938036238101921844") return;
-    currDrop(message);
-  } catch (e) {
-    handleError(null, e, message);
+    // Add experience
+    await db.addExperience(userId, guildId, username);
+
+    // Check for level-up
+    await db.checkLevelUp(userId, guildId, message);
+
+    // If only commands are ignored, still allow message drops
+    if (!ignoredChannel || ignoredChannel.status !== "ignore commands") {
+      currDrop(message);
+    }
+  } catch (error) {
+    console.error("Error in message event:", error);
   }
 });
-
 client.on(Events.InteractionCreate, async (interaction: any) => {
   if (!interaction.isChatInputCommand()) return;
 
@@ -440,13 +400,14 @@ client.on(Events.InteractionCreate, async (interaction: any) => {
   if (!command) return;
 
   try {
-    // MONGO DB
-    await mongoclient
-      .db("Aylani")
-      .collection(`${interaction.guild.id}Settings`)
-      .findOne({ command: command.command.default.data.name })
-      .then(async (doc: any) => {
-        if (doc.turnedOn === 0) {
+    await db
+      .getSettingByCommand(
+        interaction.guild.id,
+        command.command.default.data.name
+      )
+      .then(async (doc) => {
+        if (!doc || !doc.turnedOn) {
+          // Check if command is disabled
           interaction.reply({
             content:
               "This command is not turned on in this server. Contact the server owner if you're interested in this command.",
@@ -457,18 +418,15 @@ client.on(Events.InteractionCreate, async (interaction: any) => {
           const data = {
             guild: interaction.guild,
           };
+
           await player.context.provide(data, async () =>
-            command.command.default.execute(
-              client,
-              interaction,
-              conn,
-              mongoclient
-            )
+            command.command.default.execute(client, interaction, conn)
           );
-          usageHandler(command.command.default.data.name, mongoclient, conn);
+
+          // Track command usage directly with databaseHandler
+          await db.incrementCommandUsage(command.command.default.data.name);
         }
       });
-
   } catch (e) {
     handleError(interaction, e, null);
   }
@@ -542,7 +500,12 @@ player.events.on("audioTracksAdd", (queue: any, tracks: any) => {
   return queue.metadata.send({ embeds: [embed] }).catch(console.error);
 });
 
-function createDatabases(leaveTable: any, familyTable: any, rpTable: any, suggestionTable: any) {
+function createDatabases(
+  leaveTable: any,
+  familyTable: any,
+  rpTable: any,
+  suggestionTable: any
+) {
   // ------------------ Family Table ----------------
   if (!leaveTable["count()"]) {
     // If the table isn't there, create it and setup the database correctly.
@@ -687,7 +650,6 @@ function currDrop(message: any) {
             console.log(`Error: ${e}\nUser: ${user}\nrows: ${doc}`);
           }
         });
-
     } else {
       //console.log(`nothing to pick: ${dropMessage}`)
       message.delete();
@@ -695,4 +657,3 @@ function currDrop(message: any) {
   }
 }
 client.login(process.env.BOT_TOKEN);
-

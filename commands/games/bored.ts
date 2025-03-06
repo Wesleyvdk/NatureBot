@@ -11,7 +11,6 @@ import {
   ComponentType,
   AttachmentBuilder,
 } from "discord.js";
-import usageHandler from "../../handlers/usageHandler.js";
 
 export default {
   data: new SlashCommandBuilder()

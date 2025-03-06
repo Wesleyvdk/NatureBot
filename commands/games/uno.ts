@@ -4,12 +4,8 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  Embed,
-  ButtonInteraction,
   StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
   ComponentType,
-  AttachmentBuilder,
 } from "discord.js";
 import handleError from "../../handlers/errorHandler";
 
@@ -277,7 +273,12 @@ export default {
       }
     }
 
-    async function Play(queue: any, unoDeck: any, topCard: any, channelId: any) {
+    async function Play(
+      queue: any,
+      unoDeck: any,
+      topCard: any,
+      channelId: any
+    ) {
       let selection = null;
       // let first player play turn
       const channel = client.channels.cache.get(channelId);

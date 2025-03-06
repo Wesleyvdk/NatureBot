@@ -11,8 +11,15 @@ model Levels {
   userId  String
   guildId String
   name    String
-  exp     Int
+  exp     Int     @default(0)
+  level   Int     @default(1)
+}
+
+model LevelRoles {
+  id      String  @id @default(uuid()) // Unique role ID
+  guildId String
   level   Int
+  roleId  String
 }
 
 model Currency {
@@ -31,4 +38,18 @@ model Settings {
   command   String
   category  String
   turnedOn  Boolean
+}
+
+model CommandUsage {
+  id          String @id @default(uuid())
+  command     String @unique
+  category    String
+  usageCount  Int     @default(0)
+}
+
+model IgnoredChannels {
+  id         String  @id @default(uuid()) // Unique ID
+  channelId  String  @unique // Channel ID
+  guildId    String
+  status     String  // "ignore messages", "ignore commands", or "ignore all"
 }

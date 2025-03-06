@@ -1,34 +1,42 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
+import * as db from "../../handlers/databaseHandler";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("level")
-    .setDescription("shows your current level"),
-  async execute(client: any, interaction: any, conn: any, mongoclient: any) {
+    .setDescription("Shows your current level"),
+
+  async execute(client: any, interaction: any) {
     await interaction.deferReply();
 
-    let userid = interaction.user.id;
+    const userId = interaction.user.id;
+    const guildId = interaction.guild.id;
 
-    // MONGO DB
+    try {
+      // Fetch user level data
+      const userLevel = await db.getUserLevel(userId, guildId);
 
-    mongoclient
-      .db("Aylani")
-      .collection(`${interaction.guild.id}Levels`)
-      .findOne({ _id: userid })
-      .then((doc: any) => {
-        interaction.editReply(
-          `${interaction.user}, your current level is ${doc.level} and your current exp is ${doc.exp}`
+      if (!userLevel) {
+        return interaction.editReply(
+          `${interaction.user}, you haven't gained any experience yet! Start chatting to level up.`
         );
-      });
+      }
 
-    // MYSQL DB
-    // conn
-    //   .promise()
-    //   .query(`SELECT * FROM ${interaction.guild.id}Levels WHERE id=?`, [userid])
-    //   .then(function ([rows, fields]) {
-    //     interaction.editReply(
-    //       `${interaction.user}, your current level is ${rows[0].level} and your current exp is ${rows[0].exp}`
-    //     );
-    //   });
+      // Create response message
+      const levelEmbed = new EmbedBuilder()
+        .setTitle("📊 Your Level")
+        .setDescription(
+          `${interaction.user}, your current level is **${userLevel.level}** and you have **${userLevel.exp}** EXP.`
+        )
+        .setColor(0x00ae86);
+
+      return interaction.editReply({ embeds: [levelEmbed] });
+    } catch (error) {
+      await interaction.editReply({
+        content: "An error occurred while fetching your level.",
+        ephemeral: true,
+      });
+      console.error("Level Command Error:", error);
+    }
   },
 };
